@@ -33,6 +33,17 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user is a veterinarian.
+     */
+    public function veterinarian(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_veterinarian' => true,
+            'vet_rfid' => \App\Support\RfidGenerator::generateVetTag(),
+        ]);
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      */
     public function unverified(): static
