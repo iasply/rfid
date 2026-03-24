@@ -104,4 +104,34 @@ class ApiAuthTest extends TestCase
         $response = $this->getJson('/api/desktop/cattle');
         $response->assertStatus(401);
     }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function api_login_is_rate_limited_after_too_many_attempts()
+    {
+        \App\Models\Workstation::create([
+            'hash' => 'WS-HASH-LIMIT',
+            'desc' => 'Limit Lab',
+        ]);
+
+        // Attempt 5 times (limit)
+        for ($i = 0; $i < 5; $i++) {
+            $response = $this->postJson('/api/desktop/login', [
+                'workstation' => 'WS-HASH-LIMIT',
+                'tag' => 'WRONG-TAG',
+                'device_name' => 'DesktopClient',
+            ]);
+            $response->assertStatus(422)
+                ->assertJsonValidationErrors(['tag']);
+        }
+
+        // 6th attempt should be rate limited
+        $response = $this->postJson('/api/desktop/login', [
+            'workstation' => 'WS-HASH-LIMIT',
+            'tag' => 'WRONG-TAG',
+            'device_name' => 'DesktopClient',
+        ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['workstation']);
+    }
 }
+

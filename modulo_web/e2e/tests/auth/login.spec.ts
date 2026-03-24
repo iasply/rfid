@@ -24,4 +24,22 @@ test.describe('Login Flow', () => {
         await expect(loginPage.errorMessage).toBeVisible();
         await expect(loginPage.errorMessage).toContainText('records');
     });
+
+    test('should rate limit after 5 failed attempts', async ({page}) => {
+        // Use a specific email to not conflict with parallel tests using the same IP
+        const email = 'throttle_test@email.com';
+
+        for (let i = 0; i < 5; i++) {
+            await loginPage.login(email, 'wrongpass');
+            await expect(loginPage.errorMessage).toBeVisible();
+        }
+
+        // 6th attempt should be blocked by rate limiter
+        await loginPage.login(email, 'wrongpass');
+        await expect(loginPage.errorMessage).toBeVisible();
+        
+        const errorText = await loginPage.errorMessage.textContent();
+        expect(errorText?.toLowerCase()).toMatch(/(too many|muitas tentativas|segundos|seconds)/i);
+    });
 });
+
