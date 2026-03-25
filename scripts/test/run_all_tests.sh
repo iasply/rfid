@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Mudar para a raiz do repositório
+cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+
 # Default values
 MODE="local"
 KEEP_DOCKER=false
@@ -107,7 +110,7 @@ if [ "$RUN_INTEGRATION" = true ] || [ "$RUN_E2E" = true ]; then
         fi
 
         docker compose exec -T laravel php artisan migrate:fresh --seed --force
-        ../generate_dev_ssl.sh
+        ../scripts/setup/generate_dev_ssl.sh
     else
         # Local Setup
         php artisan migrate:fresh --seed --force

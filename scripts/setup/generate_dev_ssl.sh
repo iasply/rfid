@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CERTS_DIR="${SCRIPT_DIR}/modulo_web/nginx/certs"
+CERTS_DIR="${SCRIPT_DIR}/../../modulo_web/nginx/certs"
 
 echo "Generating local dev SSL certificate for localhost..."
 

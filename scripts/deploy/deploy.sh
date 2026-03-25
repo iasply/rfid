@@ -5,15 +5,16 @@ echo "====================================="
 echo "Iniciando o Deploy do CattleRFID"
 echo "====================================="
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Navega para a pasta do script (modulo_web) para garantir que roda na raiz correta
-cd "$(dirname "$0")"
+cd "$SCRIPT_DIR/../../modulo_web"
 
 # 0. Garante que os certificados SSL existem no host (evita que o Nginx falhe e fique reiniciando)
 if [ ! -f "nginx/certs/dev.crt" ] && [ ! -f "nginx/certs/fullchain.pem" ]; then
     echo "🔒 Certificados SSL ausentes! Executando ssl-certbot.sh..."
-    if [ -f "./ssl-certbot.sh" ]; then
-        chmod +x ./ssl-certbot.sh
-        ./ssl-certbot.sh
+    if [ -f "$SCRIPT_DIR/ssl-certbot.sh" ]; then
+        chmod +x "$SCRIPT_DIR/ssl-certbot.sh"
+        "$SCRIPT_DIR/ssl-certbot.sh"
     else
         echo "⚠️ Script ssl-certbot.sh não encontrado na pasta."
     fi
@@ -26,7 +27,10 @@ docker-compose down
 echo "➜ Fazendo build e subindo os containers (docker-compose up -d)..."
 docker-compose up -d --build
 
-# 2. Aguardando inicialização
+# 2. Limpeza e Aguardando inicialização
+echo "➜ Limpando imagens antigas e não utilizadas (docker image prune -f)..."
+docker image prune -f
+
 echo "➜ Aguardando o Laravel inicializar (5 segundos)..."
 sleep 5
 
