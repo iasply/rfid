@@ -1,0 +1,346 @@
+{
+    "info": {
+        "_postman_id": "8b9e5c4a-6d2e-4b7a-9c3f-7e8f1a2b3c4d",
+        "name": "Cattle RFID System API",
+        "description": "API for synchronization between Web and Desktop modules.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Login (Workstation/Tag)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"workstation\": \"WS-HASH-123\",\n    \"tag\": \"123456789\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/logout",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "logout"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Cattle",
+            "item": [
+                {
+                    "name": "List Cattle",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/cattle",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "cattle"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "List Cattle with Vaccines",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/cattle-with-vaccines",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "cattle-with-vaccines"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Cattle by RFID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/cattle/ANIMAL-001",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "cattle",
+                                "ANIMAL-001"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register Cattle",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"rfid_tag\": \"ANIMAL-001\",\n    \"name\": \"Mimosa\",\n    \"weight\": 450.5,\n    \"registration_date\": \"2026-03-25\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/cattle",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "cattle"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Cattle",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"rfid_tag\": \"ANIMAL-001\",\n    \"name\": \"Mimosa Updated\",\n    \"weight\": 460.0,\n    \"registration_date\": \"2026-03-25\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/cattle/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "cattle",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Vaccines",
+            "item": [
+                {
+                    "name": "List Vaccines",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/vaccines",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "vaccines"
+                            ],
+                            "query": [
+                                {
+                                    "key": "rfid_tag",
+                                    "value": "ANIMAL-001",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register Vaccine",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"rfid_tag\": \"ANIMAL-001\",\n    \"vaccine_type\": \"Febre Aftosa\",\n    \"current_weight\": 450.5,\n    \"vaccination_date\": \"2026-03-25\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/desktop/vaccines",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "desktop",
+                                "vaccines"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "your-token-here",
+            "type": "string"
+        }
+    ]
+}
