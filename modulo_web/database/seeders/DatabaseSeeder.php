@@ -56,5 +56,8 @@ class DatabaseSeeder extends Seeder
 
         // Dados para testes de integração do desktop Java
         $this->call(IntegrationTestDataSeeder::class);
+
+        // Conjunto de dados de teste solicitado pelo usuário (2 ws, 6 vets, 50 cattle)
+        //$this->call(LargeTestDatasetSeeder::class);
     }
 }
