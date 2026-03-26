@@ -7,12 +7,10 @@ use App\Http\Controllers\Admin\VeterinarianController;
 use App\Http\Controllers\Admin\WorkstationController;
 use App\Http\Controllers\LoginController;
 
-// Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Admin Protected Routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

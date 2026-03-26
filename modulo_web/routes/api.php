@@ -6,14 +6,11 @@ use App\Http\Controllers\Api\VaccineApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Public API Routes
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected API Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Cattle Endpoints
     Route::get('cattle-with-vaccines', [CattleApiController::class, 'indexWithVaccines']);
     Route::apiResource('cattle', CattleApiController::class)->only(['index', 'store', 'update']);
     Route::get('cattle/{rfid_tag}', [CattleApiController::class, 'show']);

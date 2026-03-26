@@ -11,12 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Admin principal (não é veterinário)
         User::create([
             'name' => 'Sistema Admin',
             'email' => 'admin@cattlerfid.com',
@@ -24,7 +20,6 @@ class DatabaseSeeder extends Seeder
             'is_veterinarian' => false,
         ]);
 
-        // Veterinário padrão
         $vet = User::create([
             'name' => 'Dr. Ricardo Vet',
             'email' => 'ricardo@vet.com',
@@ -32,7 +27,6 @@ class DatabaseSeeder extends Seeder
             'is_veterinarian' => true,
         ]);
 
-        // Animal padrão - Usando tag hardcoded válida ou gerada
         $rfid = 'C1234567894';
         if (!RfidGenerator::isValid($rfid)) {
             $rfid = RfidGenerator::generateCattleTag();
@@ -45,7 +39,6 @@ class DatabaseSeeder extends Seeder
             'registration_date' => now()->toDateString(),
         ]);
 
-        // Vacina padrão
         Vaccine::create([
             'rfid_tag' => $animal->rfid_tag,
             'vaccine_type' => 'Febre Aftosa',
@@ -54,10 +47,6 @@ class DatabaseSeeder extends Seeder
             'user_id' => $vet->id,
         ]);
 
-        // Dados para testes de integração do desktop Java
         $this->call(IntegrationTestDataSeeder::class);
-
-        // Conjunto de dados de teste solicitado pelo usuário (2 ws, 6 vets, 50 cattle)
-        //$this->call(LargeTestDatasetSeeder::class);
     }
 }

@@ -26,9 +26,6 @@ class RfidGenerator
         return 'V' . strtoupper(Str::random(10));
     }
 
-    /**
-     * Verifica se a tag é de um Animal (Cattle).
-     */
     public static function isCattleTag(?string $rfid): bool
     {
         return self::isValid($rfid) && strtoupper($rfid[0]) === 'C';
@@ -60,9 +57,6 @@ class RfidGenerator
         return ctype_alnum($rfid);
     }
 
-    /**
-     * Verifica se a tag é de um Veterinário (User).
-     */
     public static function isVetTag(?string $rfid): bool
     {
         return self::isValid($rfid) && strtoupper($rfid[0]) === 'V';

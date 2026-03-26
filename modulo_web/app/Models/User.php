@@ -13,11 +13,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -26,11 +21,7 @@ class User extends Authenticatable
         'is_veterinarian',
         'tag_hash',
     ];
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -39,26 +30,22 @@ class User extends Authenticatable
     protected static function booted()
     {
         static::creating(function ($user) {
-            // Logic for Veterinarians
             if ($user->is_veterinarian) {
                 if (!$user->vet_rfid || $user->vet_rfid === 'V') {
                     $user->vet_rfid = \App\Support\RfidGenerator::generateVetTag();
                 }
             } else {
-                // Logic for non-veterinarians (Admin/Others)
                 if (!$user->vet_rfid) {
                     $user->vet_rfid = 'USER-' . (static::max('id') + 1);
                 }
             }
 
-            // Generate initial tag_hash for everyone
             if ($user->vet_rfid) {
                 $user->tag_hash = hash('sha256', $user->vet_rfid . config('app.tag_salt'));
             }
         });
 
         static::updating(function ($user) {
-            // Sync tag_hash if vet_rfid changes
             if ($user->isDirty('vet_rfid') && $user->vet_rfid) {
                 $user->tag_hash = hash('sha256', $user->vet_rfid . config('app.tag_salt'));
             }
@@ -75,11 +62,6 @@ class User extends Authenticatable
         return $this->hasMany(Vaccine::class);
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
