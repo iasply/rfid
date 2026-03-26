@@ -14,8 +14,7 @@ import java.util.function.Consumer;
 public class SerialService {
 
     private final List<Consumer<String>> messageListeners = new ArrayList<>();
-    private final StringBuilder messageBuffer = new StringBuilder(); // Buffer para as mensagens seriais
-    // Logs
+    private final StringBuilder messageBuffer = new StringBuilder(); 
     private final List<String> logHistory = new ArrayList<>();
     private final List<Consumer<String>> logListeners = new ArrayList<>();
     private SerialPort activePort;
@@ -38,11 +37,7 @@ public class SerialService {
 
     public void setSimulationMode(boolean simulationMode) {
         this.simulationMode = simulationMode;
-        if (simulationMode) {
-            appendLog("SYS", "Modo Simulação Ativado");
-        } else {
-            appendLog("SYS", "Modo Simulação Desativado");
-        }
+        appendLog("SYS", "Modo Simulação " + (simulationMode ? "Ativado" : "Desativado"));
     }
 
     public void injectMessage(String message) {
@@ -58,7 +53,6 @@ public class SerialService {
 
         appendLog("IN", formattedMessage + " (Simulado)");
 
-        // Remove os <> para os ouvintes (como handled no setupListener)
         String payload = formattedMessage.substring(1, formattedMessage.length() - 1);
         for (Consumer<String> listener : messageListeners) {
             listener.accept(payload);
@@ -88,7 +82,6 @@ public class SerialService {
         logListeners.remove(listener);
     }
 
-    // Inicia a porta Serial. Retorna true se conectou.
     public boolean connect(String portName) {
         if (simulationMode) {
             appendLog("SYS", "Conexão Simulada iniciada.");
@@ -134,12 +127,10 @@ public class SerialService {
         messageListeners.remove(listener);
     }
 
-    // Envia o comando de leitura pro Arduino: <READ>\n
     public void requestRead() {
         sendCommand("<READ>\n");
     }
 
-    // Envia o comando de gravacao pro Arduino (ate 16 chars): <WRITE:Texto>\n
     public void requestWrite(String data) {
         if (data.length() > 16) {
             data = data.substring(0, 16);
@@ -147,7 +138,6 @@ public class SerialService {
         sendCommand("<WRITE:" + data + ">\n");
     }
 
-    // Funcao generica para mandar Bytes pra porta OUt
     public void sendCommand(String command) {
         if (isOpen()) {
             appendLog("OUT", command.trim() + (simulationMode ? " (Simulado)" : ""));
@@ -167,7 +157,6 @@ public class SerialService {
         }
     }
 
-    // Escuta assincronamente a porta Serial usando a Scanner
     private void setupListener() {
         activePort.addDataListener(new SerialPortDataListener() {
             @Override

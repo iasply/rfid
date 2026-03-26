@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Reads configuration from a .env file located at the working directory.
- * Format: KEY=VALUE (lines starting with # are ignored).
+ * Configuração carregada do arquivo .env.
  */
 public class ApiConfig {
 
@@ -20,14 +19,14 @@ public class ApiConfig {
     private final String sslDevCertPath;
 
     /**
-     * Construtor de produção: lê .env no diretório de trabalho.
+     * Construtor padrão que lê .env.
      */
     public ApiConfig() {
         this(ENV_FILE);
     }
 
     /**
-     * Construtor para testes: lê .env do path informado.
+     * Construtor para testes.
      */
     public ApiConfig(String envFilePath) {
         Map<String, String> env = loadEnv(envFilePath);
@@ -67,7 +66,7 @@ public class ApiConfig {
     }
 
     /**
-     * Retorna true se SSL_TRUST_ALL=true no .env (aceita self-signed).
+     * Verifica se deve confiar em todos os certificados (SSL_TRUST_ALL).
      */
     public boolean isTrustAllCerts() {
         return trustAllCerts;

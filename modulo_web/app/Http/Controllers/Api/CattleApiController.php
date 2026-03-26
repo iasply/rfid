@@ -27,8 +27,6 @@ class CattleApiController extends Controller
     {
         $items = \App\Models\CattleWithVaccinesView::paginate(50);
 
-        // We iterate through the paginated view items and map them
-        // using CattleResource, injecting vaccines_count
         $mappedItems = $items->getCollection()->map(function ($c) {
             $cattleModel = Cattle::find($c->id);
             if ($cattleModel) {
@@ -53,9 +51,6 @@ class CattleApiController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified cattle by its RFID tag.
-     */
     public function show(string $rfid_tag): JsonResponse
     {
         $cattle = Cattle::where('rfid_tag', $rfid_tag)->first();

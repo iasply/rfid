@@ -8,16 +8,8 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 
 /**
- * Factory para criação do HttpClient com suporte a SSL.
- *
- * <p>
- * Por padrão usa o SSLContext do sistema (confia em CAs conhecidas,
- * incluindo Let's Encrypt). Quando {@code SSL_TRUST_ALL=true} estiver
- * definido no .env, aceita qualquer certificado — útil para self-signed
- * em ambiente de desenvolvimento/testes.
- *
- * <p>
- * <b>⚠ Nunca use SSL_TRUST_ALL=true em produção.</b>
+ * Factory para criação do HttpClient com suporte a SSL (Incluindo Let's Encrypt).
+ * ⚠ Nunca use SSL_TRUST_ALL=true em produção.
  */
 public class HttpClientFactory {
 
@@ -45,7 +37,6 @@ public class HttpClientFactory {
         return builder.build();
     }
 
-    // ── Trust-all SSLContext (apenas dev/self-signed) ─────────────────────
     private static SSLContext buildDevContext(String certPath) {
         try {
             if (certPath == null || certPath.isBlank()) {

@@ -13,7 +13,6 @@ public class LoginController {
     private final AuthenticationService authService;
     private final SerialService serialService;
 
-    // View Callbacks
     private LoginViewListener viewListener;
     private User loggedUser;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
@@ -29,7 +28,6 @@ public class LoginController {
 
     public void startSerialConnection(String portName) {
         if (serialService.connect(portName)) {
-            // Configura o parser de mensagens assincronas vindo do Arduino
             serialService.addMessageListener(serialListener);
             if (viewListener != null)
                 viewListener.onSerialConnected();
@@ -62,15 +60,11 @@ public class LoginController {
         serialService.requestRead();
     }
 
-    // Metodo chamado automaticamente pela SerialService quando a porta le uma linha
-    // "<...>" completa
     protected void handleIncomingSerialMessage(String message) {
-        // Ex: "RES:OK:TAG_VET_01 :FW:92" ou "RES:ERR:NO_TAG:FW:92"
         String[] parts = message.split(":");
 
         if (parts.length >= 2) {
             if (parts[1].equals("OK")) {
-                // Sucesso de leitura
                 String tagContent = parts[2].trim();
                 if (!RfidGenerator.isVetTag(tagContent)) {
                     if (viewListener != null) {
@@ -82,7 +76,6 @@ public class LoginController {
                 attemptLogin(tagContent);
             } else if (parts[1].equals("ERR")) {
                 if (viewListener != null) {
-                    // Trata as msgs padroes de erro do protocolo
                     if (parts[2].equals("NO_TAG"))
                         viewListener.onLoginError("Nenhuma Tag ou Crachá detectado a tempo.");
                     else if (parts[2].equals("AUTH"))

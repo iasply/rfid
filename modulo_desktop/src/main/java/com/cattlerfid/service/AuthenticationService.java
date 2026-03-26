@@ -12,8 +12,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 /**
- * Authenticates a veterinarian by sending the raw RFID tag + workstation hash
- * to the Laravel API (POST /api/login).
+ * Authenticates a veterinarian by sending the raw RFID tag to the Laravel API.
  */
 public class AuthenticationService {
 
@@ -29,9 +28,6 @@ public class AuthenticationService {
 
     /**
      * Sends the raw RFID tag to the API alongside the workstation hash.
-     *
-     * @param rawRfidTag Raw tag content read from the Arduino serial port
-     * @return Optional<User> with Bearer token if authenticated, empty otherwise
      */
     public Optional<User> authenticateByTag(String rawRfidTag) {
         if (rawRfidTag == null || rawRfidTag.isBlank()) {
@@ -72,8 +68,26 @@ public class AuthenticationService {
             System.err.println("[AuthenticationService] API unreachable: " + e.getMessage());
             if (e instanceof InterruptedException)
                 Thread.currentThread().interrupt();
-            return Optional.empty();
         }
+        return Optional.empty();
+    }
+
+    /**
+     * Revokes the current token on the server.
+     *
+     * @param token Authentication token to be revoked
+     */
+    public void logout(String token) {
+        if (token == null || token.isBlank()) {
+            return;
+        }
+
+        HttpRequest request = client.newAuthenticatedRequestBuilder("/logout", token)
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        // Fire and forget logout
+        client.sendAsync(request);
     }
 
     private record LoginRequest(String workstation, String tag) {

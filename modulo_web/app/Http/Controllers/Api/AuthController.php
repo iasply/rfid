@@ -16,17 +16,11 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Route dispatcher: choose login .
-     */
     public function login(Request $request): JsonResponse
     {
         return $this->loginWithTag(TagLoginRequest::createFrom($request));
     }
 
-    /**
-     * Handle workstation + tag login (IoT / Desktop flow).
-     */
     public function loginWithTag(TagLoginRequest $request): JsonResponse
     {
         $throttleKey = $request->workstation.'|'.$request->ip();
@@ -81,9 +75,6 @@ class AuthController extends Controller
         return response()->json($response->toArray());
     }
 
-    /**
-     * Revoke the current token.
-     */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();

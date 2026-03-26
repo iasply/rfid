@@ -10,8 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Concentrates all API communication logic.
- * Handles logging, JSON serialization/deserialization, and common headers.
+ * Handles API communication, logging, and JSON serialization.
  */
 public class ApiClient {
 
@@ -31,7 +30,6 @@ public class ApiClient {
 
     /**
      * Sends a request and returns the response body as a string.
-     * Log request and response details.
      */
     public HttpResponse<String> send(HttpRequest request) throws IOException, InterruptedException {
         logRequest(request);
@@ -82,8 +80,7 @@ public class ApiClient {
         String method = request.method();
         String uri = request.uri().toString();
         String headers = request.headers().map().toString();
-        
-        // Mask Token in logs
+
         if (headers.contains("Authorization=[Bearer ")) {
             headers = headers.replaceAll("Authorization=\\[Bearer [^\\]]+\\]", "Authorization=[Bearer ********]");
         }
@@ -92,11 +89,21 @@ public class ApiClient {
         System.out.println("Method: " + method);
         System.out.println("URI:    " + uri);
         System.out.println("Headers: " + headers);
-        
+
         request.bodyPublisher().ifPresent(publisher -> {
-            // Body publishing is usually done via String in this app
-            // For logging purposes we assume it's small/readable
-            // In a real production app we might avoid logging large bodies
+            java.net.http.HttpResponse.BodySubscriber<String> subscriber = java.net.http.HttpResponse.BodySubscribers.ofString(java.nio.charset.StandardCharsets.UTF_8);
+            publisher.subscribe(new java.util.concurrent.Flow.Subscriber<java.nio.ByteBuffer>() {
+                @Override public void onSubscribe(java.util.concurrent.Flow.Subscription s) { s.request(Long.MAX_VALUE); }
+                @Override public void onNext(java.nio.ByteBuffer item) { subscriber.onNext(java.util.List.of(item)); }
+                @Override public void onError(Throwable t) { }
+                @Override public void onComplete() { subscriber.onComplete(); }
+            });
+            try {
+                String body = subscriber.getBody().toCompletableFuture().join();
+                System.out.println("Body:    " + body);
+            } catch (Exception e) {
+                System.out.println("Body:    (Could not log body: " + e.getMessage() + ")");
+            }
         });
     }
 

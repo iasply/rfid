@@ -21,7 +21,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private JLabel statusLabel;
     private JButton scanCattleButton;
 
-    // Referencia da ultima tela ativa para callbacks
     private CattleFormPanel activeCattleForm;
 
     public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
@@ -37,11 +36,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
-
-        // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Topo / Header - Premium Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIStyles.PRIMARY_DARK);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
@@ -51,7 +47,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         welcomeLabel.setFont(UIStyles.SUBHEADER_FONT);
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
-        // Botão de Logout para Retornar ao LoginPanel
         JButton logoutButton = UIStyles.createBackButton("Sair (Logout)");
         logoutButton.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja deslogar do sistema?", "Logout",
@@ -59,8 +54,11 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             if (confirm == JOptionPane.YES_OPTION) {
                 cattleController.detachSerial();
 
-                // Reconstroi serviço e abre a tela pura de Login pendurada na mesma serial viva
+                // Notifica o servidor para revogar o token (Logout real)
                 AuthenticationService authService = new AuthenticationService(apiConfig);
+                authService.logout(loggedUser.getAccessToken());
+
+                // Abre a tela de Login
                 LoginController loginController = new LoginController(authService, cattleController.getSerialService());
                 LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
                 navManager.showPanel("Login", loginPanel);
@@ -71,7 +69,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // Centro (Botoes Gigantes) - Emerald and Gold accents
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
         centerPanel.setBackground(UIStyles.BACKGROUND);
 
@@ -139,8 +136,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         bottomPanel.add(logButton, BorderLayout.EAST);
         add(bottomPanel, BorderLayout.SOUTH);
     }
-
-    // --- Callbacks do CattleController ---
 
     @Override
     public void onRfidReadSuccess(Cattle cattle, boolean isNew) {

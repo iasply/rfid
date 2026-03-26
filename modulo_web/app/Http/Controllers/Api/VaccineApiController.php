@@ -12,9 +12,6 @@ use Illuminate\Http\Request;
 
 class VaccineApiController extends Controller
 {
-    /**
-     * Store a new vaccination.
-     */
     public function store(StoreVaccineRequest $request): JsonResponse
     {
         $user = $request->user();
@@ -28,7 +25,6 @@ class VaccineApiController extends Controller
             ],
         ));
 
-        // Atualiza o peso do animal
         Cattle::where('rfid_tag', $request->rfid_tag)
             ->update(['weight' => $request->current_weight]);
 
@@ -40,9 +36,6 @@ class VaccineApiController extends Controller
         ], 201);
     }
 
-    /**
-     * List vaccinations (with filtering).
-     */
     public function index(Request $request): JsonResponse
     {
         $query = Vaccine::with(['cattle', 'user', 'workstation']);

@@ -11,7 +11,6 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        // Look & Feel moderno (FlatLaf)
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
@@ -20,20 +19,15 @@ public class Main {
 
         SwingUtilities.invokeLater(() -> {
 
-            // 1. Instanciar Serviços de Configuração e Infraestrutura
             com.cattlerfid.config.ApiConfig apiConfig = new com.cattlerfid.config.ApiConfig();
             AuthenticationService authService = new AuthenticationService(apiConfig);
             SerialService serialService = new SerialService();
 
-            // 2. Instanciar Controladores Raiz
             ConnectionController connectionController = new ConnectionController(serialService);
 
-            // 3. Inicializar a View Primária (ApplicationFrame e ConnectionPanel)
             ApplicationFrame appFrame = new ApplicationFrame();
-            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, apiConfig,
-                    appFrame);
+            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, apiConfig, appFrame);
 
-            // 4. Mostrar Aplicação Java
             appFrame.setVisible(true);
             appFrame.showPanel("Connection", connectionPanel);
 
