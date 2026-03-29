@@ -110,10 +110,12 @@ if [ "$RUN_INTEGRATION" = true ] || [ "$RUN_E2E" = true ]; then
         fi
 
         docker compose exec -T laravel php artisan migrate:fresh --seed --force
+        docker compose exec -T laravel php artisan db:seed --class=IntegrationTestDataSeeder --force
         ../scripts/setup/generate_dev_ssl.sh
     else
         # Local Setup
         php artisan migrate:fresh --seed --force
+        php artisan db:seed --class=IntegrationTestDataSeeder --force
         
         pkill -f "artisan serve" || true
         php artisan serve --port=8555 > /dev/null 2>&1 &
