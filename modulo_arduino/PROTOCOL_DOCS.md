@@ -8,19 +8,19 @@
 ---
 
 ## Comandos (Java -> Arduino)
-Formato: `<COMANDO>\n` ou `<COMANDO:PAYLOAD>\n`
+Formato: `<COMANDO:ID>\n` ou `<COMANDO:ID:PAYLOAD>\n`
 
-1. **Leitura**: `<READ>\n` (Timeout: 2.5s)
-2. **Gravação**: `<WRITE:PAYLOAD>\n` (Payload fixo de 16 bytes)
+1. **Leitura**: `<READ:ID>\n` (Timeout: 2.5s)
+2. **Gravação**: `<WRITE:ID:PAYLOAD>\n` (Payload fixo de 16 bytes)
 
 ---
 
 ## Respostas (Arduino -> Java)
-Formato: `<RES:STATUS:DADO:FW:VERSAO>`
+Formato: `<RES:ID:STATUS:DADO:FW:VERSAO>`
 
 ### Status: OK
-*   `<RES:OK:CONTEUDO_LIDO:FW:92>`
-*   `<RES:OK:WROTE:FW:92>`
+*   `<RES:ID:OK:CONTEUDO_LIDO:FW:92>`
+*   `<RES:ID:OK:WROTE:FW:92>`
 
 ### Status: ERR (Erros Comuns)
 *   `NO_TAG`: Nenhuma tag detectada.

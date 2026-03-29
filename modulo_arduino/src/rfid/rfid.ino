@@ -30,6 +30,7 @@ enum EstadoOperacao {
   MODO_GRAVACAO
 };
 EstadoOperacao estadoAtual = MODO_ESPERA;
+String idAtual = "";
 
 MFRC522::MIFARE_Key chave;
 
@@ -57,6 +58,7 @@ void setup() {
   for (byte i = 0; i < 6; i++) {
     chave.keyByte[i] = 0xFF;
   }
+
 }
 
 void loop() {
@@ -66,23 +68,34 @@ void loop() {
 
     if (req.startsWith("<") && req.endsWith(">")) {
       String cmdBody = req.substring(1, req.length() - 1);
+      
+      int firstColon = cmdBody.indexOf(':');
+      String cmd = (firstColon == -1) ? cmdBody : cmdBody.substring(0, firstColon);
 
-      if (cmdBody == "READ") {
+      if (cmd == "READ") {
+        idAtual = (firstColon == -1) ? "" : cmdBody.substring(firstColon + 1);
         estadoAtual = MODO_LEITURA;
         leitura();
         estadoAtual = MODO_ESPERA;
       }
-      else if (cmdBody.startsWith("WRITE:")) {
-        estadoAtual = MODO_GRAVACAO;
-        String payload = cmdBody.substring(6);
+      else if (cmd == "WRITE") {
+        int secondColon = (firstColon == -1) ? -1 : cmdBody.indexOf(':', firstColon + 1);
+        
+        if (firstColon != -1 && secondColon != -1) {
+          idAtual = cmdBody.substring(firstColon + 1, secondColon);
+          String payload = cmdBody.substring(secondColon + 1);
 
-        memset(texto, ' ', 16);
-        for(int i = 0; i < payload.length() && i < 16; i++) {
-          texto[i] = payload[i];
+          memset(texto, ' ', 16);
+          for(int i = 0; i < payload.length() && i < 16; i++) {
+            texto[i] = payload[i];
+          }
+
+          estadoAtual = MODO_GRAVACAO;
+          gravacao();
+          estadoAtual = MODO_ESPERA;
+        } else {
+          responder("ERR:INVALID_CMD");
         }
-
-        gravacao();
-        estadoAtual = MODO_ESPERA;
       }
       else {
         responder("ERR:INVALID_CMD");
@@ -93,6 +106,10 @@ void loop() {
 
 void responder(String mensagem) {
   Serial.print("<RES:");
+  if (idAtual.length() > 0) {
+    Serial.print(idAtual);
+    Serial.print(":");
+  }
   Serial.print(mensagem);
   Serial.print(":FW:");
   byte v = driver.PCD_ReadRegister(MFRC522Constants::VersionReg);
