@@ -81,6 +81,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        $this->call(IntegrationTestDataSeeder::class);
+        // $this->call(IntegrationTestDataSeeder::class);
+        // $this->call(LargeTestDatasetSeeder::class);
     }
 }

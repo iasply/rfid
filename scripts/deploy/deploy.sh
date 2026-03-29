@@ -9,17 +9,6 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Navega para a pasta do script (modulo_web) para garantir que roda na raiz correta
 cd "$SCRIPT_DIR/../../modulo_web"
 
-# 0. Garante que os certificados SSL existem no host (evita que o Nginx falhe e fique reiniciando)
-if [ ! -f "nginx/certs/dev.crt" ] && [ ! -f "nginx/certs/fullchain.pem" ]; then
-    echo "🔒 Certificados SSL ausentes! Executando ssl-certbot.sh..."
-    if [ -f "$SCRIPT_DIR/ssl-certbot.sh" ]; then
-        chmod +x "$SCRIPT_DIR/ssl-certbot.sh"
-        "$SCRIPT_DIR/ssl-certbot.sh"
-    else
-        echo "⚠️ Script ssl-certbot.sh não encontrado na pasta."
-    fi
-fi
-
 # 1. Derrubando containers antigos e subindo novos (recria se houve mudança de imagem/Dockerfile)
 echo "➜ Derrubando instâncias antigas do docker-compose..."
 docker-compose down
@@ -44,6 +33,7 @@ docker exec cattlerfid_app php artisan config:cache
 docker exec cattlerfid_app php artisan event:cache
 docker exec cattlerfid_app php artisan route:cache
 docker exec cattlerfid_app php artisan view:cache
+docker exec cattlerfid_app php artisan migrate 
 
 # 4. Corrigindo algumas permissões do SQLite e pastas que sempre dão problema
 echo "➜ Ajustando permissões essenciais..."
