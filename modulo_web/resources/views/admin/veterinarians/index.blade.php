@@ -3,7 +3,8 @@
 @section('content')
     <x-page-header title="Veterinários Cadastrados">
         <x-slot name="actions">
-            <x-button onclick="window.location='{{ route('admin.veterinarians.create') }}'" data-testid="create-vet-button">
+            <x-button onclick="window.location='{{ route('admin.veterinarians.create') }}'"
+                      data-testid="create-vet-button">
                 + Novo Veterinário
             </x-button>
         </x-slot>
@@ -18,9 +19,11 @@
                     <td>{{ $vet->email }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.veterinarians.show', $vet->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="vet-show-link">Ver</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                           data-testid="vet-show-link">Ver</a>
                         <a href="{{ route('admin.veterinarians.edit', $vet->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="vet-edit-link">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                           data-testid="vet-edit-link">Editar</a>
                     </td>
                 </tr>
             @endforeach

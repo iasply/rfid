@@ -3,7 +3,8 @@
 @section('content')
     <x-page-header title="Rebanho Cadastrado">
         <x-slot name="actions">
-            <a href="{{ route('admin.cattle.create') }}" class="btn btn-success" data-testid="create-cattle-link">+ Novo Animal</a>
+            <a href="{{ route('admin.cattle.create') }}" class="btn btn-success" data-testid="create-cattle-link">+ Novo
+                Animal</a>
         </x-slot>
     </x-page-header>
 
@@ -18,9 +19,11 @@
                     <td>{{ \Carbon\Carbon::parse($animal->registration_date)->format('d/m/Y') }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.cattle.show', $animal->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="cattle-show-link">Ver</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                           data-testid="cattle-show-link">Ver</a>
                         <a href="{{ route('admin.cattle.edit', $animal->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="cattle-edit-link">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                           data-testid="cattle-edit-link">Editar</a>
                     </td>
                 </tr>
             @endforeach

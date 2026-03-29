@@ -19,27 +19,26 @@ test.describe('Login Flow', () => {
     });
 
     test('should show error with invalid credentials', async ({page}) => {
-        await loginPage.login('wrong@email.com', 'wrongpassword');
+        const email = `invalid_${test.info().project.name}_${test.info().parallelIndex}@email.com`;
+        await loginPage.login(email, 'wrongpassword');
 
         await expect(loginPage.errorMessage).toBeVisible();
         await expect(loginPage.errorMessage).toContainText('records');
     });
 
     test('should rate limit after 5 failed attempts', async ({page}) => {
-        // Use a specific email to not conflict with parallel tests using the same IP
-        const email = 'throttle_test@email.com';
+        // Use a unique email per browser project and worker to avoid parallel collision
+        const email = `throttle_test_${test.info().project.name}_${test.info().parallelIndex}@email.com`;
 
         for (let i = 0; i < 5; i++) {
             await loginPage.login(email, 'wrongpass');
-            await expect(loginPage.errorMessage).toBeVisible();
+            // toHaveText is more robust than toBeVisible as it waits for stable content
+            await expect(loginPage.errorMessage).toHaveText(/match/i);
         }
 
         // 6th attempt should be blocked by rate limiter
         await loginPage.login(email, 'wrongpass');
-        await expect(loginPage.errorMessage).toBeVisible();
-        
-        const errorText = await loginPage.errorMessage.textContent();
-        expect(errorText?.toLowerCase()).toMatch(/(too many|muitas tentativas|segundos|seconds)/i);
+        await expect(loginPage.errorMessage).toHaveText(/(too many|muitas tentativas|segundos|seconds|attempts|bloqueado)/i, { timeout: 10000 });
     });
 });
 

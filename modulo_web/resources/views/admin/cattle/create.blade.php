@@ -11,7 +11,8 @@
 
             <x-input label="Peso Inicial (kg)" name="weight" type="number" step="0.01" required/>
 
-            <x-button type="submit" variant="success" fullWidth style="margin-top: 1rem;" data-testid="cattle-submit-button">
+            <x-button type="submit" variant="success" fullWidth style="margin-top: 1rem;"
+                      data-testid="cattle-submit-button">
                 Finalizar Cadastro
             </x-button>
         </form>

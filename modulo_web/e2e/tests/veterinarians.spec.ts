@@ -1,12 +1,12 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../src/pages/LoginPage';
-import { VeterinarianPage } from '../src/pages/VeterinarianPage';
+import {expect, test} from '@playwright/test';
+import {LoginPage} from '../src/pages/LoginPage';
+import {VeterinarianPage} from '../src/pages/VeterinarianPage';
 
 test.describe('Veterinarians Module', () => {
     let loginPage: LoginPage;
     let vetPage: VeterinarianPage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         loginPage = new LoginPage(page);
         vetPage = new VeterinarianPage(page);
 
@@ -20,14 +20,14 @@ test.describe('Veterinarians Module', () => {
         await expect(vetPage.vetRows.first()).toBeVisible();
     });
 
-    test('should navigate to create form and back', async ({ page }) => {
+    test('should navigate to create form and back', async ({page}) => {
         await vetPage.createButton.click();
         await expect(page).toHaveURL(/\/admin\/veterinarians\/create/);
         await page.goBack();
         await expect(page).toHaveURL(/\/admin\/veterinarians/);
     });
 
-    test('should create a new veterinarian successfully', async ({ page }) => {
+    test('should create a new veterinarian successfully', async ({page}) => {
         const uniqueEmail = `vet-${Date.now()}@example.com`;
         await vetPage.createVeterinarian('Dr. Test e2e', uniqueEmail, 'password123');
 

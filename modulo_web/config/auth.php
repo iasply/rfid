@@ -112,4 +112,6 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'throttle_limit' => env('THROTTLE_LIMIT_LOGIN', 5),
+
 ];

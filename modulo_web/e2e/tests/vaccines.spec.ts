@@ -1,14 +1,14 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../src/pages/LoginPage';
-import { VaccinePage } from '../src/pages/VaccinePage';
-import { CattlePage } from '../src/pages/CattlePage';
+import {expect, test} from '@playwright/test';
+import {LoginPage} from '../src/pages/LoginPage';
+import {VaccinePage} from '../src/pages/VaccinePage';
+import {CattlePage} from '../src/pages/CattlePage';
 
 test.describe('Vaccines Module', () => {
     let loginPage: LoginPage;
     let vaccinePage: VaccinePage;
     let cattlePage: CattlePage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         loginPage = new LoginPage(page);
         vaccinePage = new VaccinePage(page);
         cattlePage = new CattlePage(page);

@@ -26,15 +26,18 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        $throttleKey = Str::lower($request->input('email')).'|'.$request->ip();
+        $throttleKey = Str::lower($request->input('email')) . '|' . $request->ip();
+        $limit = config('auth.throttle_limit', 5);
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, $limit)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             throw ValidationException::withMessages([
-                'email' => [trans('auth.throttle', [
-                    'seconds' => $seconds,
-                    'minutes' => ceil($seconds / 60),
-                ])],
+                'email' => [
+                    trans('auth.throttle', [
+                        'seconds' => $seconds,
+                        'minutes' => ceil($seconds / 60),
+                    ])
+                ],
             ]);
         }
 

@@ -1,12 +1,12 @@
-import { expect, test } from '@playwright/test';
-import { LoginPage } from '../src/pages/LoginPage';
-import { WorkstationPage } from '../src/pages/WorkstationPage';
+import {expect, test} from '@playwright/test';
+import {LoginPage} from '../src/pages/LoginPage';
+import {WorkstationPage} from '../src/pages/WorkstationPage';
 
 test.describe('Workstations Module', () => {
     let loginPage: LoginPage;
     let wsPage: WorkstationPage;
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({page}) => {
         loginPage = new LoginPage(page);
         wsPage = new WorkstationPage(page);
 
@@ -20,7 +20,7 @@ test.describe('Workstations Module', () => {
         await expect(wsPage.workstationRows.first()).toBeVisible();
     });
 
-    test('should create a new workstation successfully', async ({ page }) => {
+    test('should create a new workstation successfully', async ({page}) => {
         const wsDesc = `Estação Teste ${Date.now()}`;
         await wsPage.createWorkstation(wsDesc);
 

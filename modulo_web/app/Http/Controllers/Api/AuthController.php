@@ -23,15 +23,17 @@ class AuthController extends Controller
 
     public function loginWithTag(TagLoginRequest $request): JsonResponse
     {
-        $throttleKey = $request->workstation.'|'.$request->ip();
+        $throttleKey = $request->workstation . '|' . $request->ip();
 
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        if (RateLimiter::tooManyAttempts($throttleKey, config('auth.throttle_limit', 5))) {
             $seconds = RateLimiter::availableIn($throttleKey);
             throw ValidationException::withMessages([
-                'workstation' => [trans('auth.throttle', [
-                    'seconds' => $seconds,
-                    'minutes' => ceil($seconds / 60),
-                ])],
+                'workstation' => [
+                    trans('auth.throttle', [
+                        'seconds' => $seconds,
+                        'minutes' => ceil($seconds / 60),
+                    ])
+                ],
             ]);
         }
 

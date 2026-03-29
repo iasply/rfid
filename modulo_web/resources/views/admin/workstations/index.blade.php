@@ -3,7 +3,8 @@
 @section('content')
     <x-page-header title="Estações de Trabalho">
         <x-slot name="actions">
-            <x-button onclick="window.location='{{ route('admin.workstations.create') }}'" data-testid="create-workstation-button">
+            <x-button onclick="window.location='{{ route('admin.workstations.create') }}'"
+                      data-testid="create-workstation-button">
                 + Nova Estação
             </x-button>
         </x-slot>
@@ -17,7 +18,8 @@
                     <td>{{ $ws->desc }}</td>
                     <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                         <a href="{{ route('admin.workstations.edit', $ws->id) }}" class="btn btn-primary"
-                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;" data-testid="workstation-edit-link">Editar</a>
+                           style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                           data-testid="workstation-edit-link">Editar</a>
                     </td>
                 </tr>
             @endforeach
