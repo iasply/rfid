@@ -1,5 +1,6 @@
 package com.cattlerfid.controller;
 
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.service.SerialService;
 
 import java.util.function.Consumer;
@@ -49,7 +50,7 @@ public class ConnectionController {
         testingConnection = true;
         if (viewListener != null)
             viewListener.onWaitingForTestTag();
-        serialService.requestRead();
+        serialService.requestRead(RfidConstants.ID_CONN);
     }
 
     private void handleIncomingSerialMessage(String message) {
@@ -57,16 +58,21 @@ public class ConnectionController {
             return;
 
         String[] parts = message.split(":");
-        if (parts.length >= 2) {
-            if (parts[1].equals("OK")) {
-                String tagContent = parts[2].trim();
+        if (parts.length >= 3) {
+            // Valida se o pacote é para este controlador
+            if (!parts[1].equals(RfidConstants.ID_CONN)) {
+                return;
+            }
+
+            if (parts[2].equals(RfidConstants.RES_OK)) {
+                String tagContent = parts[3].trim();
                 testingConnection = false;
                 if (viewListener != null) {
                     viewListener.onTestTagReadSuccess(tagContent);
                 }
-            } else if (parts[1].equals("ERR")) {
+            } else if (parts[2].equals(RfidConstants.RES_ERR)) {
                 if (viewListener != null) {
-                    if (parts[2].equals("NO_TAG"))
+                    if (parts[3].equals(RfidConstants.ERR_NO_TAG))
                         viewListener.onSerialError("Nenhuma Tag detectada a tempo. Tente novamente.");
                     else
                         viewListener.onSerialError("Erro na leitura da tag de teste: " + parts[2]);

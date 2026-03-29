@@ -127,15 +127,15 @@ public class SerialService {
         messageListeners.remove(listener);
     }
 
-    public void requestRead() {
-        sendCommand("<READ>\n");
+    public void requestRead(String id) {
+        sendCommand("<READ:" + id + ">\n");
     }
 
-    public void requestWrite(String data) {
+    public void requestWrite(String id, String data) {
         if (data.length() > 16) {
             data = data.substring(0, 16);
         }
-        sendCommand("<WRITE:" + data + ">\n");
+        sendCommand("<WRITE:" + id + ":" + data + ">\n");
     }
 
     public void sendCommand(String command) {
@@ -190,14 +190,16 @@ public class SerialService {
                             if (!message.isEmpty()) {
                                 appendLog("IN", message);
 
-                                // Valida se é o nosso pacote esperado
-                                if (message.startsWith("<") && message.endsWith(">")) {
-                                    message = message.substring(1, message.length() - 1); // Remove os <>
+                                // Valida e extrai o conteúdo entre < e >
+                                int startPacketIdx = message.indexOf('<');
+                                if (startPacketIdx != -1 && message.endsWith(">")) {
+                                    // Remove sujeira antes do < e remove os <>
+                                    String cleanMessage = message.substring(startPacketIdx + 1, message.length() - 1);
                                     for (Consumer<String> listener : messageListeners) {
-                                        listener.accept(message);
+                                        listener.accept(cleanMessage);
                                     }
                                 } else {
-                                    appendLog("WARN", "Pacote incompleto ignorado: " + message);
+                                    appendLog("WARN", "Pacote incompleto ou inválido ignorado: " + message);
                                 }
                             }
                         }

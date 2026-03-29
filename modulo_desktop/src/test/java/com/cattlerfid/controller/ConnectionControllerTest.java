@@ -1,6 +1,7 @@
 package com.cattlerfid.controller;
 
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -55,7 +56,7 @@ class ConnectionControllerTest {
         controller.requestTestRead();
 
         verify(viewListenerMock).onSerialError("Porta não conectada.");
-        verify(serialServiceMock, never()).requestRead();
+        verify(serialServiceMock, never()).requestRead(anyString());
     }
 
     @Test
@@ -65,7 +66,7 @@ class ConnectionControllerTest {
         controller.requestTestRead();
 
         verify(viewListenerMock).onWaitingForTestTag();
-        verify(serialServiceMock).requestRead();
+        verify(serialServiceMock).requestRead(RfidConstants.ID_CONN);
     }
 
     @Test
@@ -83,7 +84,7 @@ class ConnectionControllerTest {
         Consumer<String> messageHandler = captor.getValue();
 
         // 1. Enviamos MSG mas a boolean testingConnection está False por padrao
-        messageHandler.accept("RES:OK:QUALQUER_TAG :FW:92");
+        messageHandler.accept("RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_OK + ":QUALQUER_TAG :FW:92");
         verify(viewListenerMock, never()).onTestTagReadSuccess(anyString());
 
         // 2. Simulamos o clique no botão Testar
@@ -91,7 +92,7 @@ class ConnectionControllerTest {
         controller.requestTestRead();
 
         // 3. Enviamos a mensagem de novo, agora a boolean esta ativada
-        String tagTestMessage = "RES:OK:QUALQUER_TAG_16   :FW:92";
+        String tagTestMessage = "RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_OK + ":QUALQUER_TAG_16   :FW:92";
         messageHandler.accept(tagTestMessage);
 
         verify(viewListenerMock).onTestTagReadSuccess("QUALQUER_TAG_16");
@@ -112,7 +113,7 @@ class ConnectionControllerTest {
         controller.requestTestRead();
 
         // Dispara mensagem de erro vindo do Arduino
-        messageHandler.accept("RES:ERR:NO_TAG:FW:00");
+        messageHandler.accept("RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00");
         verify(viewListenerMock).onSerialError("Nenhuma Tag detectada a tempo. Tente novamente.");
     }
 

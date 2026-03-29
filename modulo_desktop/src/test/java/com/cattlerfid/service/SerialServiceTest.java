@@ -18,23 +18,23 @@ class SerialServiceTest {
     @Test
     void testRequestReadCommandFormat() {
         MockSerialService mockService = new MockSerialService();
-        mockService.requestRead();
-        assertEquals("<READ>\n", mockService.getLastSentCommand());
+        mockService.requestRead("TEST");
+        assertEquals("<READ:TEST>\n", mockService.getLastSentCommand());
     }
 
     @Test
     void testRequestWriteCommandFormat() {
         MockSerialService mockService = new MockSerialService();
-        mockService.requestWrite("JoaoSilva123");
-        assertEquals("<WRITE:JoaoSilva123>\n", mockService.getLastSentCommand());
+        mockService.requestWrite("TEST", "JoaoSilva123");
+        assertEquals("<WRITE:TEST:JoaoSilva123>\n", mockService.getLastSentCommand());
     }
 
     @Test
     void testRequestWriteCommandFormat_TruncatesAt16Chars() {
         MockSerialService mockService = new MockSerialService();
         String hugePayload = "BoiBandido123456789"; // 19 caracteres
-        mockService.requestWrite(hugePayload);
-        assertEquals("<WRITE:BoiBandido123456>\n", mockService.getLastSentCommand()); // Exatos 16 caracteres cortados
+        mockService.requestWrite("TEST", hugePayload);
+        assertEquals("<WRITE:TEST:BoiBandido123456>\n", mockService.getLastSentCommand()); // Exatos 16 caracteres cortados
     }
 
     @Test
@@ -43,10 +43,10 @@ class SerialServiceTest {
         AtomicReference<String> receivedParsedMessage = new AtomicReference<>("");
 
         // Simula a linha bruta do Arduino: <RES:OK:João :FW:92>
-        mockService.simulateArduinoIncomingLine("<RES:OK:João :FW:92>", receivedParsedMessage::set);
+        mockService.simulateArduinoIncomingLine("<RES:TEST:OK:João :FW:92>", receivedParsedMessage::set);
 
         // O servico Serial tem que cortar os <> (brackets) que sao do protocolo
-        assertEquals("RES:OK:João :FW:92", receivedParsedMessage.get());
+        assertEquals("RES:TEST:OK:João :FW:92", receivedParsedMessage.get());
     }
 
     @Test

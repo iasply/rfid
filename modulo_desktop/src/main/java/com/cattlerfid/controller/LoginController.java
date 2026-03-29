@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.util.RfidGenerator;
 
 import java.util.Optional;
@@ -57,15 +58,20 @@ public class LoginController {
         }
         if (viewListener != null)
             viewListener.onWaitingForCard();
-        serialService.requestRead();
+        serialService.requestRead(RfidConstants.ID_LOGIN);
     }
 
     protected void handleIncomingSerialMessage(String message) {
         String[] parts = message.split(":");
 
-        if (parts.length >= 2) {
-            if (parts[1].equals("OK")) {
-                String tagContent = parts[2].trim();
+        if (parts.length >= 3) {
+            // Valida se o pacote é para este controlador
+            if (!parts[1].equals(RfidConstants.ID_LOGIN)) {
+                return;
+            }
+
+            if (parts[2].equals(RfidConstants.RES_OK)) {
+                String tagContent = parts[3].trim();
                 if (!RfidGenerator.isVetTag(tagContent)) {
                     if (viewListener != null) {
                         viewListener.onLoginError(
@@ -74,14 +80,14 @@ public class LoginController {
                     return;
                 }
                 attemptLogin(tagContent);
-            } else if (parts[1].equals("ERR")) {
+            } else if (parts[2].equals(RfidConstants.RES_ERR)) {
                 if (viewListener != null) {
-                    if (parts[2].equals("NO_TAG"))
+                    if (parts[3].equals(RfidConstants.ERR_NO_TAG))
                         viewListener.onLoginError("Nenhuma Tag ou Crachá detectado a tempo.");
-                    else if (parts[2].equals("AUTH"))
+                    else if (parts[3].equals(RfidConstants.ERR_AUTH))
                         viewListener.onLoginError("Crachá com senha inválida ou não reconhecido.");
                     else
-                        viewListener.onLoginError("Erro na leitura do chip: " + parts[2]);
+                        viewListener.onLoginError("Erro na leitura do chip: " + parts[3]);
                 }
             }
         }

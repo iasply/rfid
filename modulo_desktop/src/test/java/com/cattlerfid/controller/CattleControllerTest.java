@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,13 +37,13 @@ class CattleControllerTest {
         controller.requestReadTag();
 
         verify(viewListenerMock).onRfidReadError(anyString());
-        verify(serialServiceMock, never()).requestRead();
+        verify(serialServiceMock, never()).requestRead(anyString());
     }
 
     @Test
     void testRequestReadTagConnected() {
         controller.requestReadTag();
-        verify(serialServiceMock).requestRead();
+        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE);
     }
 
     @Test
@@ -51,30 +52,30 @@ class CattleControllerTest {
         controller.requestWriteTag("C1234567890");
 
         verify(viewListenerMock).onRfidWriteError(anyString());
-        verify(serialServiceMock, never()).requestWrite(anyString());
+        verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
     }
 
     @Test
     void testRequestWriteTagConnected() {
         controller.requestWriteTag("C1234567890");
-        verify(serialServiceMock).requestRead(); // Valida fisicamente primeiro
+        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
     }
 
     @Test
     void testHandleMessageWriteReadUserTagBlocked() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:OK:VADMIN01:FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VADMIN01:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
-        verify(serialServiceMock, never()).requestWrite(anyString());
+        verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
     }
 
     @Test
     void testHandleMessageWriteReadNewTagAllowed() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:OK:COLDTAG123:FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":COLDTAG123:FW:92");
 
-        verify(serialServiceMock).requestWrite("C123456");
+        verify(serialServiceMock).requestWrite(RfidConstants.ID_CATTLE, "C123456");
     }
 
     /**
@@ -83,15 +84,15 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNoTagError() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:ERR:NO_TAG:FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Nenhuma Tag detectada"));
-        verify(serialServiceMock, never()).requestWrite(anyString());
+        verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
     }
 
     @Test
     void testHandleMessageReadSuccessExistingCattle() {
-        String simulatedSerialMsg = "RES:OK:CVACA00000000001:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":CVACA00000000001:FW:92";
         Cattle existingCattle = new Cattle("CVACA00000000001", "Mimosa", 400, "2023-01-01");
         existingCattle.setId(10);
 
@@ -105,7 +106,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadSuccessNewCattle() {
-        String simulatedSerialMsg = "RES:OK:CDESCONHECIDO12:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":CDESCONHECIDO12:FW:92";
 
         when(apiServiceMock.getCattleByTag("CDESCONHECIDO12")).thenReturn(Optional.empty());
 
@@ -121,7 +122,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadUserTagWarning() {
-        String simulatedSerialMsg = "RES:OK:VVET000000000001:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VVET000000000001:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -130,7 +131,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageWriteSuccess() {
-        String simulatedSerialMsg = "RES:OK:WROTE:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":" + RfidConstants.MSG_WROTE + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -139,7 +140,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageWriteError() {
-        String simulatedSerialMsg = "RES:ERR:WRITE_FAILED:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_WRITE_FAILED + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -208,7 +209,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadInvalidTagFormat() {
-        String simulatedSerialMsg = "RES:OK:XINVALID12345678:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":XINVALID12345678:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -217,7 +218,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadErrorNoTag() {
-        String simulatedSerialMsg = "RES:ERR:NO_TAG:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -226,7 +227,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadErrorAuth() {
-        String simulatedSerialMsg = "RES:ERR:AUTH:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_AUTH + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -235,7 +236,7 @@ class CattleControllerTest {
 
     @Test
     void testHandleMessageReadErrorUnknown() {
-        String simulatedSerialMsg = "RES:ERR:UNKNOWN_FAULT:FW:92";
+        String simulatedSerialMsg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":UNKNOWN_FAULT:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 

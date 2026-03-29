@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.util.RfidGenerator;
 
 import java.util.Optional;
@@ -43,7 +44,7 @@ public class CattleController {
                 viewListener.onRfidReadError("Porta Serial não conectada.");
             return;
         }
-        serialService.requestRead();
+        serialService.requestRead(RfidConstants.ID_CATTLE);
     }
 
     // 2. Inicia um pedido para verificar a tag pre-gravação
@@ -54,7 +55,7 @@ public class CattleController {
             return;
         }
         this.pendingWriteData = dataToWrite;
-        serialService.requestRead(); // Valida fisicamente primeiro
+        serialService.requestRead(RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
     }
 
     // 3. Salva os dados completos do formulario (Mocked Database/API)
@@ -91,18 +92,23 @@ public class CattleController {
 
     // Processa retorno do Arduino (Tanto respostas READ quanto respostas WRITE)
     protected void handleIncomingSerialMessage(String message) {
-        // Ex read: RES:OK:TAG_BOI_100 :FW:92
-        // Ex read error: RES:ERR:NO_TAG:FW:92
-        // Ex write: RES:OK:WROTE:FW:92
+        // Ex read: RES:CATTLE:OK:TAG_BOI_100:FW:92
+        // Ex read error: RES:CATTLE:ERR:NO_TAG:FW:92
+        // Ex write: RES:CATTLE:OK:WROTE:FW:92
 
         String[] parts = message.split(":");
-        if (parts.length >= 2) {
-            if (parts[1].equals("OK")) {
-                if (parts.length > 2 && parts[2].equals("WROTE")) {
+        if (parts.length >= 3) {
+            // Valida se o pacote é para este controlador
+            if (!parts[1].equals(RfidConstants.ID_CATTLE)) {
+                return;
+            }
+
+            if (parts[2].equals(RfidConstants.RES_OK)) {
+                if (parts.length > 3 && parts[3].equals(RfidConstants.MSG_WROTE)) {
                     if (viewListener != null)
                         viewListener.onRfidWriteSuccess();
-                } else if (parts.length > 2) {
-                    String readTag = parts[2].trim();
+                } else if (parts.length > 3) {
+                    String readTag = parts[3].trim();
                     if (pendingWriteData != null) {
                         // Modo pre-gravação
                         if (RfidGenerator.isVetTag(readTag)) {
@@ -112,15 +118,15 @@ public class CattleController {
                                         "Bloqueado: Não é permitido sobrescrever uma Tag de Usuário.");
                             }
                         } else {
-                            serialService.requestWrite(pendingWriteData);
+                            serialService.requestWrite(RfidConstants.ID_CATTLE, pendingWriteData);
                             pendingWriteData = null;
                         }
                     } else {
                         processTagRead(readTag);
                     }
                 }
-            } else if (parts[1].equals("ERR")) {
-                String cmdError = parts[2];
+            } else if (parts[2].equals(RfidConstants.RES_ERR)) {
+                String cmdError = parts[3];
 
                 // Se der erro durante a leitura pre-gravação
                 if (pendingWriteData != null) {
@@ -136,11 +142,11 @@ public class CattleController {
                 }
 
                 if (viewListener != null) {
-                    if (cmdError.equals("WRITE_FAILED")) {
+                    if (cmdError.equals(RfidConstants.ERR_WRITE_FAILED)) {
                         viewListener.onRfidWriteError("Erro no barramento SPI ao gravar dados na Tag.");
-                    } else if (cmdError.equals("NO_TAG")) {
+                    } else if (cmdError.equals(RfidConstants.ERR_NO_TAG)) {
                         viewListener.onRfidReadError("Nenhuma Tag detectada.");
-                    } else if (cmdError.equals("AUTH")) {
+                    } else if (cmdError.equals(RfidConstants.ERR_AUTH)) {
                         viewListener.onRfidReadError("Erro de autenticação da Tag.");
                     } else {
                         viewListener.onRfidReadError("Erro desconhecido: " + cmdError);

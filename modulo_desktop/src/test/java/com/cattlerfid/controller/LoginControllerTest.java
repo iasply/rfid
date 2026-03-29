@@ -3,6 +3,7 @@ package com.cattlerfid.controller;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,7 @@ class LoginControllerTest {
     @Test
     void testHandleMessageSuccessfulReadValidUser() {
         // Simula Tag chegando pela Serial
-        String simulatedArduinoResponse = "RES:OK:V00000VET0001:FW:92";
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":V00000VET0001:FW:92";
 
         // Simula db mock
         User mockedVet = new User("joao_vet", "Joao");
@@ -69,7 +70,7 @@ class LoginControllerTest {
 
     @Test
     void testHandleMessageSuccessfulReadInvalidUser() {
-        String simulatedArduinoResponse = "RES:OK:V00000UNKNOWN1:FW:92";
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":V00000UNKNOWN1:FW:92";
 
         when(authServiceMock.authenticateByTag("V00000UNKNOWN1")).thenReturn(Optional.empty());
 
@@ -81,7 +82,7 @@ class LoginControllerTest {
 
     @Test
     void testInvalidTagPrefixLoginRejection() {
-        String simulatedArduinoResponse = "RES:OK:UNKNOWN12345678:FW:92"; // Nao comeca com V
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":UNKNOWN12345678:FW:92"; // Nao comeca com V
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
@@ -93,7 +94,7 @@ class LoginControllerTest {
 
     @Test
     void testHandleMessageArduinoErrorNoTag() {
-        String simulatedArduinoResponse = "RES:ERR:NO_TAG:FW:92";
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
@@ -103,7 +104,7 @@ class LoginControllerTest {
 
     @Test
     void testHandleMessageArduinoErrorAuth() {
-        String simulatedArduinoResponse = "RES:ERR:AUTH:FW:92";
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_AUTH + ":FW:92";
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
@@ -112,7 +113,7 @@ class LoginControllerTest {
 
     @Test
     void testHandleMessageArduinoErrorUnknown() {
-        String simulatedArduinoResponse = "RES:ERR:HARDWARE_FAULT:FW:92";
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_ERR + ":HARDWARE_FAULT:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
@@ -146,7 +147,7 @@ class LoginControllerTest {
         controller.requestCardLogin();
 
         verify(viewListenerMock).onSerialError("Porta não conectada.");
-        verify(serialServiceMock, never()).requestRead();
+        verify(serialServiceMock, never()).requestRead(anyString());
     }
 
     @Test
@@ -156,7 +157,7 @@ class LoginControllerTest {
         controller.requestCardLogin();
 
         verify(viewListenerMock).onWaitingForCard();
-        verify(serialServiceMock).requestRead();
+        verify(serialServiceMock).requestRead(RfidConstants.ID_LOGIN);
     }
 
     @Test
