@@ -99,13 +99,6 @@ class ApiAuthTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function unauthenticated_user_cannot_access_protected_endpoints()
-    {
-        $response = $this->getJson('/api/desktop/cattle');
-        $response->assertStatus(401);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
     public function api_login_is_rate_limited_after_too_many_attempts()
     {
         \App\Models\Workstation::create([

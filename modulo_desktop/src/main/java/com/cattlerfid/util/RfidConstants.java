@@ -28,6 +28,6 @@ public class RfidConstants {
     public static final String MSG_WROTE = "WROTE";
 
     private RfidConstants() {
-        // Impedir instanciação
+
     }
 }
