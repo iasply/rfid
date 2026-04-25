@@ -13,8 +13,26 @@ class VaccineController extends Controller
 {
     public function index()
     {
-        $vaccines = Vaccine::with('user', 'workstation', 'cattle')->latest()->get()
-            ->map(fn(Vaccine $v) => VaccineResponse::fromModel($v));
+        $q   = request('q');
+        $col = request('col');
+
+        $vaccines = Vaccine::with('user', 'workstation', 'cattle')
+            ->when($q, function ($query) use ($q, $col) {
+                match ($col) {
+                    'vaccine_type' => $query->where('vaccine_type', 'like', "%{$q}%"),
+                    'rfid_tag'     => $query->where('rfid_tag', 'like', "%{$q}%"),
+                    'animal'       => $query->whereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%")),
+                    default        => $query->where(fn ($s) => $s
+                        ->where('vaccine_type', 'like', "%{$q}%")
+                        ->orWhere('rfid_tag', 'like', "%{$q}%")
+                        ->orWhereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%"))),
+                };
+            })
+            ->orderByDesc('vaccination_date')
+            ->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn (Vaccine $v) => VaccineResponse::fromModel($v));
 
         return view('admin.vaccines.index', compact('vaccines'));
     }

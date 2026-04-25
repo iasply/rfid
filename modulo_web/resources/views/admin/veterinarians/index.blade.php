@@ -11,6 +11,24 @@
     </x-page-header>
 
     <x-card>
+        <div class="index-toolbar">
+            <form method="GET" action="{{ route('admin.veterinarians.index') }}" class="search-form">
+                <select name="col" class="col-select">
+                    <option value=""      {{ request('col') === ''      ? 'selected' : '' }}>Todos os campos</option>
+                    <option value="name"  {{ request('col') === 'name'  ? 'selected' : '' }}>Nome</option>
+                    <option value="email" {{ request('col') === 'email' ? 'selected' : '' }}>E-mail</option>
+                </select>
+                <input type="search" name="q" value="{{ request('q') }}"
+                       placeholder="Pesquisar…"
+                       class="recent-search-input">
+                <button type="submit" class="search-btn">Buscar</button>
+                @if(request('q'))
+                    <a href="{{ route('admin.veterinarians.index') }}" class="search-clear">✕ Limpar</a>
+                @endif
+            </form>
+            <span class="result-count">{{ $vets->total() }} veterinário(s)</span>
+        </div>
+
         <x-table :headers="['Nome', 'Tag Rfid', 'Email', 'Ações']">
             @foreach($vets as $vet)
                 <tr data-testid="vet-row">
@@ -29,11 +47,18 @@
             @endforeach
             @if($vets->isEmpty())
                 <tr>
-                    <td colspan="4" style="text-align: center; color: var(--secondary);">Nenhum veterinário
-                        cadastrado.
-                    </td>
+                    <td colspan="4" style="text-align: center; color: var(--secondary);">Nenhum veterinário encontrado.</td>
                 </tr>
             @endif
         </x-table>
+
+        @if($vets->hasPages())
+            <div class="pagination-footer">
+                <span class="result-count">
+                    Exibindo {{ $vets->firstItem() }}–{{ $vets->lastItem() }} de {{ $vets->total() }}
+                </span>
+                {{ $vets->links() }}
+            </div>
+        @endif
     </x-card>
 @endsection

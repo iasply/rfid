@@ -14,8 +14,23 @@ class VeterinarianController extends Controller
 {
     public function index()
     {
-        $vets = User::where('is_veterinarian', true)->get()
-            ->map(fn(User $u) => VeterinarianResponse::fromModel($u));
+        $q   = request('q');
+        $col = request('col');
+
+        $vets = User::where('is_veterinarian', true)
+            ->when($q, function ($query) use ($q, $col) {
+                match ($col) {
+                    'name'  => $query->where('name', 'like', "%{$q}%"),
+                    'email' => $query->where('email', 'like', "%{$q}%"),
+                    default => $query->where(fn ($s) => $s
+                        ->where('name', 'like', "%{$q}%")
+                        ->orWhere('email', 'like', "%{$q}%")),
+                };
+            })
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn (User $u) => VeterinarianResponse::fromModel($u));
 
         return view('admin.veterinarians.index', compact('vets'));
     }
@@ -38,9 +53,29 @@ class VeterinarianController extends Controller
 
     public function show(User $veterinarian)
     {
-        $veterinarian->load('vaccinations.workstation', 'vaccinations.cattle');
         $dto = VeterinarianResponse::fromModel($veterinarian);
-        $vaccinations = $veterinarian->vaccinations->map(fn($v) => VaccineResponse::fromModel($v));
+
+        $q   = request('q');
+        $col = request('col');
+
+        $vaccinations = \App\Models\Vaccine::with('cattle', 'workstation')
+            ->where('user_id', $veterinarian->id)
+            ->when($q, function ($query) use ($q, $col) {
+                match ($col) {
+                    'vaccine_type' => $query->where('vaccine_type', 'like', "%{$q}%"),
+                    'rfid_tag'     => $query->where('rfid_tag', 'like', "%{$q}%"),
+                    'animal'       => $query->whereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%")),
+                    default        => $query->where(fn ($s) => $s
+                        ->where('vaccine_type', 'like', "%{$q}%")
+                        ->orWhere('rfid_tag', 'like', "%{$q}%")
+                        ->orWhereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%"))),
+                };
+            })
+            ->orderByDesc('vaccination_date')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString()
+            ->through(fn (\App\Models\Vaccine $v) => VaccineResponse::fromModel($v));
 
         return view('admin.veterinarians.show', [
             'veterinarian' => $dto,

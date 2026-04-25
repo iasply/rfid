@@ -12,8 +12,22 @@ class WorkstationController extends Controller
 {
     public function index()
     {
-        $workstations = Workstation::all()
-            ->map(fn(Workstation $w) => WorkstationResponse::fromModel($w));
+        $q   = request('q');
+        $col = request('col');
+
+        $workstations = Workstation::when($q, function ($query) use ($q, $col) {
+                match ($col) {
+                    'desc' => $query->where('desc', 'like', "%{$q}%"),
+                    'hash' => $query->where('hash', 'like', "%{$q}%"),
+                    default => $query->where(fn ($s) => $s
+                        ->where('desc', 'like', "%{$q}%")
+                        ->orWhere('hash', 'like', "%{$q}%")),
+                };
+            })
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn (Workstation $w) => WorkstationResponse::fromModel($w));
 
         return view('admin.workstations.index', compact('workstations'));
     }

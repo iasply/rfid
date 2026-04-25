@@ -51,7 +51,28 @@
         </x-card>
 
         <x-card>
-            <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem; font-weight: 700;">Histórico de Aplicações</h3>
+            <div class="chart-card-header" style="margin-bottom: 1.25rem;">
+                <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700;">Histórico de Aplicações</h3>
+                <span class="result-count">{{ $vaccinations->total() }} registro(s)</span>
+            </div>
+
+            <div class="index-toolbar" style="margin-bottom: 1rem;">
+                <form method="GET" action="{{ route('admin.veterinarians.show', $veterinarian->id) }}" class="search-form">
+                    <select name="col" class="col-select">
+                        <option value=""             {{ request('col') === ''             ? 'selected' : '' }}>Todos os campos</option>
+                        <option value="vaccine_type" {{ request('col') === 'vaccine_type' ? 'selected' : '' }}>Tipo de Vacina</option>
+                        <option value="rfid_tag"     {{ request('col') === 'rfid_tag'     ? 'selected' : '' }}>Tag RFID</option>
+                        <option value="animal"       {{ request('col') === 'animal'       ? 'selected' : '' }}>Animal</option>
+                    </select>
+                    <input type="search" name="q" value="{{ request('q') }}"
+                           placeholder="Pesquisar…"
+                           class="recent-search-input">
+                    <button type="submit" class="search-btn">Buscar</button>
+                    @if(request('q'))
+                        <a href="{{ route('admin.veterinarians.show', $veterinarian->id) }}" class="search-clear">✕ Limpar</a>
+                    @endif
+                </form>
+            </div>
 
             <x-table :headers="['Data', 'Animal', 'Vacina Aplicada', 'Peso']">
                 @foreach($vaccinations as $v)
@@ -81,6 +102,15 @@
                     </tr>
                 @endif
             </x-table>
+
+            @if($vaccinations->hasPages())
+                <div class="pagination-footer">
+                    <span class="result-count">
+                        Exibindo {{ $vaccinations->firstItem() }}–{{ $vaccinations->lastItem() }} de {{ $vaccinations->total() }}
+                    </span>
+                    {{ $vaccinations->links() }}
+                </div>
+            @endif
         </x-card>
     </div>
 @endsection
