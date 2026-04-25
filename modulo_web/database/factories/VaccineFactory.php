@@ -16,7 +16,11 @@ class VaccineFactory extends Factory
     {
         return [
             'rfid_tag' => Cattle::factory(),
-            'vaccine_type' => fake()->randomElement(['Febre Aftosa', 'Brucelose', 'Raiva', 'Clostridiose', 'Botulismo']),
+            'vaccine_type' => fake()->randomElement([
+                'Febre Aftosa', 'Brucelose', 'Raiva', 'Clostridiose',
+                'Carbúnculo Sintomático', 'Leptospirose', 'IBR/BVD',
+                'Verminose', 'Tristeza Parasitária', 'Botulismo',
+            ]),
             'current_weight' => fake()->randomFloat(2, 100, 800),
             'vaccination_date' => now()->toDateString(),
             'user_id' => User::factory(),
