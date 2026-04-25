@@ -179,6 +179,25 @@
                class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
                 Estações
             </a>
+            <a href="{{ route('admin.alerts') }}"
+               class="nav-link {{ request()->routeIs('admin.alerts') ? 'active' : '' }}"
+               style="position: relative;">
+                Avisos
+                @php
+                    $alertCount = \Illuminate\Support\Facades\Cache::remember('alert_badge_count', 300, function () {
+                        return \App\Models\Vaccine::selectRaw('rfid_tag, vaccine_type, MAX(vaccination_date) as last_vax')
+                            ->groupBy('rfid_tag', 'vaccine_type')
+                            ->get()
+                            ->filter(fn($r) => \Carbon\Carbon::parse($r->last_vax)->addDays(150)->isPast())
+                            ->count();
+                    });
+                @endphp
+                @if($alertCount > 0)
+                    <span style="margin-left: auto; background: #ef4444; color: white; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 999px; line-height: 1.6;">
+                        {{ $alertCount > 99 ? '99+' : $alertCount }}
+                    </span>
+                @endif
+            </a>
         </nav>
 
         <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
@@ -238,6 +257,7 @@
         @yield('content')
     </main>
 </div>
+    @stack('scripts')
 </body>
 
 </html>
