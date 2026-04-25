@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+<script>
+window.__animalData = {
+    weightOverTime: @json($chartWeightOverTime),
+    vaccineTypes:   @json($chartAnimalVaccineTypes),
+};
+</script>
     <x-page-header :title="'Animal: ' . $cattle->name" :backLink="route('admin.cattle.index')">
         <x-slot name="actions">
             <x-button variant="secondary" onclick="window.location='{{ route('admin.cattle.edit', $cattle->id) }}'">
@@ -83,5 +89,23 @@
                 @endif
             </x-table>
         </x-card>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card chart-card">
+            <p class="chart-title">Evolução de Peso
+                <span class="chart-subtitle">(kg por evento de vacinação)</span>
+            </p>
+            <div class="chart-wrap">
+                <canvas id="chart-animal-weight"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <p class="chart-title">Vacinas Recebidas</p>
+            <div class="chart-wrap">
+                <canvas id="chart-animal-vaccines"></canvas>
+            </div>
+        </div>
     </div>
 @endsection
