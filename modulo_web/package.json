@@ -7,6 +7,9 @@
         "dev": "vite",
         "test:e2e": "npm test --prefix e2e"
     },
+    "dependencies": {
+        "chart.js": "^4.4.4"
+    },
     "devDependencies": {
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
