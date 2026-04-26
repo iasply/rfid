@@ -24,6 +24,7 @@ class ApiSecurityTest extends TestCase
             'Cattle Show' => ['GET', '/api/desktop/cattle/TAG123'],
             'Vaccines Index' => ['GET', '/api/desktop/vaccines'],
             'Vaccines Store' => ['POST', '/api/desktop/vaccines'],
+            'Vaccine Types' => ['GET', '/api/desktop/vaccine-types'],
             'User Profile' => ['GET', '/api/desktop/user'],
         ];
     }

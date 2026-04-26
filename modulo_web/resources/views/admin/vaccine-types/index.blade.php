@@ -3,7 +3,7 @@
 @section('content')
 <x-page-header title="Tipos de Vacina">
     <x-slot name="actions">
-        <a href="{{ route('admin.vaccine-types.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.vaccine-types.create') }}" class="btn btn-primary" data-testid="create-vaccine-type-link">
             + Novo Tipo
         </a>
     </x-slot>
@@ -12,7 +12,7 @@
 <x-card>
     <x-table :headers="['Nome', 'Intervalo', 'Meses de Pico', 'Descrição', '']">
         @forelse($vaccineTypes as $vt)
-            <tr>
+            <tr data-testid="vaccine-type-row">
                 <td><strong>{{ $vt->name }}</strong></td>
                 <td>
                     @if($vt->interval_days)

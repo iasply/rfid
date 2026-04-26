@@ -20,6 +20,7 @@ class WebSecurityTest extends TestCase
             'Cattle' => ['/admin/cattle'],
             'Vaccines' => ['/admin/vaccines'],
             'Workstations' => ['/admin/workstations'],
+            'Vaccine Types' => ['/admin/vaccine-types'],
             'Root Redirect' => ['/'],
         ];
     }

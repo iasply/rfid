@@ -41,7 +41,7 @@
             </div>
         </div>
 
-        <x-button type="submit" fullWidth style="margin-top: 0.5rem;">Salvar Alterações</x-button>
+        <x-button type="submit" fullWidth data-testid="vaccine-type-submit" style="margin-top: 0.5rem;">Salvar Alterações</x-button>
     </form>
 </x-card>
 @endsection
