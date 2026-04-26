@@ -7,7 +7,8 @@
     </x-slot>
 </x-page-header>
 
-{{-- KPI Summary --}}
+{{-- KPI Summary (only when a type is selected) --}}
+@if($typeFilter)
 <div class="kpi-grid" style="margin-bottom: 1.5rem;">
     <div class="card kpi-card kpi-danger">
         <p class="kpi-label">Atrasadas</p>
@@ -25,6 +26,7 @@
         <span class="kpi-sub">Vacinas em época — sem registro</span>
     </div>
 </div>
+@endif
 
 {{-- Type filter --}}
 <div class="index-toolbar" style="margin-bottom: 1.5rem;">
@@ -40,9 +42,11 @@
         <a href="{{ route('admin.alerts') }}" class="search-clear">✕ Limpar filtro</a>
         @endif
     </form>
+    @if($typeFilter)
     <span class="result-count">
         {{ collect($alertsByType)->sum('total') }} animal(is) com pendências
     </span>
+    @endif
 </div>
 
 {{-- Alert sections --}}
@@ -186,9 +190,15 @@
 @empty
 <x-card>
     <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        @if(!$typeFilter)
+        <div style="font-size: 3rem; margin-bottom: 1rem;">💉</div>
+        <h3 style="margin: 0 0 0.5rem; font-size: 1.125rem; color: var(--text-main);">Selecione um tipo de vacina</h3>
+        <p style="margin: 0; font-size: 0.9rem;">Escolha um tipo de vacina no filtro acima para ver os avisos de vacinação do rebanho.</p>
+        @else
         <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
         <h3 style="margin: 0 0 0.5rem; font-size: 1.125rem; color: var(--text-main);">Rebanho em dia!</h3>
         <p style="margin: 0; font-size: 0.9rem;">Nenhuma vacina pendente ou vencendo nos próximos 30 dias.</p>
+        @endif
     </div>
 </x-card>
 @endforelse

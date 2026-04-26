@@ -33,6 +33,20 @@ class AlertController extends Controller
         $totalDueSoon = 0;
         $totalNever = 0;
 
+        // Vaccine type names for the filter dropdown (all types with an interval)
+        $vaccineTypeNames = VaccineType::whereNotNull('interval_days')->orderBy('name')->pluck('name');
+
+        if (!$typeFilter) {
+            return view('admin.alerts.index', [
+                'alertsByType'  => [],
+                'totalOverdue'  => 0,
+                'totalDueSoon'  => 0,
+                'totalNever'    => 0,
+                'vaccineTypes'  => $vaccineTypeNames,
+                'typeFilter'    => null,
+            ]);
+        }
+
         foreach ($schedule as $vt) {
             $interval = $vt->interval_days;
             $threshold = $interval - self::ALERT_WINDOW;
@@ -127,9 +141,6 @@ class AlertController extends Controller
                 'rows' => $displayRows,
             ];
         }
-
-        // Vaccine type names for the filter dropdown (all types with an interval)
-        $vaccineTypeNames = VaccineType::whereNotNull('interval_days')->orderBy('name')->pluck('name');
 
         return view('admin.alerts.index', [
             'alertsByType' => $alertsByType,

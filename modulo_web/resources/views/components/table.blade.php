@@ -52,24 +52,25 @@
     }
 
     .premium-table th {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
         font-weight: 700;
         color: var(--text-muted);
-        background-color: var(--bg-main);
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid #e2e8f0;
+        background-color: #f8fafc;
+        padding: 0.875rem 1rem;
+        border-bottom: 2px solid #e8edf2;
         white-space: nowrap;
         text-align: left;
     }
 
     .premium-table td {
-        padding: 1rem;
+        padding: 0.9rem 1rem;
         border-bottom: 1px solid #f1f5f9;
-        font-size: 0.9375rem;
+        font-size: 0.9rem;
         vertical-align: middle;
-        white-space: nowrap; /* Prevent wrapping in cells by default for fitting */
+        white-space: nowrap;
+        transition: background 0.1s;
     }
 
     /* Special alignments */

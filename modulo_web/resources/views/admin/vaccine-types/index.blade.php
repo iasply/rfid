@@ -11,6 +11,24 @@
 </x-page-header>
 
 <x-card>
+    <div class="index-toolbar">
+        <form method="GET" action="{{ route('admin.vaccine-types.index') }}" class="search-form">
+            <select name="col" class="col-select">
+                <option value="" {{ request('col') === '' ? 'selected' : '' }}>Todos os campos</option>
+                <option value="name" {{ request('col') === 'name' ? 'selected' : '' }}>Nome</option>
+                <option value="description" {{ request('col') === 'description' ? 'selected' : '' }}>Descrição</option>
+            </select>
+            <input type="search" name="q" value="{{ request('q') }}"
+                   placeholder="Pesquisar…"
+                   class="recent-search-input">
+            <button type="submit" class="search-btn">Buscar</button>
+            @if(request('q'))
+            <a href="{{ route('admin.vaccine-types.index') }}" class="search-clear">✕ Limpar</a>
+            @endif
+        </form>
+        <span class="result-count">{{ $vaccineTypes->total() }} tipo(s)</span>
+    </div>
+
     <x-table :headers="['Nome', 'Intervalo', 'Meses de Pico', 'Descrição', 'Ações']">
         @forelse($vaccineTypes as $vt)
         <tr data-testid="vaccine-type-row">
@@ -34,20 +52,18 @@
                 <span style="color: var(--text-muted);">Todos</span>
                 @endif
             </td>
-            <td style="max-width: 360px; font-size: 0.82rem; color: var(--text-muted);">
+            <td style="max-width: 360px; overflow: hidden; text-overflow: ellipsis; font-size: 0.82rem; color: var(--text-muted);">
                 {{ Str::limit($vt->description, 100) }}
             </td>
-            <td style="white-space: nowrap; display: flex; gap: 1rem;">
+            <td class="text-right" style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                 <a href="{{ route('admin.vaccine-types.show', $vt->id) }}"
-                   data-testid="vaccine-type-show-link"
-                   style="font-size: 0.8rem; font-weight: 600; color: var(--secondary); text-decoration: none;">
-                    Ver →
-                </a>
+                   class="btn btn-primary"
+                   style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                   data-testid="vaccine-type-show-link">Ver</a>
                 <a href="{{ route('admin.vaccine-types.edit', $vt->id) }}"
-                   data-testid="vaccine-type-edit-link"
-                   style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-decoration: none;">
-                    Editar →
-                </a>
+                   class="btn btn-primary"
+                   style="font-size: 0.75rem; text-decoration: none; padding: 0.4rem 0.8rem;"
+                   data-testid="vaccine-type-edit-link">Editar</a>
             </td>
         </tr>
         @empty

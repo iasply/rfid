@@ -238,7 +238,7 @@
 {{-- Quick Actions --}}
 <div class="card">
     <h3 style="margin-top:0; margin-bottom:1rem;">Ações Rápidas</h3>
-    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+    <div class="quick-actions">
         <a href="{{ route('admin.veterinarians.create') }}" class="btn btn-primary"
            style="text-decoration:none;" data-testid="dashboard-new-vet-link">+ Novo Veterinário</a>
         <a href="{{ route('admin.cattle.create') }}" class="btn btn-success"

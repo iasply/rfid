@@ -18,7 +18,25 @@ class VaccineTypeController extends Controller
 
     public function index()
     {
-        $vaccineTypes = VaccineType::orderBy('name')->paginate(15)->withQueryString();
+        $q   = request('q');
+        $col = request('col');
+
+        $query = VaccineType::orderBy('name');
+
+        if ($q) {
+            if ($col === 'name') {
+                $query->where('name', 'like', "%{$q}%");
+            } elseif ($col === 'description') {
+                $query->where('description', 'like', "%{$q}%");
+            } else {
+                $query->where(function ($sq) use ($q) {
+                    $sq->where('name', 'like', "%{$q}%")
+                       ->orWhere('description', 'like', "%{$q}%");
+                });
+            }
+        }
+
+        $vaccineTypes = $query->paginate(15)->withQueryString();
 
         return view('admin.vaccine-types.index', compact('vaccineTypes'));
     }

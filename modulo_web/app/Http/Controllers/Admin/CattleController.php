@@ -78,7 +78,25 @@ class CattleController extends Controller
             'values' => $typeCounts->values()->toArray(),
         ];
 
-        $vaccines = $cattle->vaccines->map(fn($v) => VaccineResponse::fromModel($v));
+        $q   = request('q');
+        $col = request('col');
+
+        $vaccines = $cattle->vaccines()
+            ->with('vaccineType', 'user', 'workstation')
+            ->when($q, function ($query) use ($q, $col) {
+                match ($col) {
+                    'vaccine_type' => $query->whereHas('vaccineType', fn($s) => $s->where('name', 'like', "%{$q}%")),
+                    'vet'          => $query->whereHas('user', fn($s) => $s->where('name', 'like', "%{$q}%")),
+                    default        => $query->where(fn($s) => $s
+                        ->whereHas('vaccineType', fn($t) => $t->where('name', 'like', "%{$q}%"))
+                        ->orWhereHas('user', fn($t) => $t->where('name', 'like', "%{$q}%"))
+                    ),
+                };
+            })
+            ->orderByDesc('vaccination_date')
+            ->paginate(15)
+            ->withQueryString()
+            ->through(fn($v) => VaccineResponse::fromModel($v));
 
         return view('admin.cattle.show', compact('cattle', 'vaccines', 'chartWeightOverTime', 'chartAnimalVaccineTypes'));
     }

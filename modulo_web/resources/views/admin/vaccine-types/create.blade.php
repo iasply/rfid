@@ -29,7 +29,7 @@
             <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.75rem;">
                 Meses de aplicação (época)
             </label>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem;">
                 @foreach($monthNames as $num => $label)
                 <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
                     <input type="checkbox" name="season_months[]" value="{{ $num }}"

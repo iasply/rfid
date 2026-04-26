@@ -15,7 +15,7 @@
 <x-card style="margin-bottom: 1.5rem;">
     <div style="display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start;">
         @if($vaccineType->description)
-        <div style="flex: 1; min-width: 240px;">
+        <div style="flex: 1; min-width: 0;">
             <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">{{ $vaccineType->description }}</p>
         </div>
         @endif
@@ -34,14 +34,16 @@
             @if($vaccineType->season_months)
             @php
             $abbr = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-            $months = implode(', ', array_map(fn($m) => $abbr[$m], $vaccineType->season_months));
             @endphp
-            <div>
-                <div
-                    style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+            <div style="max-width: 100%;">
+                <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem;">
                     Época
                 </div>
-                <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-dark);">{{ $months }}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                    @foreach($vaccineType->season_months as $m)
+                    <span style="font-size: 0.75rem; font-weight: 600; background: rgba(16,185,129,0.1); color: var(--primary-dark); padding: 0.2rem 0.55rem; border-radius: 999px; white-space: nowrap;">{{ $abbr[$m] }}</span>
+                    @endforeach
+                </div>
             </div>
             @endif
         </div>
@@ -101,7 +103,7 @@
 </div>
 
 {{-- Charts row 1: bar + donut --}}
-<div style="display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; margin-bottom: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
     <x-card>
         <div
             style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">

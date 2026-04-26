@@ -15,8 +15,7 @@
     </x-slot>
 </x-page-header>
 
-<div
-    style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; @media (min-width: 1024px) { grid-template-columns: 350px 1fr; }">
+<div class="show-layout">
     <x-card>
         <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem; font-weight: 700;">Detalhes do Animal</h3>
 
@@ -67,7 +66,27 @@
     </x-card>
 
     <x-card>
-        <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem; font-weight: 700;">Histórico de Vacinação</h3>
+        <div class="chart-card-header" style="margin-bottom: 1.25rem;">
+            <h3 style="margin: 0; font-size: 1.125rem; font-weight: 700;">Histórico de Vacinação</h3>
+            <span class="result-count">{{ $vaccines->total() }} registro(s)</span>
+        </div>
+
+        <div class="index-toolbar" style="margin-bottom: 1rem;">
+            <form method="GET" action="{{ route('admin.cattle.show', $cattle->id) }}" class="search-form">
+                <select name="col" class="col-select">
+                    <option value="" {{ request('col') === '' ? 'selected' : '' }}>Todos os campos</option>
+                    <option value="vaccine_type" {{ request('col') === 'vaccine_type' ? 'selected' : '' }}>Vacina</option>
+                    <option value="vet" {{ request('col') === 'vet' ? 'selected' : '' }}>Veterinário</option>
+                </select>
+                <input type="search" name="q" value="{{ request('q') }}"
+                       placeholder="Pesquisar…"
+                       class="recent-search-input">
+                <button type="submit" class="search-btn">Buscar</button>
+                @if(request('q'))
+                <a href="{{ route('admin.cattle.show', $cattle->id) }}" class="search-clear">✕ Limpar</a>
+                @endif
+            </form>
+        </div>
 
         <x-table :headers="['Data', 'Vacina', 'Peso na Época', 'Veterinário']">
             @foreach($vaccines as $v)
@@ -83,12 +102,20 @@
             @if($vaccines->isEmpty())
             <tr>
                 <td colspan="4" style="text-align: center; color: var(--secondary); padding: 2rem;">Nenhuma
-                    vacina
-                    registrada para este animal.
+                    vacina registrada para este animal.
                 </td>
             </tr>
             @endif
         </x-table>
+
+        @if($vaccines->hasPages())
+        <div class="pagination-footer">
+            <span class="result-count">
+                Exibindo {{ $vaccines->firstItem() }}–{{ $vaccines->lastItem() }} de {{ $vaccines->total() }}
+            </span>
+            {{ $vaccines->links() }}
+        </div>
+        @endif
     </x-card>
 </div>
 

@@ -10,8 +10,7 @@
     </x-slot>
 </x-page-header>
 
-<div
-    style="display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; @media (min-width: 1024px) { grid-template-columns: 350px 1fr; }">
+<div class="show-layout">
     <x-card>
         <div
             style="display: flex; flex-direction: column; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--bg-main); margin-bottom: 1.5rem;">
