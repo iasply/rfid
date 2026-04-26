@@ -27,7 +27,7 @@ class CattleApiController extends Controller
 
     public function indexWithVaccines(): JsonResponse
     {
-        $items = CattleWithVaccinesView::paginate(50);
+        $items = CattleWithVaccinesView::paginate(15);
 
         $mappedItems = $items->getCollection()->map(function ($c) {
             $cattleModel = Cattle::find($c->id);

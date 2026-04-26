@@ -1,6 +1,7 @@
 package com.cattlerfid.view;
 
 import com.cattlerfid.model.Cattle;
+import com.cattlerfid.model.PagedResult;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.view.utils.UIStyles;
@@ -9,8 +10,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 
 public class CattleListPanel extends JPanel {
@@ -23,6 +22,15 @@ public class CattleListPanel extends JPanel {
 
     private DefaultTableModel tableModel;
     private JTable table;
+
+    private int currentPage = 1;
+    private int lastPage = 1;
+    private int totalRecords = 0;
+
+    private JButton prevButton;
+    private JButton nextButton;
+    private JLabel pageLabel;
+    private JButton editButton;
 
     public CattleListPanel(CattleApiService apiService,
             com.cattlerfid.controller.CattleController controller,
@@ -40,6 +48,7 @@ public class CattleListPanel extends JPanel {
         setLayout(new BorderLayout(15, 15));
         setBackground(UIStyles.BACKGROUND);
 
+        // ── Header ──────────────────────────────────────────────────────────────────
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(UIStyles.BACKGROUND);
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -53,12 +62,12 @@ public class CattleListPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Configuração da Tabela
+        // ── Table ────────────────────────────────────────────────────────────────────
         String[] columnNames = {"Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas"};
         tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Apenas leitura
+                return false;
             }
         };
 
@@ -68,25 +77,20 @@ public class CattleListPanel extends JPanel {
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFont(UIStyles.BODY_FONT);
         table.getTableHeader().setFont(UIStyles.SUBHEADER_FONT);
-        table.getTableHeader().setBackground(UIStyles.PRIMARY_DARK); // Dark Emerald Header
+        table.getTableHeader().setBackground(UIStyles.PRIMARY_DARK);
         table.getTableHeader().setForeground(Color.WHITE);
 
-        // Alternating row colors
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected,
-                    boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected,
-                        hasFocus, row, column);
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
                 }
                 return c;
             }
         });
-
-        refreshTable();
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createLineBorder(UIStyles.SECONDARY));
@@ -98,7 +102,35 @@ public class CattleListPanel extends JPanel {
 
         add(centerWrapper, BorderLayout.CENTER);
 
-        // Botoes extra
+        // ── Bottom: pagination + action buttons ──────────────────────────────────────
+        JPanel southContainer = new JPanel(new BorderLayout());
+        southContainer.setBackground(UIStyles.BACKGROUND);
+
+        // Pagination bar
+        JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
+        paginationPanel.setBackground(UIStyles.BACKGROUND);
+
+        prevButton = new JButton("< Anterior");
+        prevButton.setFont(UIStyles.BODY_FONT);
+        prevButton.setEnabled(false);
+        prevButton.addActionListener(e -> loadPage(currentPage - 1));
+
+        pageLabel = new JLabel("Carregando…");
+        pageLabel.setFont(UIStyles.BODY_FONT);
+        pageLabel.setForeground(UIStyles.TEXT_MUTED);
+
+        nextButton = new JButton("Próxima >");
+        nextButton.setFont(UIStyles.BODY_FONT);
+        nextButton.setEnabled(false);
+        nextButton.addActionListener(e -> loadPage(currentPage + 1));
+
+        paginationPanel.add(prevButton);
+        paginationPanel.add(pageLabel);
+        paginationPanel.add(nextButton);
+
+        southContainer.add(paginationPanel, BorderLayout.NORTH);
+
+        // Action buttons bar
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         bottomPanel.setBackground(UIStyles.BACKGROUND);
 
@@ -110,44 +142,76 @@ public class CattleListPanel extends JPanel {
         });
         bottomPanel.add(logButton);
 
-        JButton editButton = UIStyles.createSuccessButton("Editar Selecionado");
+        editButton = UIStyles.createSuccessButton("Editar Selecionado");
         editButton.setPreferredSize(new Dimension(200, 35));
         editButton.addActionListener(e -> openEditDialog());
         bottomPanel.add(editButton);
 
         JButton closeBtn = UIStyles.createBackButton("< Menu");
         closeBtn.setPreferredSize(new Dimension(100, 35));
-        closeBtn.addActionListener(e -> {
-            navManager.showPanel("Main", parentMainPanel);
-        });
+        closeBtn.addActionListener(e -> navManager.showPanel("Main", parentMainPanel));
         bottomPanel.add(closeBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
+
+        southContainer.add(bottomPanel, BorderLayout.SOUTH);
+
+        add(southContainer, BorderLayout.SOUTH);
+
+        loadPage(1);
     }
 
-    private void refreshTable() {
-        tableModel.setRowCount(0); // Limpa tabela
-        List<Cattle> allCattle = apiService.getAllCattleWithVaccines();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private void loadPage(int page) {
+        prevButton.setEnabled(false);
+        nextButton.setEnabled(false);
+        editButton.setEnabled(false);
+        pageLabel.setText("Carregando…");
 
-        for (Cattle c : allCattle) {
-            String dateStr = c.getRegistrationDate() != null ? c.getRegistrationDate() : "N/A";
-
-            // Re-format YYYY-MM-DD to DD/MM/YYYY for UI
-            if (dateStr.length() == 10 && dateStr.contains("-")) {
-                String[] parts = dateStr.split("-");
-                dateStr = parts[2] + "/" + parts[1] + "/" + parts[0];
+        new SwingWorker<PagedResult<Cattle>, Void>() {
+            @Override
+            protected PagedResult<Cattle> doInBackground() {
+                return apiService.getCattleWithVaccinesPaginated(page);
             }
 
-            int countVaccines = c.getVaccinesCount();
+            @Override
+            protected void done() {
+                try {
+                    PagedResult<Cattle> result = get();
+                    currentPage = result.getCurrentPage();
+                    lastPage = result.getLastPage();
+                    totalRecords = result.getTotal();
 
-            Object[] row = {
-                    c.getRfidTag(),
-                    c.getName(),
-                    c.getWeight(),
-                    dateStr,
-                    countVaccines
-            };
-            tableModel.addRow(row);
+                    tableModel.setRowCount(0);
+                    for (Cattle c : result.getData()) {
+                        String dateStr = c.getRegistrationDate() != null ? c.getRegistrationDate() : "N/A";
+                        if (dateStr.length() == 10 && dateStr.contains("-")) {
+                            String[] parts = dateStr.split("-");
+                            dateStr = parts[2] + "/" + parts[1] + "/" + parts[0];
+                        }
+                        tableModel.addRow(new Object[]{
+                                c.getRfidTag(),
+                                c.getName(),
+                                c.getWeight(),
+                                dateStr,
+                                c.getVaccinesCount()
+                        });
+                    }
+
+                    updatePaginationControls();
+                    editButton.setEnabled(true);
+                } catch (Exception ex) {
+                    pageLabel.setText("Erro ao carregar dados");
+                    editButton.setEnabled(true);
+                }
+            }
+        }.execute();
+    }
+
+    private void updatePaginationControls() {
+        prevButton.setEnabled(currentPage > 1);
+        nextButton.setEnabled(currentPage < lastPage);
+        if (totalRecords == 0) {
+            pageLabel.setText("Nenhum registro encontrado");
+        } else {
+            pageLabel.setText("Página " + currentPage + " de " + lastPage + "  (" + totalRecords + " registros)");
         }
     }
 
@@ -164,27 +228,17 @@ public class CattleListPanel extends JPanel {
 
         if (targetOpt.isPresent()) {
             Cattle target = targetOpt.get();
-            // Abre o formulario como isNew=false, isManual=true (permitir gravação RFID e
-            // salvar no DB)
             CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser,
-                    navManager,
-                    parentMainPanel);
+                    navManager, parentMainPanel);
 
-            // Informa ao MainPanel (ouvinte master da porta serial) que esta é a tela
-            // aguardando a gravação
             if (parentMainPanel != null) {
                 parentMainPanel.setActiveCattleForm(form);
             }
 
-            // Transitamos para o form de edição. Quando voltar ele vai passar por um novo
-            // state,
-            // mas nós podemos forçar o refresh ao chamar a lista novamente caso seja
-            // necessário.
             navManager.showPanel("EditCattle", form);
         } else {
             JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.cattlerfid.service;
 import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.Cattle;
+import com.cattlerfid.model.PagedResult;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.model.VaccineType;
@@ -84,6 +85,28 @@ public class CattleApiService {
             handleError("Error fetching all cattle with vaccines", e);
         }
         return new ArrayList<>();
+    }
+
+    public PagedResult<Cattle> getCattleWithVaccinesPaginated(int page) {
+        HttpRequest request = authenticatedRequestBuilder("/cattle-with-vaccines?page=" + page).GET().build();
+
+        try {
+            HttpResponse<String> response = client.send(request);
+            if (response.statusCode() == 200) {
+                JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
+                Type listType = new TypeToken<ArrayList<Cattle>>() {
+                }.getType();
+                List<Cattle> data = client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
+                int currentPage = obj.get("current_page").getAsInt();
+                int lastPage = obj.get("last_page").getAsInt();
+                int total = obj.get("total").getAsInt();
+                int perPage = obj.get("per_page").getAsInt();
+                return new PagedResult<>(data, currentPage, lastPage, total, perPage);
+            }
+        } catch (IOException | InterruptedException e) {
+            handleError("Error fetching paginated cattle", e);
+        }
+        return new PagedResult<>(new ArrayList<>(), 1, 1, 0, 15);
     }
 
     public boolean saveCattle(Cattle cattle) {
