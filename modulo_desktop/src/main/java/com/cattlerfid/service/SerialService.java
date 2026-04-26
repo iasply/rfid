@@ -174,15 +174,12 @@ public class SerialService {
                     for (int i = 0; i < numRead; i++) {
                         char c = (char) newData[i];
 
-                        // Ignora quebra de linhas malucas no meio do payload enviadas pelo println do
-                        // Arduino
                         if (c == '\r' || c == '\n') {
                             continue;
                         }
 
                         messageBuffer.append(c);
 
-                        // O Arduino envia < no começo e > no fim. Vamos ler ate fechar o >.
                         if (c == '>') {
                             String message = messageBuffer.toString().trim();
                             messageBuffer.setLength(0); // Limpa o buffer para a proxima
@@ -190,10 +187,8 @@ public class SerialService {
                             if (!message.isEmpty()) {
                                 appendLog("IN", message);
 
-                                // Valida e extrai o conteúdo entre < e >
                                 int startPacketIdx = message.indexOf('<');
                                 if (startPacketIdx != -1 && message.endsWith(">")) {
-                                    // Remove sujeira antes do < e remove os <>
                                     String cleanMessage = message.substring(startPacketIdx + 1, message.length() - 1);
                                     for (Consumer<String> listener : messageListeners) {
                                         listener.accept(cleanMessage);

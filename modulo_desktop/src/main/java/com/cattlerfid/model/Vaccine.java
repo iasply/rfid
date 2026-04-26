@@ -2,10 +2,7 @@ package com.cattlerfid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Represents a Vaccine record.
- * Matches VaccineResource fields and StoreVaccineRequest.
- */
+
 public class Vaccine {
     private String id;
 

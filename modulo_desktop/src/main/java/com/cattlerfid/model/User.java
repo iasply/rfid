@@ -1,9 +1,5 @@
 package com.cattlerfid.model;
 
-/**
- * Represents an authenticated user returned by the API.
- * Fields match VeterinarianResponse DTO from the web module.
- */
 public class User {
     private int id;
     private String name;
@@ -22,7 +18,6 @@ public class User {
         this.name = fullName;
     }
 
-    // --- API fields ---
 
     public int getId() {
         return id;
@@ -67,8 +62,6 @@ public class User {
     public void setVeterinarian(boolean v) {
         this.is_veterinarian = v;
     }
-
-    // --- Session token (not serialized) ---
 
     public String getAccessToken() {
         return accessToken;

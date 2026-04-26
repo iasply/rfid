@@ -11,9 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-/**
- * Authenticates a veterinarian by sending the raw RFID tag to the Laravel API.
- */
+
 public class AuthenticationService {
 
     private final ApiClient client;
@@ -26,9 +24,6 @@ public class AuthenticationService {
         this.client = client;
     }
 
-    /**
-     * Sends the raw RFID tag to the API alongside the workstation hash.
-     */
     public Optional<User> authenticateByTag(String rawRfidTag) {
         if (rawRfidTag == null || rawRfidTag.isBlank()) {
             return Optional.empty();
@@ -72,11 +67,6 @@ public class AuthenticationService {
         return Optional.empty();
     }
 
-    /**
-     * Revokes the current token on the server.
-     *
-     * @param token Authentication token to be revoked
-     */
     public void logout(String token) {
         if (token == null || token.isBlank()) {
             return;

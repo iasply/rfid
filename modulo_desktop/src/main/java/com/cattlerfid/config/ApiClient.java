@@ -28,9 +28,6 @@ public class ApiClient {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    /**
-     * Sends a request and returns the response body as a string.
-     */
     public HttpResponse<String> send(HttpRequest request) throws IOException, InterruptedException {
         logRequest(request);
         HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
@@ -38,9 +35,6 @@ public class ApiClient {
         return response;
     }
 
-    /**
-     * Asynchronous version of send.
-     */
     public CompletableFuture<HttpResponse<String>> sendAsync(HttpRequest request) {
         logRequest(request);
         return http.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -50,9 +44,6 @@ public class ApiClient {
                 });
     }
 
-    /**
-     * Helper to create a request builder with common headers.
-     */
     public HttpRequest.Builder newRequestBuilder(String path) {
         return HttpRequest.newBuilder()
                 .uri(java.net.URI.create(config.url(path)))
@@ -60,9 +51,6 @@ public class ApiClient {
                 .header("Accept", "application/json");
     }
 
-    /**
-     * Helper to create an authenticated request builder.
-     */
     public HttpRequest.Builder newAuthenticatedRequestBuilder(String path, String token) {
         return newRequestBuilder(path)
                 .header("Authorization", "Bearer " + token);

@@ -35,7 +35,6 @@ public class CattleApiService {
         this.user = user;
     }
 
-    /** Finds a single cattle by its RFID tag content. */
     public Optional<Cattle> getCattleByTag(String rfidTag) {
         if (rfidTag == null || rfidTag.isBlank())
             return Optional.empty();
@@ -53,7 +52,6 @@ public class CattleApiService {
         return Optional.empty();
     }
 
-    /** Lists all cattle registered in the system. */
     public List<Cattle> getAllCattle() {
         HttpRequest request = authenticatedRequestBuilder("/cattle").GET().build();
 
@@ -70,7 +68,6 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    /** Lists all cattle with their vaccine count. */
     public List<Cattle> getAllCattleWithVaccines() {
         HttpRequest request = authenticatedRequestBuilder("/cattle-with-vaccines").GET().build();
 
@@ -87,7 +84,6 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    /** Persists new cattle data to the server. */
     public boolean saveCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
         HttpRequest request = authenticatedRequestBuilder("/cattle")
@@ -102,7 +98,6 @@ public class CattleApiService {
         }
     }
 
-    /** Updates existing cattle data. */
     public boolean updateCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
         HttpRequest request = authenticatedRequestBuilder("/cattle/" + cattle.getId())
@@ -117,7 +112,6 @@ public class CattleApiService {
         }
     }
 
-    /** Records a new vaccination event. */
     public boolean saveVaccine(Vaccine vaccine) {
         String body = client.getGson().toJson(vaccine);
         HttpRequest request = authenticatedRequestBuilder("/vaccines")
@@ -132,7 +126,6 @@ public class CattleApiService {
         }
     }
 
-    /** Lists vaccines applied to a specific animal. */
     public List<Vaccine> getVaccinesByCattle(String rfidTag) {
         if (rfidTag == null || rfidTag.isBlank())
             return new ArrayList<>();
@@ -152,10 +145,6 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    /**
-     * Fetches all available vaccine types from the server.
-     * Called once at startup so the form can show a dropdown.
-     */
     public List<VaccineType> getVaccineTypes() {
         HttpRequest request = authenticatedRequestBuilder("/vaccine-types").GET().build();
 
@@ -172,8 +161,6 @@ public class CattleApiService {
         }
         return new ArrayList<>();
     }
-
-    // --- helpers ---
 
     private HttpRequest.Builder authenticatedRequestBuilder(String path) {
         return client.newAuthenticatedRequestBuilder(path, user.getAccessToken());
