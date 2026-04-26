@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cattle;
 use App\Models\User;
 use App\Models\Vaccine;
+use App\Models\VaccineType;
 
 class VaccineController extends Controller
 {
@@ -16,14 +17,14 @@ class VaccineController extends Controller
         $q   = request('q');
         $col = request('col');
 
-        $vaccines = Vaccine::with('user', 'workstation', 'cattle')
+        $vaccines = Vaccine::with('user', 'workstation', 'cattle', 'vaccineType')
             ->when($q, function ($query) use ($q, $col) {
                 match ($col) {
-                    'vaccine_type' => $query->where('vaccine_type', 'like', "%{$q}%"),
+                    'vaccine_type' => $query->whereHas('vaccineType', fn ($vt) => $vt->where('name', 'like', "%{$q}%")),
                     'rfid_tag'     => $query->where('rfid_tag', 'like', "%{$q}%"),
                     'animal'       => $query->whereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%")),
                     default        => $query->where(fn ($s) => $s
-                        ->where('vaccine_type', 'like', "%{$q}%")
+                        ->whereHas('vaccineType', fn ($vt) => $vt->where('name', 'like', "%{$q}%"))
                         ->orWhere('rfid_tag', 'like', "%{$q}%")
                         ->orWhereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%"))),
                 };
@@ -37,9 +38,18 @@ class VaccineController extends Controller
         return view('admin.vaccines.index', compact('vaccines'));
     }
 
+    public function create()
+    {
+        $gattos       = Cattle::all();
+        $vets         = User::where('is_veterinarian', true)->get();
+        $vaccineTypes = VaccineType::orderBy('name')->get();
+
+        return view('admin.vaccines.create', compact('gattos', 'vets', 'vaccineTypes'));
+    }
+
     public function store(StoreVaccineRequest $request)
     {
-        $vaccine = Vaccine::create(array_merge(
+        Vaccine::create(array_merge(
             $request->validated(),
             ['user_id' => auth()->id()],
         ));
@@ -48,13 +58,5 @@ class VaccineController extends Controller
             ->update(['weight' => $request->current_weight]);
 
         return redirect()->route('admin.vaccines.index')->with('success', 'Vacinação registrada!');
-    }
-
-    public function create()
-    {
-        $gattos = Cattle::all();
-        $vets = User::where('is_veterinarian', true)->get();
-
-        return view('admin.vaccines.create', compact('gattos', 'vets'));
     }
 }

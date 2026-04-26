@@ -21,7 +21,6 @@ class DashboardController extends Controller
 
         // ── Insight KPIs ──────────────────────────────────────────────────────
 
-        // Vaccination coverage %
         $vaccinatedCattle = DB::table('cattle')
             ->whereExists(function ($q) {
                 $q->select(DB::raw(1))
@@ -33,16 +32,16 @@ class DashboardController extends Controller
             ? round(($vaccinatedCattle / $stats['cattle']) * 100, 1)
             : 0;
 
-        // Average herd weight
         $avgWeight = round((float) Cattle::avg('weight'), 2);
 
-        // Most-used vaccine type
-        $topVaccine = Vaccine::select('vaccine_type', DB::raw('COUNT(*) as total'))
-            ->groupBy('vaccine_type')
+        // Most-used vaccine type (join for name)
+        $topVaccine = DB::table('vaccines')
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
+            ->select('vaccine_types.name', DB::raw('COUNT(*) as total'))
+            ->groupBy('vaccine_types.id', 'vaccine_types.name')
             ->orderByDesc('total')
-            ->value('vaccine_type') ?? '—';
+            ->value('vaccine_types.name') ?? '—';
 
-        // Most active vet (by vaccines applied)
         $topVetRow = DB::table('vaccines')
             ->join('users', 'vaccines.user_id', '=', 'users.id')
             ->select('users.name', DB::raw('COUNT(*) as total'))
@@ -53,7 +52,6 @@ class DashboardController extends Controller
             ? ['name' => $topVetRow->name, 'count' => (int) $topVetRow->total]
             : ['name' => '—', 'count' => 0];
 
-        // Cattle never vaccinated
         $neverVaccinated = DB::table('cattle')
             ->whereNotExists(function ($q) {
                 $q->select(DB::raw(1))
@@ -62,7 +60,6 @@ class DashboardController extends Controller
             })
             ->count();
 
-        // Average days since last vaccination (SQLite JULIANDAY)
         $avgDaysSinceVax = DB::table('cattle')
             ->join(
                 DB::raw('(SELECT rfid_tag, MAX(vaccination_date) as last_vax FROM vaccines GROUP BY rfid_tag) as lv'),
@@ -82,7 +79,6 @@ class DashboardController extends Controller
 
         // ── Chart datasets ────────────────────────────────────────────────────
 
-        // Helper: build monthly vaccination counts for N months back
         $buildMonthly = function (int $months): array {
             $raw = DB::table('vaccines')
                 ->select(
@@ -105,22 +101,22 @@ class DashboardController extends Controller
             return ['labels' => $labels, 'values' => $values];
         };
 
-        // Period datasets for interactive filter (pre-computed, no AJAX needed)
         $chartPeriods = [
             '3m'  => $buildMonthly(3),
             '6m'  => $buildMonthly(6),
             '12m' => $buildMonthly(12),
         ];
 
-        // Vaccine type distribution
-        $vaccineTypes = DB::table('vaccines')
-            ->select('vaccine_type', DB::raw('COUNT(*) as total'))
-            ->groupBy('vaccine_type')
+        // Vaccine type distribution (join for name)
+        $vaccineTypesData = DB::table('vaccines')
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
+            ->select('vaccine_types.name as vaccine_type', DB::raw('COUNT(*) as total'))
+            ->groupBy('vaccine_types.id', 'vaccine_types.name')
             ->orderByDesc('total')
             ->get();
         $chartVaccineTypes = [
-            'labels' => $vaccineTypes->pluck('vaccine_type')->toArray(),
-            'values' => $vaccineTypes->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
+            'labels' => $vaccineTypesData->pluck('vaccine_type')->toArray(),
+            'values' => $vaccineTypesData->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
         ];
 
         // Cattle per veterinarian
@@ -151,7 +147,7 @@ class DashboardController extends Controller
             'values' => $vaccinesPerWorkstation->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
         ];
 
-        // Average weight at vaccination events by month (tracks herd weight evolution)
+        // Average weight evolution by month
         $weightRaw = DB::table('vaccines')
             ->select(
                 DB::raw("strftime('%Y-%m', vaccination_date) as month"),
@@ -167,13 +163,13 @@ class DashboardController extends Controller
         $weightLabels = [];
         $weightValues = [];
         for ($i = 11; $i >= 0; $i--) {
-            $key           = now()->subMonths($i)->format('Y-m');
+            $key            = now()->subMonths($i)->format('Y-m');
             $weightLabels[] = now()->subMonths($i)->translatedFormat('M/y');
             $weightValues[] = $weightRaw->has($key) ? (float) $weightRaw[$key]->avg_weight : null;
         }
         $chartWeightEvolution = ['labels' => $weightLabels, 'values' => $weightValues];
 
-        // Average weight at vaccination per workstation
+        // Average weight per workstation
         $weightByStation = DB::table('vaccines')
             ->leftJoin('workstations', 'vaccines.workstation_id', '=', 'workstations.id')
             ->select(
@@ -189,15 +185,16 @@ class DashboardController extends Controller
             'values' => $weightByStation->pluck('avg_weight')->map(fn ($v) => (float) $v)->toArray(),
         ];
 
-        // Vaccine type breakdown per workstation (stacked bar)
+        // Vaccine type breakdown per workstation — stacked bar (join for name)
         $vaxByStation = DB::table('vaccines')
             ->leftJoin('workstations', 'vaccines.workstation_id', '=', 'workstations.id')
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
             ->select(
                 DB::raw("COALESCE(workstations.desc, 'Sem Estação') as station"),
-                'vaccines.vaccine_type',
+                'vaccine_types.name as vaccine_type',
                 DB::raw('COUNT(*) as total')
             )
-            ->groupBy('workstations.id', 'workstations.desc', 'vaccines.vaccine_type')
+            ->groupBy('workstations.id', 'workstations.desc', 'vaccine_types.id', 'vaccine_types.name')
             ->orderBy('station')
             ->get();
 
@@ -219,11 +216,12 @@ class DashboardController extends Controller
             'datasets' => $stackedDatasets,
         ];
 
-        // Average weight at vaccination per vaccine type (horizontal bar)
+        // Average weight per vaccine type (join for name)
         $weightByVaccine = DB::table('vaccines')
-            ->select('vaccine_type', DB::raw('ROUND(AVG(current_weight), 1) as avg_weight'))
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
+            ->select('vaccine_types.name as vaccine_type', DB::raw('ROUND(AVG(current_weight), 1) as avg_weight'))
             ->where('current_weight', '>', 0)
-            ->groupBy('vaccine_type')
+            ->groupBy('vaccine_types.id', 'vaccine_types.name')
             ->orderByDesc('avg_weight')
             ->get();
         $chartWeightByVaccineType = [
@@ -231,8 +229,8 @@ class DashboardController extends Controller
             'values' => $weightByVaccine->pluck('avg_weight')->map(fn ($v) => (float) $v)->toArray(),
         ];
 
-        // Seasonal vaccination pattern: counts by month-of-year, all years aggregated
-        $monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        // Seasonal vaccination pattern
+        $monthNames  = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         $seasonalRaw = DB::table('vaccines')
             ->select(DB::raw("strftime('%m', vaccination_date) as month_num"), DB::raw('COUNT(*) as total'))
             ->groupBy('month_num')
@@ -246,13 +244,14 @@ class DashboardController extends Controller
         }
         $chartSeasonalVaccinations = ['labels' => $monthNames, 'values' => $seasonalValues];
 
-        // Last 10 vaccinations (recent activity feed)
+        // Last 10 vaccinations (join for vaccine type name)
         $recentVaccinations = DB::table('vaccines')
             ->join('cattle', 'vaccines.rfid_tag', '=', 'cattle.rfid_tag')
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
             ->leftJoin('users', 'vaccines.user_id', '=', 'users.id')
             ->select(
                 'cattle.name as animal',
-                'vaccines.vaccine_type',
+                'vaccine_types.name as vaccine_type',
                 'vaccines.current_weight',
                 'vaccines.vaccination_date',
                 DB::raw("COALESCE(users.name, '—') as vet")

@@ -23,5 +23,23 @@ test.describe('Vaccines Module', () => {
         await expect(vaccinePage.vaccineRows.first()).toBeVisible();
     });
 
+    test('should navigate to create form and back', async ({page}) => {
+        await page.goto('/admin/vaccines/create');
+        await expect(vaccinePage.vaccineTypeSelect).toBeVisible();
+        await page.goBack();
+        await expect(page).toHaveURL(/\/admin\/vaccines/);
+    });
 
+    test('should create a new vaccine successfully', async ({page}) => {
+        await page.goto('/admin/vaccines/create');
+
+        await vaccinePage.animalSelect.selectOption({index: 1});
+        await vaccinePage.vaccineTypeSelect.selectOption({label: /Febre Aftosa/});
+        await vaccinePage.weightInput.fill('350.5');
+        await vaccinePage.vetSelect.selectOption({index: 1});
+        await vaccinePage.submitButton.click();
+
+        await expect(page).toHaveURL(/\/admin\/vaccines/);
+        await expect(page.locator('body')).toContainText('Vacinação registrada');
+    });
 });

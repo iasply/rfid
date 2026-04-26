@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cattle;
 use App\Models\User;
+use App\Models\VaccineType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -25,13 +26,15 @@ class ApiSyncTest extends TestCase
             'weight' => 300.0,
         ]);
 
+        $vaccineType = VaccineType::factory()->create(['name' => 'Anti-Rábica']);
+
         $token = $vet->createToken('Desktop')->plainTextToken;
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/desktop/vaccines', [
             'rfid_tag' => $cattle->rfid_tag,
-            'vaccine_type' => 'Anti-Rábica',
+            'vaccine_type_id' => $vaccineType->id,
             'current_weight' => 310.5,
             'vaccination_date' => now()->toDateString(),
             'vaccinator_username' => $vet->username,
@@ -40,7 +43,7 @@ class ApiSyncTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('vaccines', [
             'rfid_tag' => $cattle->rfid_tag,
-            'vaccine_type' => 'Anti-Rábica',
+            'vaccine_type_id' => $vaccineType->id,
         ]);
 
         // Verify cattle weight was updated

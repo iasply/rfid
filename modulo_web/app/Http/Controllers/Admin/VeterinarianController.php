@@ -8,6 +8,7 @@ use App\DTOs\Response\VaccineResponse;
 use App\DTOs\Response\VeterinarianResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Vaccine;
 use Illuminate\Support\Facades\Hash;
 
 class VeterinarianController extends Controller
@@ -38,7 +39,7 @@ class VeterinarianController extends Controller
     public function store(StoreVeterinarianRequest $request)
     {
         User::create(array_merge($request->validated(), [
-            'password' => Hash::make($request->password),
+            'password'        => Hash::make($request->password),
             'is_veterinarian' => true,
         ]));
 
@@ -58,15 +59,15 @@ class VeterinarianController extends Controller
         $q   = request('q');
         $col = request('col');
 
-        $vaccinations = \App\Models\Vaccine::with('cattle', 'workstation')
+        $vaccinations = Vaccine::with('cattle', 'workstation', 'vaccineType')
             ->where('user_id', $veterinarian->id)
             ->when($q, function ($query) use ($q, $col) {
                 match ($col) {
-                    'vaccine_type' => $query->where('vaccine_type', 'like', "%{$q}%"),
+                    'vaccine_type' => $query->whereHas('vaccineType', fn ($vt) => $vt->where('name', 'like', "%{$q}%")),
                     'rfid_tag'     => $query->where('rfid_tag', 'like', "%{$q}%"),
                     'animal'       => $query->whereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%")),
                     default        => $query->where(fn ($s) => $s
-                        ->where('vaccine_type', 'like', "%{$q}%")
+                        ->whereHas('vaccineType', fn ($vt) => $vt->where('name', 'like', "%{$q}%"))
                         ->orWhere('rfid_tag', 'like', "%{$q}%")
                         ->orWhereHas('cattle', fn ($c) => $c->where('name', 'like', "%{$q}%"))),
                 };
@@ -75,7 +76,7 @@ class VeterinarianController extends Controller
             ->orderByDesc('id')
             ->paginate(10)
             ->withQueryString()
-            ->through(fn (\App\Models\Vaccine $v) => VaccineResponse::fromModel($v));
+            ->through(fn (Vaccine $v) => VaccineResponse::fromModel($v));
 
         return view('admin.veterinarians.show', [
             'veterinarian' => $dto,

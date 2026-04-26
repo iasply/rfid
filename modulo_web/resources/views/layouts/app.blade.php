@@ -175,6 +175,10 @@
                class="nav-link {{ request()->routeIs('admin.vaccines.*') ? 'active' : '' }}">
                 Vacinas
             </a>
+            <a href="{{ route('admin.vaccine-types.index') }}"
+               class="nav-link {{ request()->routeIs('admin.vaccine-types.*') ? 'active' : '' }}">
+                Tipos de Vacina
+            </a>
             <a href="{{ route('admin.workstations.index') }}"
                class="nav-link {{ request()->routeIs('admin.workstations.*') ? 'active' : '' }}">
                 Estações
@@ -185,8 +189,8 @@
                 Avisos
                 @php
                     $alertCount = \Illuminate\Support\Facades\Cache::remember('alert_badge_count', 300, function () {
-                        return \App\Models\Vaccine::selectRaw('rfid_tag, vaccine_type, MAX(vaccination_date) as last_vax')
-                            ->groupBy('rfid_tag', 'vaccine_type')
+                        return \App\Models\Vaccine::selectRaw('rfid_tag, vaccine_type_id, MAX(vaccination_date) as last_vax')
+                            ->groupBy('rfid_tag', 'vaccine_type_id')
                             ->get()
                             ->filter(fn($r) => \Carbon\Carbon::parse($r->last_vax)->addDays(150)->isPast())
                             ->count();

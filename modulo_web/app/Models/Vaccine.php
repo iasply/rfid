@@ -11,12 +11,17 @@ class Vaccine extends Model
 
     protected $fillable = [
         'rfid_tag',
-        'vaccine_type',
+        'vaccine_type_id',
         'current_weight',
         'vaccination_date',
         'user_id',
         'workstation_id',
     ];
+
+    public function vaccineType()
+    {
+        return $this->belongsTo(VaccineType::class);
+    }
 
     public function user()
     {

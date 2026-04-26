@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Cattle;
 use App\Models\User;
 use App\Models\Vaccine;
+use App\Models\VaccineType;
 use App\Models\Workstation;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -15,17 +16,7 @@ class LargeTestDatasetSeeder extends Seeder
     /**
      * Monthly probability weights per vaccine type (index 0 = January, 11 = December).
      *
-     * Based on the Brazilian MAPA/Embrapa bovine vaccination calendar:
-     *   - Febre Aftosa:          mandatory government campaigns in May and November
-     *   - Brucelose:             1st-semester deadline (May 31), permitted until Nov 30
-     *   - Raiva:                 endemic regions; peaks during rainy season (Nov–Apr)
-     *   - Clostridiose:          polyvalent, mild 1st-semester bias
-     *   - Carbúnculo Sintomático:paired with Clostridiose, young animals
-     *   - Leptospirose:          every 6 months → two peaks (May, Oct/Nov)
-     *   - IBR/BVD:               pre-breeding season (Mar/Sep)
-     *   - Verminose:             "5-7-9" scheme (May, July, September) + Nov reinforcement
-     *   - Tristeza Parasitária:  tick-driven, dry season bias (Jun–Sep)
-     *   - Botulismo:             dry season (Jun–Oct)
+     * Based on the Brazilian MAPA/Embrapa bovine vaccination calendar.
      */
     private array $vaccineSeasons = [
         'Febre Aftosa'           => [ 1,  1,  1,  2, 10,  2,  1,  1,  1,  2, 10,  2],
@@ -51,7 +42,7 @@ class LargeTestDatasetSeeder extends Seeder
         $vets         = User::factory()->count(10)->veterinarian()->create();
 
         // 300 cattle distributed evenly across vets
-        $allCattle  = collect();
+        $allCattle   = collect();
         $totalCattle = 300;
         $perVet      = intdiv($totalCattle, $vets->count());
         $extra       = $totalCattle % $vets->count();
@@ -62,11 +53,15 @@ class LargeTestDatasetSeeder extends Seeder
             $allCattle = $allCattle->concat($batch);
         }
 
-        $vaccineTypes = array_keys($this->vaccineSeasons);
-        $yearStart    = Carbon::now()->subYear()->startOfDay();
-        $today        = Carbon::now()->startOfDay();
+        // Pre-build id lookup: vaccine type name → id (only for types in vaccineSeasons)
+        $vaccineTypeMap = VaccineType::whereIn('name', array_keys($this->vaccineSeasons))
+            ->pluck('id', 'name')
+            ->all();
 
-        // Pre-build workstation id list and vet id list for fast random access
+        $vaccineTypeNames = array_keys($this->vaccineSeasons);
+        $yearStart        = Carbon::now()->subYear()->startOfDay();
+        $today            = Carbon::now()->startOfDay();
+
         $wsIds  = $workstations->pluck('id')->all();
         $vetIds = $vets->pluck('id')->all();
 
@@ -75,27 +70,28 @@ class LargeTestDatasetSeeder extends Seeder
         foreach ($allCattle as $animal) {
             $vaccineCount = rand(3, 8);
 
-            // Shuffle types so each animal gets a varied, non-repetitive schedule
-            $shuffled  = $vaccineTypes;
+            $shuffled = $vaccineTypeNames;
             shuffle($shuffled);
-            $schedule  = array_slice($shuffled, 0, $vaccineCount);
+            $schedule = array_slice($shuffled, 0, $vaccineCount);
 
-            foreach ($schedule as $type) {
-                $date = $this->seasonalDate($yearStart, $today, $type);
+            foreach ($schedule as $typeName) {
+                // Skip if the type wasn't seeded (shouldn't happen but defensive)
+                if (!isset($vaccineTypeMap[$typeName])) {
+                    continue;
+                }
 
-                // Weight at vaccination time: animals are lighter further in the past.
-                // Assume 10–30% total growth over the year (realistic for beef cattle).
+                $date = $this->seasonalDate($yearStart, $today, $typeName);
+
                 $daysAgo     = $today->diffInDays($date);
                 $growthShare = rand(10, 30) / 100;
                 $factor      = 1 - ($growthShare * ($daysAgo / 365));
                 $pastWeight  = $animal->weight * max(0.70, $factor);
-                // Add a small noise of ±2% around the estimated past weight
                 $noise       = $pastWeight * (rand(-20, 20) / 1000);
                 $weight      = round(max(80.0, $pastWeight + $noise), 2);
 
                 $rows[] = [
                     'rfid_tag'         => $animal->rfid_tag,
-                    'vaccine_type'     => $type,
+                    'vaccine_type_id'  => $vaccineTypeMap[$typeName],
                     'current_weight'   => $weight,
                     'vaccination_date' => $date->toDateString(),
                     'user_id'          => $vetIds[array_rand($vetIds)],
@@ -106,7 +102,6 @@ class LargeTestDatasetSeeder extends Seeder
             }
         }
 
-        // Bulk insert in chunks (SQLite performs well up to ~500 rows per statement)
         foreach (array_chunk($rows, 500) as $chunk) {
             DB::table('vaccines')->insert($chunk);
         }
@@ -120,15 +115,10 @@ class LargeTestDatasetSeeder extends Seeder
         ));
     }
 
-    /**
-     * Pick a random date within [$from, $to] with monthly probability
-     * weighted by the given vaccine type's seasonal profile.
-     */
     private function seasonalDate(Carbon $from, Carbon $to, string $vaccineType): Carbon
     {
         $weights = $this->vaccineSeasons[$vaccineType] ?? array_fill(0, 12, 1);
 
-        // Build weighted pool: each calendar month in range appears $weight times
         $pool   = [];
         $cursor = $from->copy()->startOfMonth();
 
@@ -143,7 +133,6 @@ class LargeTestDatasetSeeder extends Seeder
         /** @var Carbon $chosenMonth */
         $chosenMonth = $pool[array_rand($pool)];
 
-        // Clamp day range to [from, to] within the chosen month
         $dayStart  = $chosenMonth->copy()->startOfMonth()->max($from);
         $dayEnd    = $chosenMonth->copy()->endOfMonth()->min($to);
         $dayOffset = rand(0, max(0, (int) $dayEnd->diffInDays($dayStart)));

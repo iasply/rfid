@@ -11,8 +11,7 @@ class CattleController extends Controller
 {
     public function __construct(
         protected \App\Services\CattleService $cattleService
-    )
-    {
+    ) {
     }
 
     public function index()
@@ -51,7 +50,7 @@ class CattleController extends Controller
 
     public function show(Cattle $cattle)
     {
-        $cattle->load('vaccines.user', 'vaccines.workstation');
+        $cattle->load('vaccines.user', 'vaccines.workstation', 'vaccines.vaccineType');
 
         // Weight evolution — chronological, only records with a valid weight
         $chronological = $cattle->vaccines
@@ -64,9 +63,9 @@ class CattleController extends Controller
             'values' => $chronological->map(fn ($v) => (float) $v->current_weight)->toArray(),
         ];
 
-        // Vaccine type distribution for this animal
+        // Vaccine type distribution for this animal (keyed by type name)
         $typeCounts = $cattle->vaccines
-            ->groupBy('vaccine_type')
+            ->groupBy(fn ($v) => $v->vaccineType?->name ?? 'Desconhecida')
             ->map(fn ($group) => $group->count())
             ->sortDesc();
 

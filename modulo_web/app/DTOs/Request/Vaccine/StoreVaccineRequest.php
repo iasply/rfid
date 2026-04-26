@@ -23,8 +23,8 @@ class StoreVaccineRequest extends FormRequest
                     }
                 },
             ],
-            'vaccine_type' => 'required|string|max:255',
-            'current_weight' => 'required|numeric|min:0',
+            'vaccine_type_id'  => 'required|exists:vaccine_types,id',
+            'current_weight'   => 'required|numeric|min:0',
             'vaccination_date' => 'required|date',
         ];
     }
