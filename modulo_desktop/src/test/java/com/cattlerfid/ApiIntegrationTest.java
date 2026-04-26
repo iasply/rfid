@@ -5,6 +5,7 @@ import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
+import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.util.RfidGenerator;
@@ -81,9 +82,13 @@ public class ApiIntegrationTest {
     @DisplayName("Should register a vaccine for a test cattle")
     void testRegisterVaccine() {
         assertNotNull(cattleService);
+
+        List<VaccineType> types = cattleService.getVaccineTypes();
+        assertFalse(types.isEmpty(), "API must return at least one vaccine type");
+
         Vaccine v = new Vaccine();
         v.setRfidTag(sharedTestTag);
-        v.setVaccineType("BRUCELOSE");
+        v.setVaccineTypeId(types.get(0).getId());
         v.setCurrentWeight(180.0);
         v.setVaccinationDate("2024-03-14");
 

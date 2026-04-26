@@ -4,9 +4,11 @@ import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
+import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.util.RfidGenerator;
 import com.cattlerfid.view.utils.UIStyles;
+import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private JButton scanCattleButton;
 
     private CattleFormPanel activeCattleForm;
+    private List<VaccineType> vaccineTypes;
 
     public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
                      com.cattlerfid.config.ApiConfig apiConfig) {
@@ -29,7 +32,10 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         this.cattleController = cattleController;
         this.navManager = navManager;
         this.apiConfig = apiConfig;
-        this.cattleController.setViewListener(this); // Assume controle dos callbacks
+        this.cattleController.setViewListener(this);
+
+        // Fetch available vaccine types once at startup so forms can show a dropdown
+        this.vaccineTypes = cattleController.getApiService().getVaccineTypes();
 
         setupUI();
     }
@@ -142,7 +148,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Animal Encontrado (" + cattle.getRfidTag() + ")");
             System.out.println("-> Abrindo Formulário de Vacina para: " + cattle.getRfidTag());
-            VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser, navManager, this);
+            VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser, navManager, this, vaccineTypes);
             navManager.showPanel("Vaccine", form);
         });
     }

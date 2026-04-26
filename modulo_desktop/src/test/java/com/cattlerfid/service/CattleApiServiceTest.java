@@ -4,6 +4,7 @@ import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
+import com.cattlerfid.model.VaccineType;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -98,6 +99,7 @@ public class CattleApiServiceTest {
     void should_save_vaccine_successfully() throws IOException, InterruptedException {
         Vaccine vaccine = new Vaccine();
         vaccine.setRfidTag("C001");
+        vaccine.setVaccineTypeId(1L);
 
         when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
@@ -106,5 +108,22 @@ public class CattleApiServiceTest {
         boolean result = apiService.saveVaccine(vaccine);
 
         assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Should fetch vaccine types successfully")
+    void should_fetch_vaccine_types_successfully() throws IOException, InterruptedException {
+        String json = "{\"data\": [{\"id\":1,\"name\":\"Febre Aftosa\",\"interval_days\":180}, {\"id\":2,\"name\":\"Brucelose\",\"interval_days\":365}]}";
+
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(json);
+
+        List<VaccineType> result = apiService.getVaccineTypes();
+
+        assertEquals(2, result.size());
+        assertEquals("Febre Aftosa", result.get(0).getName());
+        assertEquals(180, result.get(0).getIntervalDays());
     }
 }

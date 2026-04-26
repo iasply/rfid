@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Represents a Vaccine record.
- * Matches VaccineResponse DTO and StoreVaccineRequest fields.
+ * Matches VaccineResource fields and StoreVaccineRequest.
  */
 public class Vaccine {
     private String id;
@@ -13,87 +13,54 @@ public class Vaccine {
     private String rfidTag;
 
     @SerializedName("vaccination_date")
-    private String vaccinationDate; // Using String to simplify API parsing (YYYY-MM-DD)
+    private String vaccinationDate;
 
-    @SerializedName("vaccine_type")
-    private String vaccineType;
+    @SerializedName("vaccine_type_id")
+    private long vaccineTypeId;
+
+    @SerializedName("vaccine_type_name")
+    private String vaccineTypeName;
 
     @SerializedName("current_weight")
     private double currentWeight;
 
-    // Response-only fields
     @SerializedName("veterinarian_name")
     private String veterinarianName;
 
     @SerializedName("workstation_desc")
     private String workstationDesc;
 
-    public Vaccine() {
-    }
+    public Vaccine() {}
 
-    public Vaccine(String id, String rfidTag, String vaccinationDate, String vaccineType, double currentWeight) {
-        this.id = id;
-        this.rfidTag = rfidTag;
+    public Vaccine(String id, String rfidTag, String vaccinationDate, long vaccineTypeId, double currentWeight) {
+        this.id            = id;
+        this.rfidTag       = rfidTag;
         this.vaccinationDate = vaccinationDate;
-        this.vaccineType = vaccineType;
+        this.vaccineTypeId = vaccineTypeId;
         this.currentWeight = currentWeight;
     }
 
-    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public String getId() {
-        return id;
-    }
+    public String getRfidTag() { return rfidTag; }
+    public void setRfidTag(String rfidTag) { this.rfidTag = rfidTag; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getVaccinationDate() { return vaccinationDate; }
+    public void setVaccinationDate(String vaccinationDate) { this.vaccinationDate = vaccinationDate; }
 
-    public String getRfidTag() {
-        return rfidTag;
-    }
+    public long getVaccineTypeId() { return vaccineTypeId; }
+    public void setVaccineTypeId(long vaccineTypeId) { this.vaccineTypeId = vaccineTypeId; }
 
-    public void setRfidTag(String rfidTag) {
-        this.rfidTag = rfidTag;
-    }
+    public String getVaccineTypeName() { return vaccineTypeName; }
+    public void setVaccineTypeName(String vaccineTypeName) { this.vaccineTypeName = vaccineTypeName; }
 
-    public String getVaccinationDate() {
-        return vaccinationDate;
-    }
+    public double getCurrentWeight() { return currentWeight; }
+    public void setCurrentWeight(double currentWeight) { this.currentWeight = currentWeight; }
 
-    public void setVaccinationDate(String vaccinationDate) {
-        this.vaccinationDate = vaccinationDate;
-    }
+    public String getVeterinarianName() { return veterinarianName; }
+    public void setVeterinarianName(String veterinarianName) { this.veterinarianName = veterinarianName; }
 
-    public String getVaccineType() {
-        return vaccineType;
-    }
-
-    public void setVaccineType(String vaccineType) {
-        this.vaccineType = vaccineType;
-    }
-
-    public double getCurrentWeight() {
-        return currentWeight;
-    }
-
-    public void setCurrentWeight(double currentWeight) {
-        this.currentWeight = currentWeight;
-    }
-
-    public String getVeterinarianName() {
-        return veterinarianName;
-    }
-
-    public void setVeterinarianName(String veterinarianName) {
-        this.veterinarianName = veterinarianName;
-    }
-
-    public String getWorkstationDesc() {
-        return workstationDesc;
-    }
-
-    public void setWorkstationDesc(String workstationDesc) {
-        this.workstationDesc = workstationDesc;
-    }
+    public String getWorkstationDesc() { return workstationDesc; }
+    public void setWorkstationDesc(String workstationDesc) { this.workstationDesc = workstationDesc; }
 }

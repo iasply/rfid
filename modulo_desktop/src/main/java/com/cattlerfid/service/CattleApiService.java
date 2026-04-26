@@ -5,6 +5,7 @@ import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
+import com.cattlerfid.model.VaccineType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -18,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Communicates with the Laravel API for Cattle and Vaccine operations.
- * Requires an authenticated User (with Bearer token).
+ * Communicates with the Laravel API for Cattle, Vaccine, and VaccineType operations.
  */
 public class CattleApiService {
 
@@ -35,16 +35,12 @@ public class CattleApiService {
         this.user = user;
     }
 
-    /**
-     * Finds a single cattle by its RFID tag content.
-     */
+    /** Finds a single cattle by its RFID tag content. */
     public Optional<Cattle> getCattleByTag(String rfidTag) {
         if (rfidTag == null || rfidTag.isBlank())
             return Optional.empty();
 
-        HttpRequest request = authenticatedRequestBuilder("/cattle/" + rfidTag)
-                .GET()
-                .build();
+        HttpRequest request = authenticatedRequestBuilder("/cattle/" + rfidTag).GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -57,21 +53,16 @@ public class CattleApiService {
         return Optional.empty();
     }
 
-    /**
-     * Lists all cattle registered in the system.
-     */
+    /** Lists all cattle registered in the system. */
     public List<Cattle> getAllCattle() {
-        HttpRequest request = authenticatedRequestBuilder("/cattle")
-                .GET()
-                .build();
+        HttpRequest request = authenticatedRequestBuilder("/cattle").GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
-                JsonArray dataArray = jsonObject.getAsJsonArray("data");
+                JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
-                return client.getGson().fromJson(dataArray, listType);
+                return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle", e);
@@ -79,21 +70,16 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    /**
-     * Lists all cattle registered in the system along with their vaccine count.
-     */
+    /** Lists all cattle with their vaccine count. */
     public List<Cattle> getAllCattleWithVaccines() {
-        HttpRequest request = authenticatedRequestBuilder("/cattle-with-vaccines")
-                .GET()
-                .build();
+        HttpRequest request = authenticatedRequestBuilder("/cattle-with-vaccines").GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
-                JsonArray dataArray = jsonObject.getAsJsonArray("data");
+                JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
-                return client.getGson().fromJson(dataArray, listType);
+                return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching all cattle with vaccines", e);
@@ -101,14 +87,11 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    /**
-     * Persists new cattle data to the cloud.
-     */
+    /** Persists new cattle data to the server. */
     public boolean saveCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
         HttpRequest request = authenticatedRequestBuilder("/cattle")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -119,14 +102,11 @@ public class CattleApiService {
         }
     }
 
-    /**
-     * Updates existing cattle data on the cloud.
-     */
+    /** Updates existing cattle data. */
     public boolean updateCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
         HttpRequest request = authenticatedRequestBuilder("/cattle/" + cattle.getId())
-                .PUT(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+                .PUT(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -137,14 +117,11 @@ public class CattleApiService {
         }
     }
 
-    /**
-     * Records a new vaccination event.
-     */
+    /** Records a new vaccination event. */
     public boolean saveVaccine(Vaccine vaccine) {
         String body = client.getGson().toJson(vaccine);
         HttpRequest request = authenticatedRequestBuilder("/vaccines")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -155,24 +132,19 @@ public class CattleApiService {
         }
     }
 
-    /**
-     * Lists vaccines applied to a specific animal.
-     */
+    /** Lists vaccines applied to a specific animal. */
     public List<Vaccine> getVaccinesByCattle(String rfidTag) {
         if (rfidTag == null || rfidTag.isBlank())
             return new ArrayList<>();
 
-        HttpRequest request = authenticatedRequestBuilder("/vaccines?rfid_tag=" + rfidTag)
-                .GET()
-                .build();
+        HttpRequest request = authenticatedRequestBuilder("/vaccines?rfid_tag=" + rfidTag).GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
-                JsonObject jsonObject = client.getGson().fromJson(response.body(), JsonObject.class);
-                JsonArray dataArray = jsonObject.getAsJsonArray("data");
+                JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 Type listType = new TypeToken<ArrayList<Vaccine>>() {}.getType();
-                return client.getGson().fromJson(dataArray, listType);
+                return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
             handleError("Error fetching vaccines for tag: " + rfidTag, e);
@@ -180,7 +152,28 @@ public class CattleApiService {
         return new ArrayList<>();
     }
 
-    // --- Helper Methods ---
+    /**
+     * Fetches all available vaccine types from the server.
+     * Called once at startup so the form can show a dropdown.
+     */
+    public List<VaccineType> getVaccineTypes() {
+        HttpRequest request = authenticatedRequestBuilder("/vaccine-types").GET().build();
+
+        try {
+            HttpResponse<String> response = client.send(request);
+            if (response.statusCode() == 200) {
+                JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
+                JsonArray data = obj.getAsJsonArray("data");
+                Type listType = new TypeToken<ArrayList<VaccineType>>() {}.getType();
+                return client.getGson().fromJson(data, listType);
+            }
+        } catch (IOException | InterruptedException e) {
+            handleError("Error fetching vaccine types", e);
+        }
+        return new ArrayList<>();
+    }
+
+    // --- helpers ---
 
     private HttpRequest.Builder authenticatedRequestBuilder(String path) {
         return client.newAuthenticatedRequestBuilder(path, user.getAccessToken());

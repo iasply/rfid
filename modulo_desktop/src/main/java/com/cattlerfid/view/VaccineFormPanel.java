@@ -4,6 +4,7 @@ import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
+import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class VaccineFormPanel extends JPanel {
 
@@ -21,23 +23,23 @@ public class VaccineFormPanel extends JPanel {
     private final MainPanel parentMainPanel;
 
     private JTextField dateField;
-    private JTextField vaccineTypeField;
+    private JComboBox<VaccineType> vaccineTypeCombo;
     private JTextField weightField;
-    private JTextField nameField;
     private JButton submitButton;
 
-    public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager,
-                            MainPanel parentMainPanel) {
-        this.cattle = cattle;
-        this.controller = controller;
-        this.loggedUser = loggedUser;
-        this.navManager = navManager;
+    public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser,
+                            NavigationManager navManager, MainPanel parentMainPanel,
+                            List<VaccineType> vaccineTypes) {
+        this.cattle          = cattle;
+        this.controller      = controller;
+        this.loggedUser      = loggedUser;
+        this.navManager      = navManager;
         this.parentMainPanel = parentMainPanel;
 
-        setupUI();
+        setupUI(vaccineTypes);
     }
 
-    private void setupUI() {
+    private void setupUI(List<VaccineType> vaccineTypes) {
         setLayout(new BorderLayout(10, 10));
         setBackground(UIStyles.BACKGROUND);
 
@@ -51,78 +53,50 @@ public class VaccineFormPanel extends JPanel {
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 30));
-        backButton.addActionListener(e -> {
-            navManager.showPanel("Main", parentMainPanel);
-        });
+        backButton.addActionListener(e -> navManager.showPanel("Main", parentMainPanel));
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Form Container with Card Styling
+        // Form card
         JPanel cardPanel = new JPanel(new GridBagLayout());
         cardPanel.setBackground(Color.WHITE);
         cardPanel.setBorder(UIStyles.createCardBorder());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
-        // RFID Tag
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        JLabel tagLabel = new JLabel("Tag RFID:");
-        tagLabel.setFont(UIStyles.LABEL_FONT);
-        cardPanel.add(tagLabel, gbc);
-
-        gbc.gridx = 1;
-        JTextField tagField = new JTextField(cattle.getRfidTag());
-        tagField.setFont(UIStyles.BODY_FONT);
-        tagField.setEditable(false);
-        tagField.setBackground(UIStyles.SECONDARY);
-        cardPanel.add(tagField, gbc);
+        // Tag RFID
+        addRow(cardPanel, gbc, 0, "Tag RFID:", makeReadonlyField(cattle.getRfidTag()));
 
         // Nome
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        JLabel nameLabel = new JLabel("Nome do Animal:");
-        nameLabel.setFont(UIStyles.LABEL_FONT);
-        cardPanel.add(nameLabel, gbc);
+        addRow(cardPanel, gbc, 1, "Nome do Animal:",
+               makeReadonlyField(cattle.getName() != null ? cattle.getName() : ""));
 
-        gbc.gridx = 1;
-        nameField = new JTextField(cattle.getName() != null ? cattle.getName() : "");
-        nameField.setFont(UIStyles.BODY_FONT);
-        nameField.setEditable(false);
-        nameField.setBackground(UIStyles.SECONDARY);
-        cardPanel.add(nameField, gbc);
+        // Veterinário
+        addRow(cardPanel, gbc, 2, "Veterinário:", makeReadonlyField(loggedUser.getName()));
 
-        // Responsável
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        JLabel respLabel = new JLabel("Veterinário:");
-        respLabel.setFont(UIStyles.LABEL_FONT);
-        cardPanel.add(respLabel, gbc);
-
-        gbc.gridx = 1;
-        JTextField userField = new JTextField(loggedUser.getName());
-        userField.setFont(UIStyles.BODY_FONT);
-        userField.setEditable(false);
-        userField.setBackground(UIStyles.SECONDARY);
-        cardPanel.add(userField, gbc);
-
-        // Vacina
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+        // Tipo da Vacina (dropdown)
+        gbc.gridx = 0; gbc.gridy = 3;
         JLabel vLabel = new JLabel("Tipo da Vacina:");
         vLabel.setFont(UIStyles.LABEL_FONT);
         cardPanel.add(vLabel, gbc);
 
         gbc.gridx = 1;
-        vaccineTypeField = new JTextField();
-        vaccineTypeField.setFont(UIStyles.BODY_FONT);
-        cardPanel.add(vaccineTypeField, gbc);
+        DefaultComboBoxModel<VaccineType> comboModel = new DefaultComboBoxModel<>();
+        if (vaccineTypes == null || vaccineTypes.isEmpty()) {
+            comboModel.addElement(null);  // fallback — won't happen if server is reachable
+        } else {
+            for (VaccineType vt : vaccineTypes) {
+                comboModel.addElement(vt);
+            }
+        }
+        vaccineTypeCombo = new JComboBox<>(comboModel);
+        vaccineTypeCombo.setFont(UIStyles.BODY_FONT);
+        cardPanel.add(vaccineTypeCombo, gbc);
 
         // Peso
-        gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 4;
         JLabel wLabel = new JLabel("Peso Atual (kg):");
         wLabel.setFont(UIStyles.LABEL_FONT);
         cardPanel.add(wLabel, gbc);
@@ -133,8 +107,7 @@ public class VaccineFormPanel extends JPanel {
         cardPanel.add(weightField, gbc);
 
         // Data
-        gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 5;
         JLabel dLabel = new JLabel("Data Aplicação:");
         dLabel.setFont(UIStyles.LABEL_FONT);
         cardPanel.add(dLabel, gbc);
@@ -144,14 +117,12 @@ public class VaccineFormPanel extends JPanel {
         dateField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(dateField, gbc);
 
-        // Wrapper for centering
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setBackground(UIStyles.BACKGROUND);
         wrapperPanel.add(cardPanel);
-
         add(wrapperPanel, BorderLayout.CENTER);
 
-        // Botoes Pannel
+        // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         buttonPanel.setBackground(UIStyles.BACKGROUND);
 
@@ -164,30 +135,46 @@ public class VaccineFormPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    private JTextField makeReadonlyField(String text) {
+        JTextField f = new JTextField(text);
+        f.setFont(UIStyles.BODY_FONT);
+        f.setEditable(false);
+        f.setBackground(UIStyles.SECONDARY);
+        return f;
+    }
+
+    private void addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JComponent field) {
+        gbc.gridx = 0; gbc.gridy = row;
+        JLabel label = new JLabel(labelText);
+        label.setFont(UIStyles.LABEL_FONT);
+        panel.add(label, gbc);
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+    }
+
     private void saveAction() {
         try {
+            VaccineType selectedType = (VaccineType) vaccineTypeCombo.getSelectedItem();
+            if (selectedType == null) {
+                JOptionPane.showMessageDialog(this, "Selecione um tipo de vacina.", "Aviso",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             double weight = 0.0;
             if (!weightField.getText().trim().isEmpty()) {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
 
-            LocalDate date;
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            date = LocalDate.parse(dateField.getText().trim(), formatter);
-
-            String vType = vaccineTypeField.getText().trim();
-            if (vType.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "O tipo/nome da vacina é obrigatório.", "Aviso",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+            LocalDate date = LocalDate.parse(dateField.getText().trim(),
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
             Vaccine v = new Vaccine();
             v.setRfidTag(cattle.getRfidTag());
-            v.setVaccineType(vType);
+            v.setVaccineTypeId(selectedType.getId());
             v.setCurrentWeight(weight);
 
-            // Convert DD/MM/YYYY (UI) to YYYY-MM-DD (API)
+            // Convert DD/MM/YYYY (UI) → YYYY-MM-DD (API)
             String[] parts = dateField.getText().trim().split("/");
             if (parts.length == 3) {
                 v.setVaccinationDate(parts[2] + "-" + parts[1] + "-" + parts[0]);
@@ -197,10 +184,10 @@ public class VaccineFormPanel extends JPanel {
             navManager.showPanel("Main", parentMainPanel);
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro",
                     JOptionPane.ERROR_MESSAGE);
         } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, "Data inválida. Use formato DD/MM/AAAA.", "Erro de Digitação",
+            JOptionPane.showMessageDialog(this, "Data inválida. Use formato DD/MM/AAAA.", "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
