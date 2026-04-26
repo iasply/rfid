@@ -77,7 +77,8 @@ public class CattleController {
     }
 
     // 4. Salva a vacina aplicada e atualiza o peso do animal
-    public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle, double currentWeight) {
+    public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle,
+            double currentWeight) {
         // O peso ja eh atualizado pelo VaccineApiController no servidor
         boolean vaccineSuccess = apiService.saveVaccine(vaccine);
 
@@ -135,7 +136,8 @@ public class CattleController {
                         if (cmdError.equals("NO_TAG")) {
                             viewListener.onRfidWriteError("Nenhuma Tag detectada para gravação.");
                         } else {
-                            viewListener.onRfidWriteError("Erro de leitura antes de gravar: " + cmdError);
+                            viewListener.onRfidWriteError(
+                                    "Erro de leitura antes de gravar: " + cmdError);
                         }
                     }
                     return;
@@ -143,7 +145,8 @@ public class CattleController {
 
                 if (viewListener != null) {
                     if (cmdError.equals(RfidConstants.ERR_WRITE_FAILED)) {
-                        viewListener.onRfidWriteError("Erro no barramento SPI ao gravar dados na Tag.");
+                        viewListener.onRfidWriteError(
+                                "Erro no barramento SPI ao gravar dados na Tag.");
                     } else if (cmdError.equals(RfidConstants.ERR_NO_TAG)) {
                         viewListener.onRfidReadError("Nenhuma Tag detectada.");
                     } else if (cmdError.equals(RfidConstants.ERR_AUTH)) {
@@ -165,7 +168,8 @@ public class CattleController {
                 }
             } else {
                 if (viewListener != null) {
-                    viewListener.onRfidReadError("Formato de Tag animal inválido ou inválida para o sistema. Lido: " + rfidTag);
+                    viewListener.onRfidReadError(
+                            "Formato de Tag animal inválido ou inválida para o sistema. Lido: " + rfidTag);
                 }
             }
             return;
@@ -180,7 +184,8 @@ public class CattleController {
                 viewListener.onRfidReadSuccess(currentEditingCattle, false);
         } else {
             if (viewListener != null)
-                viewListener.onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
+                viewListener.onRfidReadError(
+                        "Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
         }
     }
 

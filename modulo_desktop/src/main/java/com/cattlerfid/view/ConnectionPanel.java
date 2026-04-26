@@ -23,7 +23,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton testReadButton;
 
     public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-                           com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
+            com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.apiConfig = apiConfig;
@@ -191,7 +191,8 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
             controller.detachSerial();
 
-            LoginController loginController = new LoginController(authService, controller.getSerialService());
+            LoginController loginController = new LoginController(authService,
+                    controller.getSerialService());
             LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
 
             navManager.showPanel("Login", loginPanel);

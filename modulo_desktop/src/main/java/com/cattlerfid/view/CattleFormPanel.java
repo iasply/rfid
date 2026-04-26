@@ -25,8 +25,9 @@ public class CattleFormPanel extends JPanel {
     private JButton writeTagButton;
     private JButton saveDbButton;
 
-    public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+    public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual,
+            CattleController controller,
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
@@ -48,7 +49,8 @@ public class CattleFormPanel extends JPanel {
         headerPanel.setBackground(UIStyles.BACKGROUND);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel titleLabel = UIStyles.createTitleLabel(isNew ? "Novo Cadastro de Animal" : "Editando Animal");
+        JLabel titleLabel = UIStyles.createTitleLabel(
+                isNew ? "Novo Cadastro de Animal" : "Editando Animal");
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
@@ -162,7 +164,8 @@ public class CattleFormPanel extends JPanel {
         saveDbButton.setPreferredSize(new Dimension(220, 40));
         saveDbButton.setBackground(UIStyles.PRIMARY); // Emerald for Saving
         saveDbButton.addActionListener(e -> saveDbAction());
-        saveDbButton.setEnabled(!isManual || !isNew); // Habilita direto se for edição ou se não for manual
+        saveDbButton.setEnabled(
+                !isManual || !isNew); // Habilita direto se for edição ou se não for manual
         buttonPanel.add(saveDbButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -206,7 +209,8 @@ public class CattleFormPanel extends JPanel {
             }
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
+                    "Erro de Digitação",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -229,7 +233,8 @@ public class CattleFormPanel extends JPanel {
             controller.saveCattleData(cattle);
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação",
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
+                    "Erro de Digitação",
                     JOptionPane.ERROR_MESSAGE);
             saveDbButton.setEnabled(true);
         }

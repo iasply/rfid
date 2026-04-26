@@ -24,8 +24,9 @@ public class CattleListPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTable table;
 
-    public CattleListPanel(CattleApiService apiService, com.cattlerfid.controller.CattleController controller,
-                           User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+    public CattleListPanel(CattleApiService apiService,
+            com.cattlerfid.controller.CattleController controller,
+            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -73,9 +74,11 @@ public class CattleListPanel extends JPanel {
         // Alternating row colors
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected,
+                    boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected,
+                        hasFocus, row, column);
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
                 }
@@ -163,7 +166,8 @@ public class CattleListPanel extends JPanel {
             Cattle target = targetOpt.get();
             // Abre o formulario como isNew=false, isManual=true (permitir gravação RFID e
             // salvar no DB)
-            CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser, navManager,
+            CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser,
+                    navManager,
                     parentMainPanel);
 
             // Informa ao MainPanel (ouvinte master da porta serial) que esta é a tela
@@ -178,7 +182,8 @@ public class CattleListPanel extends JPanel {
             // necessário.
             navManager.showPanel("EditCattle", form);
         } else {
-            JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.", "Erro",
+            JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.",
+                    "Erro",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

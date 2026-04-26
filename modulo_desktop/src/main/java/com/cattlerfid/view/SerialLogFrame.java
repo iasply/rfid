@@ -94,7 +94,8 @@ public class SerialLogFrame extends JFrame {
             JButton simWriteErrButton = new JButton("Simular Erro Gravação");
 
             simWriteOkButton.addActionListener(e -> serialService.injectMessage("WRITE:OK"));
-            simWriteErrButton.addActionListener(e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU"));
+            simWriteErrButton.addActionListener(
+                    e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU"));
 
             writeSimPanel.add(simWriteOkButton);
             writeSimPanel.add(simWriteErrButton);

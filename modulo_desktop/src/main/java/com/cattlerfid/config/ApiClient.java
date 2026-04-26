@@ -70,7 +70,8 @@ public class ApiClient {
         String headers = request.headers().map().toString();
 
         if (headers.contains("Authorization=[Bearer ")) {
-            headers = headers.replaceAll("Authorization=\\[Bearer [^\\]]+\\]", "Authorization=[Bearer ********]");
+            headers = headers.replaceAll("Authorization=\\[Bearer [^\\]]+\\]",
+                    "Authorization=[Bearer ********]");
         }
 
         System.out.println("\n[API REQUEST]");
@@ -79,12 +80,27 @@ public class ApiClient {
         System.out.println("Headers: " + headers);
 
         request.bodyPublisher().ifPresent(publisher -> {
-            java.net.http.HttpResponse.BodySubscriber<String> subscriber = java.net.http.HttpResponse.BodySubscribers.ofString(java.nio.charset.StandardCharsets.UTF_8);
+            java.net.http.HttpResponse.BodySubscriber<String> subscriber = java.net.http.HttpResponse.BodySubscribers.ofString(
+                    java.nio.charset.StandardCharsets.UTF_8);
             publisher.subscribe(new java.util.concurrent.Flow.Subscriber<java.nio.ByteBuffer>() {
-                @Override public void onSubscribe(java.util.concurrent.Flow.Subscription s) { s.request(Long.MAX_VALUE); }
-                @Override public void onNext(java.nio.ByteBuffer item) { subscriber.onNext(java.util.List.of(item)); }
-                @Override public void onError(Throwable t) { }
-                @Override public void onComplete() { subscriber.onComplete(); }
+                @Override
+                public void onSubscribe(java.util.concurrent.Flow.Subscription s) {
+                    s.request(Long.MAX_VALUE);
+                }
+
+                @Override
+                public void onNext(java.nio.ByteBuffer item) {
+                    subscriber.onNext(java.util.List.of(item));
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                }
+
+                @Override
+                public void onComplete() {
+                    subscriber.onComplete();
+                }
             });
             try {
                 String body = subscriber.getBody().toCompletableFuture().join();

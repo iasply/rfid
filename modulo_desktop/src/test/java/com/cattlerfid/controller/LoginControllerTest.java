@@ -76,7 +76,8 @@ class LoginControllerTest {
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
-        verify(viewListenerMock).onLoginError("Acesso Negado: Tag não cadastrada como funcionário VET.");
+        verify(viewListenerMock).onLoginError(
+                "Acesso Negado: Tag não cadastrada como funcionário VET.");
         assertNull(controller.getLoggedUser());
     }
 
@@ -87,7 +88,8 @@ class LoginControllerTest {
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
         verify(viewListenerMock)
-                .onLoginError("Tag RFID inválida para Login (Veterinário). Lido: 'UNKNOWN12345678'");
+                .onLoginError(
+                        "Tag RFID inválida para Login (Veterinário). Lido: 'UNKNOWN12345678'");
         assertNull(controller.getLoggedUser());
         verify(authServiceMock, never()).authenticateByTag(any());
     }

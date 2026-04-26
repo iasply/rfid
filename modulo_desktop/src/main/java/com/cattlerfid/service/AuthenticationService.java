@@ -1,7 +1,7 @@
 package com.cattlerfid.service;
 
-import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.config.ApiClient;
+import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.User;
 import com.cattlerfid.util.RfidGenerator;
 import com.google.gson.JsonObject;
@@ -30,7 +30,8 @@ public class AuthenticationService {
         }
 
         if (!RfidGenerator.isVetTag(rawRfidTag)) {
-            System.err.println("[AuthenticationService] Invalid RFID tag for vet login: " + rawRfidTag);
+            System.err.println(
+                    "[AuthenticationService] Invalid RFID tag for vet login: " + rawRfidTag);
             return Optional.empty();
         }
 
@@ -56,7 +57,8 @@ public class AuthenticationService {
                 return Optional.of(user);
             }
 
-            System.err.println("[AuthenticationService] Login refused. Status: " + response.statusCode());
+            System.err.println(
+                    "[AuthenticationService] Login refused. Status: " + response.statusCode());
             return Optional.empty();
 
         } catch (IOException | InterruptedException e) {

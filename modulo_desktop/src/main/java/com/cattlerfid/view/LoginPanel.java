@@ -19,7 +19,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private JButton readCardButton;
 
     public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
-                      NavigationManager navManager) {
+            NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
         this.navManager = navManager;
@@ -50,8 +50,10 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             controller.getSerialService().disconnect();
 
             AuthenticationService authService = new AuthenticationService(apiConfig);
-            ConnectionController connController = new ConnectionController(controller.getSerialService());
-            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig, navManager);
+            ConnectionController connController = new ConnectionController(
+                    controller.getSerialService());
+            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig,
+                    navManager);
             navManager.showPanel("Connection", connPanel);
         });
         headerPanel.add(backButton, BorderLayout.WEST);
@@ -110,7 +112,8 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             }
 
             // Instancia o repositorio e controller global do sistema
-            com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService(apiConfig,
+            com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService(
+                    apiConfig,
                     user);
             com.cattlerfid.controller.CattleController cattleController = new com.cattlerfid.controller.CattleController(
                     apiService, controller.getSerialService());
@@ -127,7 +130,8 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             readCardButton.setText("Aproximar Crachá (READ)");
             statusLabel.setText(message);
             statusLabel.setForeground(Color.RED);
-            JOptionPane.showMessageDialog(this, message, "Erro de Login", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Erro de Login",
+                    JOptionPane.ERROR_MESSAGE);
         });
     }
 
@@ -145,7 +149,8 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText(message);
             statusLabel.setForeground(Color.RED);
-            JOptionPane.showMessageDialog(this, message, "Erro da Porta", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Erro da Porta",
+                    JOptionPane.ERROR_MESSAGE);
         });
     }
 

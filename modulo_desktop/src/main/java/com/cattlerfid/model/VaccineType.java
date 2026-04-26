@@ -1,6 +1,7 @@
 package com.cattlerfid.model;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class VaccineType {
@@ -15,24 +16,52 @@ public class VaccineType {
     @SerializedName("season_months")
     private List<Integer> seasonMonths;
 
-    public VaccineType() {}
+    public VaccineType() {
+    }
 
-    public long getId() { return id; }
-    public void setId(long id) { this.id = id; }
+    public long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
-    public Integer getIntervalDays() { return intervalDays; }
-    public void setIntervalDays(Integer intervalDays) { this.intervalDays = intervalDays; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public List<Integer> getSeasonMonths() { return seasonMonths; }
-    public void setSeasonMonths(List<Integer> seasonMonths) { this.seasonMonths = seasonMonths; }
+    public String getDescription() {
+        return description;
+    }
 
-    /** Shown in the JComboBox dropdown. */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getIntervalDays() {
+        return intervalDays;
+    }
+
+    public void setIntervalDays(Integer intervalDays) {
+        this.intervalDays = intervalDays;
+    }
+
+    public List<Integer> getSeasonMonths() {
+        return seasonMonths;
+    }
+
+    public void setSeasonMonths(List<Integer> seasonMonths) {
+        this.seasonMonths = seasonMonths;
+    }
+
+    /**
+     * Shown in the JComboBox dropdown.
+     */
     @Override
     public String toString() {
         if (intervalDays != null) {

@@ -26,7 +26,8 @@ public class Main {
             ConnectionController connectionController = new ConnectionController(serialService);
 
             ApplicationFrame appFrame = new ApplicationFrame();
-            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, apiConfig, appFrame);
+            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService,
+                    apiConfig, appFrame);
 
             appFrame.setVisible(true);
             appFrame.showPanel("Connection", connectionPanel);

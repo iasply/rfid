@@ -34,7 +34,8 @@ class SerialServiceTest {
         MockSerialService mockService = new MockSerialService();
         String hugePayload = "BoiBandido123456789"; // 19 caracteres
         mockService.requestWrite("TEST", hugePayload);
-        assertEquals("<WRITE:TEST:BoiBandido123456>\n", mockService.getLastSentCommand()); // Exatos 16 caracteres cortados
+        assertEquals("<WRITE:TEST:BoiBandido123456>\n",
+                mockService.getLastSentCommand()); // Exatos 16 caracteres cortados
     }
 
     @Test
@@ -43,7 +44,8 @@ class SerialServiceTest {
         AtomicReference<String> receivedParsedMessage = new AtomicReference<>("");
 
         // Simula a linha bruta do Arduino: <RES:OK:João :FW:92>
-        mockService.simulateArduinoIncomingLine("<RES:TEST:OK:João :FW:92>", receivedParsedMessage::set);
+        mockService.simulateArduinoIncomingLine("<RES:TEST:OK:João :FW:92>",
+                receivedParsedMessage::set);
 
         // O servico Serial tem que cortar os <> (brackets) que sao do protocolo
         assertEquals("RES:TEST:OK:João :FW:92", receivedParsedMessage.get());
@@ -67,7 +69,8 @@ class SerialServiceTest {
 
         service.injectMessage("TAG:123");
 
-        assertEquals("TAG:123", received.get(), "Listener should receive the injected message without brackets");
+        assertEquals("TAG:123", received.get(),
+                "Listener should receive the injected message without brackets");
     }
 
     @Test
@@ -104,7 +107,8 @@ class SerialServiceTest {
         }
 
         // Metodo pra simular entrada fake vinda do Arduino, chamando o callback
-        public void simulateArduinoIncomingLine(String line, java.util.function.Consumer<String> callback) {
+        public void simulateArduinoIncomingLine(String line,
+                java.util.function.Consumer<String> callback) {
             if (line.startsWith("<") && line.endsWith(">")) {
                 callback.accept(line.substring(1, line.length() - 1));
             }

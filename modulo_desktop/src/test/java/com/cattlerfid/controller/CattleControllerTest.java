@@ -58,13 +58,15 @@ class CattleControllerTest {
     @Test
     void testRequestWriteTagConnected() {
         controller.requestWriteTag("C1234567890");
-        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
+        verify(serialServiceMock).requestRead(
+                RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
     }
 
     @Test
     void testHandleMessageWriteReadUserTagBlocked() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VADMIN01:FW:92");
+        controller.handleIncomingSerialMessage(
+                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VADMIN01:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
         verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
@@ -73,7 +75,8 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNewTagAllowed() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":COLDTAG123:FW:92");
+        controller.handleIncomingSerialMessage(
+                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":COLDTAG123:FW:92");
 
         verify(serialServiceMock).requestWrite(RfidConstants.ID_CATTLE, "C123456");
     }
@@ -84,7 +87,8 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNoTagError() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92");
+        controller.handleIncomingSerialMessage(
+                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Nenhuma Tag detectada"));
         verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
@@ -96,7 +100,8 @@ class CattleControllerTest {
         Cattle existingCattle = new Cattle("CVACA00000000001", "Mimosa", 400, "2023-01-01");
         existingCattle.setId(10);
 
-        when(apiServiceMock.getCattleByTag("CVACA00000000001")).thenReturn(Optional.of(existingCattle));
+        when(apiServiceMock.getCattleByTag("CVACA00000000001")).thenReturn(
+                Optional.of(existingCattle));
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
@@ -114,7 +119,8 @@ class CattleControllerTest {
 
         verify(apiServiceMock).getCattleByTag("CDESCONHECIDO12");
         verify(viewListenerMock)
-                .onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
+                .onRfidReadError(
+                        "Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
 
         Cattle c = controller.getCurrentEditingCattle();
         assertNull(c);
@@ -213,7 +219,8 @@ class CattleControllerTest {
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(viewListenerMock).onRfidReadError(contains("Formato de Tag animal inválido ou inválida para o sistema"));
+        verify(viewListenerMock).onRfidReadError(
+                contains("Formato de Tag animal inválido ou inválida para o sistema"));
     }
 
     @Test

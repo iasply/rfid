@@ -101,7 +101,8 @@ public class LoginController {
                 viewListener.onLoginSuccess(this.loggedUser);
         } else {
             if (viewListener != null)
-                viewListener.onLoginError("Acesso Negado: Tag não cadastrada como funcionário VET.");
+                viewListener.onLoginError(
+                        "Acesso Negado: Tag não cadastrada como funcionário VET.");
         }
     }
 

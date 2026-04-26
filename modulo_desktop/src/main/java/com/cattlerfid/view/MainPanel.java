@@ -8,10 +8,10 @@ import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.util.RfidGenerator;
 import com.cattlerfid.view.utils.UIStyles;
-import java.util.List;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class MainPanel extends JPanel implements CattleController.CattleViewListener {
 
@@ -26,8 +26,9 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private CattleFormPanel activeCattleForm;
     private List<VaccineType> vaccineTypes;
 
-    public MainPanel(User loggedUser, CattleController cattleController, NavigationManager navManager,
-                     com.cattlerfid.config.ApiConfig apiConfig) {
+    public MainPanel(User loggedUser, CattleController cattleController,
+            NavigationManager navManager,
+            com.cattlerfid.config.ApiConfig apiConfig) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
         this.navManager = navManager;
@@ -55,7 +56,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         JButton logoutButton = UIStyles.createBackButton("Sair (Logout)");
         logoutButton.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja deslogar do sistema?", "Logout",
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Tem certeza que deseja deslogar do sistema?", "Logout",
                     JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 cattleController.detachSerial();
@@ -65,7 +67,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 authService.logout(loggedUser.getAccessToken());
 
                 // Abre a tela de Login
-                LoginController loginController = new LoginController(authService, cattleController.getSerialService());
+                LoginController loginController = new LoginController(authService,
+                        cattleController.getSerialService());
                 LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
                 navManager.showPanel("Login", loginPanel);
                 loginController.attachToActiveSerial();
@@ -78,7 +81,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
         centerPanel.setBackground(UIStyles.BACKGROUND);
 
-        scanCattleButton = UIStyles.createPrimaryButton("<html><center>IDENTIFICAR<br>E VACINAR</center></html>");
+        scanCattleButton = UIStyles.createPrimaryButton(
+                "<html><center>IDENTIFICAR<br>E VACINAR</center></html>");
         scanCattleButton.setPreferredSize(new Dimension(220, 120));
         scanCattleButton.setFont(UIStyles.HEADER_FONT);
         scanCattleButton.setBackground(UIStyles.WARNING); // Gold/Amber accent
@@ -103,17 +107,20 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             newCattle.setRfidTag(generatedTag);
 
             System.out.println("-> Abrindo Formulário Manual do Gado para: " + generatedTag);
-            activeCattleForm = new CattleFormPanel(newCattle, true, true, cattleController, loggedUser, navManager,
+            activeCattleForm = new CattleFormPanel(newCattle, true, true, cattleController,
+                    loggedUser, navManager,
                     this);
             navManager.showPanel("ManualRegister", activeCattleForm);
         });
 
-        JButton listButton = UIStyles.createPrimaryButton("<html><center>LISTAR<br>REBANHO</center></html>");
+        JButton listButton = UIStyles.createPrimaryButton(
+                "<html><center>LISTAR<br>REBANHO</center></html>");
         listButton.setPreferredSize(new Dimension(220, 120));
         listButton.setFont(UIStyles.HEADER_FONT);
         listButton.setBackground(UIStyles.SECONDARY); // Slate
         listButton.addActionListener(e -> {
-            CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(), cattleController,
+            CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(),
+                    cattleController,
                     loggedUser, navManager, this);
             navManager.showPanel("List", listPanel);
         });
@@ -148,7 +155,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Animal Encontrado (" + cattle.getRfidTag() + ")");
             System.out.println("-> Abrindo Formulário de Vacina para: " + cattle.getRfidTag());
-            VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser, navManager, this, vaccineTypes);
+            VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser,
+                    navManager, this, vaccineTypes);
             navManager.showPanel("Vaccine", form);
         });
     }
@@ -176,7 +184,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Erro de Escrita: " + message);
             JOptionPane.showMessageDialog(this,
-                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.", "Erro ao Gravar RFID",
+                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.",
+                    "Erro ao Gravar RFID",
                     JOptionPane.ERROR_MESSAGE);
             if (activeCattleForm != null) {
                 activeCattleForm.resetSubmitButton();
@@ -188,7 +197,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     public void onApiSaveSuccess() {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Dados salvos com sucesso.");
-            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!", "Sucesso",
+            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!",
+                    "Sucesso",
                     JOptionPane.INFORMATION_MESSAGE);
             if (activeCattleForm != null) {
                 activeCattleForm = null;
@@ -202,7 +212,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     public void onApiSaveError(String message) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Falha no Banco: " + message);
-            JOptionPane.showMessageDialog(this, message, "Erro Base de Dados", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Erro Base de Dados",
+                    JOptionPane.ERROR_MESSAGE);
             if (activeCattleForm != null) {
                 activeCattleForm.resetSubmitButton();
             }

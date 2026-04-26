@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public class SerialService {
 
     private final List<Consumer<String>> messageListeners = new ArrayList<>();
-    private final StringBuilder messageBuffer = new StringBuilder(); 
+    private final StringBuilder messageBuffer = new StringBuilder();
     private final List<String> logHistory = new ArrayList<>();
     private final List<Consumer<String>> logListeners = new ArrayList<>();
     private SerialPort activePort;
@@ -89,7 +89,8 @@ public class SerialService {
         }
 
         activePort = SerialPort.getCommPort(portName);
-        activePort.setComPortParameters(9600, 8, 1, 0); // 9600 baud rate, 8 bits de dados, 1 bit de parada, sem
+        activePort.setComPortParameters(9600, 8, 1,
+                0); // 9600 baud rate, 8 bits de dados, 1 bit de parada, sem
         // paridade
         activePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
 
@@ -189,12 +190,14 @@ public class SerialService {
 
                                 int startPacketIdx = message.indexOf('<');
                                 if (startPacketIdx != -1 && message.endsWith(">")) {
-                                    String cleanMessage = message.substring(startPacketIdx + 1, message.length() - 1);
+                                    String cleanMessage = message.substring(startPacketIdx + 1,
+                                            message.length() - 1);
                                     for (Consumer<String> listener : messageListeners) {
                                         listener.accept(cleanMessage);
                                     }
                                 } else {
-                                    appendLog("WARN", "Pacote incompleto ou inválido ignorado: " + message);
+                                    appendLog("WARN",
+                                            "Pacote incompleto ou inválido ignorado: " + message);
                                 }
                             }
                         }

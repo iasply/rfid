@@ -59,7 +59,8 @@ public class CattleApiService {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
+                Type listType = new TypeToken<ArrayList<Cattle>>() {
+                }.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -75,7 +76,8 @@ public class CattleApiService {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
+                Type listType = new TypeToken<ArrayList<Cattle>>() {
+                }.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -130,13 +132,15 @@ public class CattleApiService {
         if (rfidTag == null || rfidTag.isBlank())
             return new ArrayList<>();
 
-        HttpRequest request = authenticatedRequestBuilder("/vaccines?rfid_tag=" + rfidTag).GET().build();
+        HttpRequest request = authenticatedRequestBuilder(
+                "/vaccines?rfid_tag=" + rfidTag).GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Vaccine>>() {}.getType();
+                Type listType = new TypeToken<ArrayList<Vaccine>>() {
+                }.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -153,7 +157,8 @@ public class CattleApiService {
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 JsonArray data = obj.getAsJsonArray("data");
-                Type listType = new TypeToken<ArrayList<VaccineType>>() {}.getType();
+                Type listType = new TypeToken<ArrayList<VaccineType>>() {
+                }.getType();
                 return client.getGson().fromJson(data, listType);
             }
         } catch (IOException | InterruptedException e) {

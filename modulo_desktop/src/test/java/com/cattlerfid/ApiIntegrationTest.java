@@ -1,7 +1,7 @@
 package com.cattlerfid;
 
-import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.config.ApiClient;
+import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;

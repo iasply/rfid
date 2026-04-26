@@ -60,11 +60,13 @@ public class HttpClientFactory {
             p = p.normalize();
             System.out.println("Path: " + p.toAbsolutePath());
             java.io.FileInputStream fis = new java.io.FileInputStream(p.toFile());
-            java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory.getInstance("X.509");
+            java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory.getInstance(
+                    "X.509");
             java.security.cert.X509Certificate caCert = (java.security.cert.X509Certificate) cf
                     .generateCertificate(fis);
 
-            java.security.KeyStore ks = java.security.KeyStore.getInstance(java.security.KeyStore.getDefaultType());
+            java.security.KeyStore ks = java.security.KeyStore.getInstance(
+                    java.security.KeyStore.getDefaultType());
             ks.load(null, null);
             ks.setCertificateEntry("dev-cert", caCert);
 
@@ -99,7 +101,8 @@ public class HttpClientFactory {
             ctx.init(null, trustAll, new java.security.SecureRandom());
             return ctx;
         } catch (Exception e) {
-            throw new RuntimeException("[HttpClientFactory] Failed to build trust-all SSLContext", e);
+            throw new RuntimeException("[HttpClientFactory] Failed to build trust-all SSLContext",
+                    e);
         }
     }
 }

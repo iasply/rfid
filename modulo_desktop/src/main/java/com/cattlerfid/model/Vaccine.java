@@ -27,37 +27,79 @@ public class Vaccine {
     @SerializedName("workstation_desc")
     private String workstationDesc;
 
-    public Vaccine() {}
+    public Vaccine() {
+    }
 
-    public Vaccine(String id, String rfidTag, String vaccinationDate, long vaccineTypeId, double currentWeight) {
-        this.id            = id;
-        this.rfidTag       = rfidTag;
+    public Vaccine(String id, String rfidTag, String vaccinationDate, long vaccineTypeId,
+            double currentWeight) {
+        this.id = id;
+        this.rfidTag = rfidTag;
         this.vaccinationDate = vaccinationDate;
         this.vaccineTypeId = vaccineTypeId;
         this.currentWeight = currentWeight;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getRfidTag() { return rfidTag; }
-    public void setRfidTag(String rfidTag) { this.rfidTag = rfidTag; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getVaccinationDate() { return vaccinationDate; }
-    public void setVaccinationDate(String vaccinationDate) { this.vaccinationDate = vaccinationDate; }
+    public String getRfidTag() {
+        return rfidTag;
+    }
 
-    public long getVaccineTypeId() { return vaccineTypeId; }
-    public void setVaccineTypeId(long vaccineTypeId) { this.vaccineTypeId = vaccineTypeId; }
+    public void setRfidTag(String rfidTag) {
+        this.rfidTag = rfidTag;
+    }
 
-    public String getVaccineTypeName() { return vaccineTypeName; }
-    public void setVaccineTypeName(String vaccineTypeName) { this.vaccineTypeName = vaccineTypeName; }
+    public String getVaccinationDate() {
+        return vaccinationDate;
+    }
 
-    public double getCurrentWeight() { return currentWeight; }
-    public void setCurrentWeight(double currentWeight) { this.currentWeight = currentWeight; }
+    public void setVaccinationDate(String vaccinationDate) {
+        this.vaccinationDate = vaccinationDate;
+    }
 
-    public String getVeterinarianName() { return veterinarianName; }
-    public void setVeterinarianName(String veterinarianName) { this.veterinarianName = veterinarianName; }
+    public long getVaccineTypeId() {
+        return vaccineTypeId;
+    }
 
-    public String getWorkstationDesc() { return workstationDesc; }
-    public void setWorkstationDesc(String workstationDesc) { this.workstationDesc = workstationDesc; }
+    public void setVaccineTypeId(long vaccineTypeId) {
+        this.vaccineTypeId = vaccineTypeId;
+    }
+
+    public String getVaccineTypeName() {
+        return vaccineTypeName;
+    }
+
+    public void setVaccineTypeName(String vaccineTypeName) {
+        this.vaccineTypeName = vaccineTypeName;
+    }
+
+    public double getCurrentWeight() {
+        return currentWeight;
+    }
+
+    public void setCurrentWeight(double currentWeight) {
+        this.currentWeight = currentWeight;
+    }
+
+    public String getVeterinarianName() {
+        return veterinarianName;
+    }
+
+    public void setVeterinarianName(String veterinarianName) {
+        this.veterinarianName = veterinarianName;
+    }
+
+    public String getWorkstationDesc() {
+        return workstationDesc;
+    }
+
+    public void setWorkstationDesc(String workstationDesc) {
+        this.workstationDesc = workstationDesc;
+    }
 }
