@@ -19,7 +19,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::resource('veterinarians', VeterinarianController::class)->except(['destroy']);
     Route::resource('cattle', CattleController::class)->except(['destroy']);
-    Route::resource('vaccines', VaccineController::class)->except(['destroy']);
+    Route::get('vaccines', [VaccineController::class, 'index'])->name('vaccines.index');
     Route::resource('vaccine-types', VaccineTypeController::class)->except(['destroy']);
     Route::resource('workstations', WorkstationController::class)->except(['destroy']);
 });
