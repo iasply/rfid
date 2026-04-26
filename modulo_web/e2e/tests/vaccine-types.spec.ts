@@ -46,7 +46,7 @@ test.describe('Vaccine Types Module', () => {
     });
 
     test('should edit an existing vaccine type', async ({page}) => {
-        await vaccineTypePage.vaccineTypeRows.first().getByRole('link', {name: /Editar/}).click();
+        await page.getByTestId('vaccine-type-edit-link').first().click();
         await expect(page).toHaveURL(/\/admin\/vaccine-types\/\d+\/edit/);
 
         await vaccineTypePage.intervalInput.fill('270');
@@ -54,5 +54,14 @@ test.describe('Vaccine Types Module', () => {
 
         await expect(page).toHaveURL(/\/admin\/vaccine-types/);
         await expect(page.locator('body')).toContainText('atualizado');
+    });
+
+    test('should show vaccine type statistics page', async ({page}) => {
+        await page.getByTestId('vaccine-type-show-link').first().click();
+        await expect(page).toHaveURL(/\/admin\/vaccine-types\/\d+$/);
+
+        await expect(page.locator('#chart-vt-monthly')).toBeVisible();
+        await expect(page.locator('#chart-vt-coverage')).toBeVisible();
+        await expect(page.locator('#chart-vt-weight')).toBeVisible();
     });
 });

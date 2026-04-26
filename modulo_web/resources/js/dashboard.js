@@ -452,12 +452,34 @@ function initAnimalCharts() {
         buildDoughnutChart(el('chart-animal-vaccines'), raw.vaccineTypes);
 }
 
+// ── Vaccine type detail charts ────────────────────────────────────────────────
+
+function initVaccineTypeCharts() {
+    const raw = window.__vaccineTypeData;
+    if (!raw) return;
+
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.color       = C.secondary;
+
+    const el = id => document.getElementById(id);
+
+    if (el('chart-vt-monthly'))
+        buildBarChart(el('chart-vt-monthly'), raw.monthly, { unit: 'aplicações' });
+
+    if (el('chart-vt-coverage'))
+        buildDoughnutChart(el('chart-vt-coverage'), raw.coverage);
+
+    if (el('chart-vt-weight'))
+        buildWeightChart(el('chart-vt-weight'), raw.weight);
+}
+
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 // Deferred modules run after HTML parse — DOM is ready, call directly
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { initDashboardCharts(); initAnimalCharts(); });
+    document.addEventListener('DOMContentLoaded', () => { initDashboardCharts(); initAnimalCharts(); initVaccineTypeCharts(); });
 } else {
     initDashboardCharts();
     initAnimalCharts();
+    initVaccineTypeCharts();
 }

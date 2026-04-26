@@ -10,7 +10,7 @@
 </x-page-header>
 
 <x-card>
-    <x-table :headers="['Nome', 'Intervalo', 'Meses de Pico', 'Descrição', '']">
+    <x-table :headers="['Nome', 'Intervalo', 'Meses de Pico', 'Descrição', 'Ações']">
         @forelse($vaccineTypes as $vt)
             <tr data-testid="vaccine-type-row">
                 <td><strong>{{ $vt->name }}</strong></td>
@@ -36,9 +36,15 @@
                 <td style="max-width: 360px; font-size: 0.82rem; color: var(--text-muted);">
                     {{ Str::limit($vt->description, 100) }}
                 </td>
-                <td>
+                <td style="white-space: nowrap; display: flex; gap: 1rem;">
+                    <a href="{{ route('admin.vaccine-types.show', $vt->id) }}"
+                       data-testid="vaccine-type-show-link"
+                       style="font-size: 0.8rem; font-weight: 600; color: var(--secondary); text-decoration: none;">
+                        Ver →
+                    </a>
                     <a href="{{ route('admin.vaccine-types.edit', $vt->id) }}"
-                       style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-decoration: none; white-space: nowrap;">
+                       data-testid="vaccine-type-edit-link"
+                       style="font-size: 0.8rem; font-weight: 600; color: var(--primary); text-decoration: none;">
                         Editar →
                     </a>
                 </td>

@@ -34,7 +34,7 @@ test.describe('Vaccines Module', () => {
         await page.goto('/admin/vaccines/create');
 
         await vaccinePage.animalSelect.selectOption({index: 1});
-        await vaccinePage.vaccineTypeSelect.selectOption({label: /Febre Aftosa/});
+        await vaccinePage.vaccineTypeSelect.selectOption({index: 1});
         await vaccinePage.weightInput.fill('350.5');
         await vaccinePage.vetSelect.selectOption({index: 1});
         await vaccinePage.submitButton.click();

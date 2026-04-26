@@ -106,6 +106,21 @@ class VaccineTypeTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
+    public function vaccine_type_show_page_loads_with_stats()
+    {
+        $admin = User::factory()->create();
+        $type  = VaccineType::factory()->create(['name' => 'Botulismo', 'interval_days' => 365]);
+
+        $response = $this->actingAs($admin)->get(route('admin.vaccine-types.show', $type->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('Botulismo');
+        $response->assertSee('chart-vt-monthly');
+        $response->assertSee('chart-vt-coverage');
+        $response->assertSee('chart-vt-weight');
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
     public function vaccine_types_api_returns_authenticated_list()
     {
         $token = User::factory()->create()->createToken('test')->plainTextToken;
