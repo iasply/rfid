@@ -4,17 +4,17 @@
 
 {{-- Dados dos charts injetados de forma síncrona (antes do módulo Vite executar) --}}
 <script>
-window.__dashboardData = {
-    periods:                @json($chartPeriods),
-    vaccineTypes:           @json($chartVaccineTypes),
-    cattlePerVet:           @json($chartCattlePerVet),
-    vaccinesPerWorkstation: @json($chartVaccinesPerWorkstation),
-    weightEvolution:        @json($chartWeightEvolution),
-    weightByVaccineType:        @json($chartWeightByVaccineType),
-    seasonalVaccinations:       @json($chartSeasonalVaccinations),
-    vaccineTypeByWorkstation:   @json($chartVaccineTypeByWorkstation),
-    weightByWorkstation:        @json($chartWeightByWorkstation),
-};
+    window.__dashboardData = {
+        periods: @json($chartPeriods),
+        vaccineTypes: @json($chartVaccineTypes),
+        cattlePerVet: @json($chartCattlePerVet),
+        vaccinesPerWorkstation: @json($chartVaccinesPerWorkstation),
+        weightEvolution: @json($chartWeightEvolution),
+        weightByVaccineType: @json($chartWeightByVaccineType),
+        seasonalVaccinations: @json($chartSeasonalVaccinations),
+        vaccineTypeByWorkstation: @json($chartVaccineTypeByWorkstation),
+        weightByWorkstation: @json($chartWeightByWorkstation),
+    };
 </script>
 
 {{-- Page Header --}}
@@ -77,7 +77,8 @@ window.__dashboardData = {
 
     <div class="card kpi-card {{ $insights['never_vaccinated'] > 0 ? 'kpi-danger' : 'kpi-light' }}">
         <p class="kpi-label">Sem Nenhuma Vacina</p>
-        <p class="kpi-value" style="color:{{ $insights['never_vaccinated'] > 0 ? 'var(--danger)' : 'var(--primary)' }};">
+        <p class="kpi-value"
+           style="color:{{ $insights['never_vaccinated'] > 0 ? 'var(--danger)' : 'var(--primary)' }};">
             {{ $insights['never_vaccinated'] }}
         </p>
         <span class="kpi-sub">{{ $insights['never_vaccinated'] > 0 ? 'Animais em risco' : 'Rebanho protegido' }}</span>
@@ -87,9 +88,9 @@ window.__dashboardData = {
         <p class="kpi-label">Dias Desde Última Vacina</p>
         <p class="kpi-value" style="color:var(--secondary);">
             @if($insights['avg_days_since_vax'] !== null)
-                {{ $insights['avg_days_since_vax'] }}
+            {{ $insights['avg_days_since_vax'] }}
             @else
-                —
+            —
             @endif
         </p>
         <span class="kpi-sub">Média do rebanho vacinado</span>
@@ -205,30 +206,30 @@ window.__dashboardData = {
     <div class="table-wrap">
         <table class="activity-table" id="recent-table">
             <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Animal</th>
-                    <th>Vacina</th>
-                    <th>Veterinário</th>
-                    <th>Peso na Vacinação</th>
-                </tr>
+            <tr>
+                <th>Data</th>
+                <th>Animal</th>
+                <th>Vacina</th>
+                <th>Veterinário</th>
+                <th>Peso na Vacinação</th>
+            </tr>
             </thead>
             <tbody>
-                @forelse($recentVaccinations as $row)
-                    <tr>
-                        <td>{{ \Carbon\Carbon::parse($row->vaccination_date)->format('d/m/Y') }}</td>
-                        <td><strong>{{ $row->animal }}</strong></td>
-                        <td><span class="badge-vaccine">{{ $row->vaccine_type }}</span></td>
-                        <td>{{ $row->vet }}</td>
-                        <td>{{ number_format($row->current_weight, 1, ',', '.') }} kg</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">
-                            Nenhuma vacinação registrada ainda.
-                        </td>
-                    </tr>
-                @endforelse
+            @forelse($recentVaccinations as $row)
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($row->vaccination_date)->format('d/m/Y') }}</td>
+                <td><strong>{{ $row->animal }}</strong></td>
+                <td><span class="badge-vaccine">{{ $row->vaccine_type }}</span></td>
+                <td>{{ $row->vet }}</td>
+                <td>{{ number_format($row->current_weight, 1, ',', '.') }} kg</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">
+                    Nenhuma vacinação registrada ainda.
+                </td>
+            </tr>
+            @endforelse
             </tbody>
         </table>
     </div>

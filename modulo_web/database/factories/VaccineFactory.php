@@ -16,12 +16,12 @@ class VaccineFactory extends Factory
     public function definition(): array
     {
         return [
-            'rfid_tag'        => Cattle::factory(),
+            'rfid_tag' => Cattle::factory(),
             'vaccine_type_id' => VaccineType::factory(),
-            'current_weight'  => fake()->randomFloat(2, 100, 800),
+            'current_weight' => fake()->randomFloat(2, 100, 800),
             'vaccination_date' => now()->toDateString(),
-            'user_id'          => User::factory(),
-            'workstation_id'   => Workstation::factory(),
+            'user_id' => User::factory(),
+            'workstation_id' => Workstation::factory(),
         ];
     }
 }

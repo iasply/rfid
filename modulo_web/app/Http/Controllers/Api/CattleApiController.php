@@ -7,12 +7,14 @@ use App\DTOs\Request\Cattle\UpdateCattleRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CattleResource;
 use App\Models\Cattle;
+use App\Models\CattleWithVaccinesView;
+use App\Services\CattleService;
 use Illuminate\Http\JsonResponse;
 
 class CattleApiController extends Controller
 {
     public function __construct(
-        protected \App\Services\CattleService $cattleService
+        protected CattleService $cattleService
     )
     {
     }
@@ -25,7 +27,7 @@ class CattleApiController extends Controller
 
     public function indexWithVaccines(): JsonResponse
     {
-        $items = \App\Models\CattleWithVaccinesView::paginate(50);
+        $items = CattleWithVaccinesView::paginate(50);
 
         $mappedItems = $items->getCollection()->map(function ($c) {
             $cattleModel = Cattle::find($c->id);

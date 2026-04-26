@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Request\Vaccine;
 
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreVaccineRequest extends FormRequest
@@ -18,13 +19,13 @@ class StoreVaccineRequest extends FormRequest
                 'required',
                 'exists:cattle,rfid_tag',
                 function ($attribute, $value, $fail) {
-                    if (!\App\Support\RfidGenerator::isCattleTag($value)) {
+                    if (!RfidGenerator::isCattleTag($value)) {
                         $fail(__('A tag RFID do animal é inválida ou não possui o prefixo esperado (C).'));
                     }
                 },
             ],
-            'vaccine_type_id'  => 'required|exists:vaccine_types,id',
-            'current_weight'   => 'required|numeric|min:0',
+            'vaccine_type_id' => 'required|exists:vaccine_types,id',
+            'current_weight' => 'required|numeric|min:0',
             'vaccination_date' => 'required|date',
         ];
     }

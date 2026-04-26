@@ -7,7 +7,6 @@ use App\Models\Cattle;
 use App\Models\Vaccine;
 use App\Models\VaccineType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class VaccineTypeController extends Controller
 {
@@ -24,16 +23,11 @@ class VaccineTypeController extends Controller
         return view('admin.vaccine-types.index', compact('vaccineTypes'));
     }
 
-    public function create()
-    {
-        return view('admin.vaccine-types.create', ['monthNames' => self::MONTH_NAMES]);
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'          => 'required|string|max:100|unique:vaccine_types,name',
-            'description'   => 'nullable|string|max:500',
+            'name' => 'required|string|max:100|unique:vaccine_types,name',
+            'description' => 'nullable|string|max:500',
             'interval_days' => 'nullable|integer|min:1|max:3650',
             'season_months' => 'nullable|array',
             'season_months.*' => 'integer|between:1,12',
@@ -47,9 +41,14 @@ class VaccineTypeController extends Controller
             ->with('success', 'Tipo de vacina cadastrado com sucesso!');
     }
 
+    public function create()
+    {
+        return view('admin.vaccine-types.create', ['monthNames' => self::MONTH_NAMES]);
+    }
+
     public function show(VaccineType $vaccineType)
     {
-        $abbr  = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        $abbr = ['', 'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         $since = now()->subMonths(11)->startOfMonth()->toDateString();
 
         $monthlyRaw = Vaccine::where('vaccine_type_id', $vaccineType->id)
@@ -67,32 +66,32 @@ class VaccineTypeController extends Controller
             ->orderBy('month')
             ->pluck('avg_w', 'month');
 
-        $labels       = [];
-        $monthly      = [];
+        $labels = [];
+        $monthly = [];
         $weightValues = [];
         for ($i = 11; $i >= 0; $i--) {
-            $d      = now()->subMonths($i);
-            $key    = $d->format('Y-m');
-            $labels[]       = $abbr[(int) $d->format('n')] . '/' . $d->format('y');
-            $monthly[]      = $monthlyRaw[$key] ?? 0;
-            $weightValues[] = isset($weightRaw[$key]) ? (float) $weightRaw[$key] : null;
+            $d = now()->subMonths($i);
+            $key = $d->format('Y-m');
+            $labels[] = $abbr[(int)$d->format('n')] . '/' . $d->format('y');
+            $monthly[] = $monthlyRaw[$key] ?? 0;
+            $weightValues[] = isset($weightRaw[$key]) ? (float)$weightRaw[$key] : null;
         }
 
-        $totalCattle     = Cattle::count();
+        $totalCattle = Cattle::count();
         $vaccinatedCount = Vaccine::where('vaccine_type_id', $vaccineType->id)
             ->distinct('rfid_tag')->count('rfid_tag');
-        $neverCount      = max(0, $totalCattle - $vaccinatedCount);
-        $coverage        = $totalCattle > 0 ? round($vaccinatedCount / $totalCattle * 100) : 0;
+        $neverCount = max(0, $totalCattle - $vaccinatedCount);
+        $coverage = $totalCattle > 0 ? round($vaccinatedCount / $totalCattle * 100) : 0;
 
         $totalApplications = Vaccine::where('vaccine_type_id', $vaccineType->id)->count();
-        $lastApplication   = Vaccine::where('vaccine_type_id', $vaccineType->id)->max('vaccination_date');
-        $avgWeight         = Vaccine::where('vaccine_type_id', $vaccineType->id)
+        $lastApplication = Vaccine::where('vaccine_type_id', $vaccineType->id)->max('vaccination_date');
+        $avgWeight = Vaccine::where('vaccine_type_id', $vaccineType->id)
             ->where('current_weight', '>', 0)->avg('current_weight');
 
         $chartData = [
-            'monthly'  => ['labels' => $labels, 'values' => $monthly],
+            'monthly' => ['labels' => $labels, 'values' => $monthly],
             'coverage' => ['labels' => ['Vacinados', 'Nunca vacinados'], 'values' => [$vaccinatedCount, $neverCount]],
-            'weight'   => ['labels' => $labels, 'values' => $weightValues],
+            'weight' => ['labels' => $labels, 'values' => $weightValues],
         ];
 
         return view('admin.vaccine-types.show', compact(
@@ -105,17 +104,17 @@ class VaccineTypeController extends Controller
     {
         return view('admin.vaccine-types.edit', [
             'vaccineType' => $vaccineType,
-            'monthNames'  => self::MONTH_NAMES,
+            'monthNames' => self::MONTH_NAMES,
         ]);
     }
 
     public function update(Request $request, VaccineType $vaccineType)
     {
         $data = $request->validate([
-            'name'            => 'required|string|max:100|unique:vaccine_types,name,' . $vaccineType->id,
-            'description'     => 'nullable|string|max:500',
-            'interval_days'   => 'nullable|integer|min:1|max:3650',
-            'season_months'   => 'nullable|array',
+            'name' => 'required|string|max:100|unique:vaccine_types,name,' . $vaccineType->id,
+            'description' => 'nullable|string|max:500',
+            'interval_days' => 'nullable|integer|min:1|max:3650',
+            'season_months' => 'nullable|array',
             'season_months.*' => 'integer|between:1,12',
         ]);
 

@@ -8,6 +8,7 @@ use App\Models\Vaccine;
 use App\Models\VaccineType;
 use App\Models\Workstation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AdminSearchFilterTest extends TestCase
@@ -16,15 +17,7 @@ class AdminSearchFilterTest extends TestCase
 
     private User $admin;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->admin = User::factory()->create();
-    }
-
-    // ── Cattle ───────────────────────────────────────────────────────────────────
-
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function cattle_filter_by_name_returns_matching_records()
     {
         Cattle::factory()->create(['name' => 'Mimosa', 'rfid_tag' => 'TAG-MIM-01']);
@@ -38,7 +31,9 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Boiadeiro');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    // ── Cattle ───────────────────────────────────────────────────────────────────
+
+    #[Test]
     public function cattle_filter_by_rfid_tag_returns_matching_records()
     {
         Cattle::factory()->create(['name' => 'Mimosa', 'rfid_tag' => 'TAG-MIM-01']);
@@ -52,7 +47,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Boiadeiro');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function cattle_default_search_matches_name_and_rfid()
     {
         Cattle::factory()->create(['name' => 'Mimosa', 'rfid_tag' => 'TAG-MIM-01']);
@@ -66,16 +61,14 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Boiadeiro');
     }
 
-    // ── Vaccines ──────────────────────────────────────────────────────────────────
-
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function vaccines_filter_by_vaccine_type_returns_matching_records()
     {
-        $ws  = Workstation::factory()->create();
+        $ws = Workstation::factory()->create();
         $vt1 = VaccineType::factory()->create(['name' => 'Febre Aftosa']);
         $vt2 = VaccineType::factory()->create(['name' => 'Brucelose']);
-        $c1  = Cattle::factory()->create(['rfid_tag' => 'TAG-VT-001']);
-        $c2  = Cattle::factory()->create(['rfid_tag' => 'TAG-VT-002']);
+        $c1 = Cattle::factory()->create(['rfid_tag' => 'TAG-VT-001']);
+        $c2 = Cattle::factory()->create(['rfid_tag' => 'TAG-VT-002']);
 
         $this->createVaccine($c1->rfid_tag, $vt1->id, $ws->id);
         $this->createVaccine($c2->rfid_tag, $vt2->id, $ws->id);
@@ -88,7 +81,21 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Brucelose');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    // ── Vaccines ──────────────────────────────────────────────────────────────────
+
+    private function createVaccine(string $rfidTag, int $vaccineTypeId, int $workstationId): void
+    {
+        Vaccine::create([
+            'rfid_tag' => $rfidTag,
+            'vaccine_type_id' => $vaccineTypeId,
+            'current_weight' => 350.0,
+            'vaccination_date' => now()->toDateString(),
+            'user_id' => $this->admin->id,
+            'workstation_id' => $workstationId,
+        ]);
+    }
+
+    #[Test]
     public function vaccines_filter_by_rfid_tag_returns_matching_records()
     {
         $ws = Workstation::factory()->create();
@@ -107,7 +114,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('TAG-RFID-BBB');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function vaccines_filter_by_animal_name_returns_matching_records()
     {
         $ws = Workstation::factory()->create();
@@ -126,14 +133,14 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Boiadeiro');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function vaccines_default_search_matches_across_type_rfid_and_animal()
     {
-        $ws  = Workstation::factory()->create();
+        $ws = Workstation::factory()->create();
         $vt1 = VaccineType::factory()->create(['name' => 'Febre Aftosa']);
         $vt2 = VaccineType::factory()->create(['name' => 'Brucelose']);
-        $c1  = Cattle::factory()->create(['name' => 'Mimosa', 'rfid_tag' => 'TAG-DEF-001']);
-        $c2  = Cattle::factory()->create(['name' => 'Boiadeiro', 'rfid_tag' => 'TAG-DEF-002']);
+        $c1 = Cattle::factory()->create(['name' => 'Mimosa', 'rfid_tag' => 'TAG-DEF-001']);
+        $c2 = Cattle::factory()->create(['name' => 'Boiadeiro', 'rfid_tag' => 'TAG-DEF-002']);
 
         $this->createVaccine($c1->rfid_tag, $vt1->id, $ws->id);
         $this->createVaccine($c2->rfid_tag, $vt2->id, $ws->id);
@@ -148,7 +155,7 @@ class AdminSearchFilterTest extends TestCase
 
     // ── Veterinarians ─────────────────────────────────────────────────────────────
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function veterinarians_filter_by_name_returns_matching_records()
     {
         User::factory()->veterinarian()->create(['name' => 'Dr. Fulano', 'email' => 'fulano@example.com']);
@@ -162,7 +169,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Dr. Sicrano');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function veterinarians_filter_by_email_returns_matching_records()
     {
         User::factory()->veterinarian()->create(['name' => 'Dr. Fulano', 'email' => 'fulano@example.com']);
@@ -176,7 +183,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('sicrano@example.com');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function veterinarians_default_search_matches_name_and_email()
     {
         User::factory()->veterinarian()->create(['name' => 'Dr. Fulano', 'email' => 'fulano@example.com']);
@@ -192,7 +199,7 @@ class AdminSearchFilterTest extends TestCase
 
     // ── Workstations ──────────────────────────────────────────────────────────────
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function workstations_filter_by_desc_returns_matching_records()
     {
         Workstation::factory()->create(['desc' => 'Curral Norte', 'hash' => 'WS-NORTE-01']);
@@ -206,7 +213,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('Curral Sul');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function workstations_filter_by_hash_returns_matching_records()
     {
         Workstation::factory()->create(['desc' => 'Curral Norte', 'hash' => 'WS-NORTE-01']);
@@ -220,7 +227,7 @@ class AdminSearchFilterTest extends TestCase
         $response->assertDontSee('WS-SUL-0002');
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function workstations_default_search_matches_desc_and_hash()
     {
         Workstation::factory()->create(['desc' => 'Curral Norte', 'hash' => 'WS-NORTE-01']);
@@ -236,15 +243,9 @@ class AdminSearchFilterTest extends TestCase
 
     // ── Helpers ───────────────────────────────────────────────────────────────────
 
-    private function createVaccine(string $rfidTag, int $vaccineTypeId, int $workstationId): void
+    protected function setUp(): void
     {
-        Vaccine::create([
-            'rfid_tag'         => $rfidTag,
-            'vaccine_type_id'  => $vaccineTypeId,
-            'current_weight'   => 350.0,
-            'vaccination_date' => now()->toDateString(),
-            'user_id'          => $this->admin->id,
-            'workstation_id'   => $workstationId,
-        ]);
+        parent::setUp();
+        $this->admin = User::factory()->create();
     }
 }

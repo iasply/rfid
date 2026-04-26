@@ -10,10 +10,11 @@
         <x-input label="Nome da Vacina" name="name" required :value="old('name')" placeholder="Ex: Febre Aftosa"/>
 
         <div style="margin-bottom: 1rem;">
-            <label style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Descrição</label>
+            <label
+                style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Descrição</label>
             <textarea name="description" rows="3"
-                style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid rgba(226,232,240,0.9); border-radius: var(--radius-md); font-family: inherit; font-size: 0.875rem; resize: vertical;"
-                placeholder="Contexto clínico, protocolo e observações…">{{ old('description') }}</textarea>
+                      style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid rgba(226,232,240,0.9); border-radius: var(--radius-md); font-family: inherit; font-size: 0.875rem; resize: vertical;"
+                      placeholder="Contexto clínico, protocolo e observações…">{{ old('description') }}</textarea>
             @error('description') <span style="color: var(--danger); font-size: 0.8rem;">{{ $message }}</span> @enderror
         </div>
 
@@ -30,11 +31,11 @@
             </label>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
                 @foreach($monthNames as $num => $label)
-                    <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
-                        <input type="checkbox" name="season_months[]" value="{{ $num }}"
-                            {{ in_array($num, old('season_months', [])) ? 'checked' : '' }}>
-                        {{ $label }}
-                    </label>
+                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                    <input type="checkbox" name="season_months[]" value="{{ $num }}"
+                           {{ in_array($num, old('season_months', [])) ? 'checked' : '' }}>
+                    {{ $label }}
+                </label>
                 @endforeach
             </div>
             <p style="margin-top: 0.5rem; font-size: 0.78rem; color: var(--text-muted);">
@@ -42,7 +43,9 @@
             </p>
         </div>
 
-        <x-button type="submit" fullWidth data-testid="vaccine-type-submit" style="margin-top: 0.5rem;">Cadastrar Tipo de Vacina</x-button>
+        <x-button type="submit" fullWidth data-testid="vaccine-type-submit" style="margin-top: 0.5rem;">Cadastrar Tipo
+            de Vacina
+        </x-button>
     </form>
 </x-card>
 @endsection

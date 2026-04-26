@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -15,19 +16,19 @@ return new class extends Migration {
         });
 
         // Ensure all users have a vet_rfid and tag_hash before enforcing NOT NULL
-        $users = \Illuminate\Support\Facades\DB::table('users')->get();
+        $users = DB::table('users')->get();
         foreach ($users as $user) {
             $rfid = $user->vet_rfid;
 
             if (empty($rfid)) {
                 $rfid = 'USER-' . $user->id;
-                \Illuminate\Support\Facades\DB::table('users')
+                DB::table('users')
                     ->where('id', $user->id)
                     ->update(['vet_rfid' => $rfid]);
             }
 
             $hash = hash('sha256', $rfid . config('app.tag_salt'));
-            \Illuminate\Support\Facades\DB::table('users')
+            DB::table('users')
                 ->where('id', $user->id)
                 ->update(['tag_hash' => $hash]);
         }

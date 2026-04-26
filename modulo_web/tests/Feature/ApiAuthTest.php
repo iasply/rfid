@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Workstation;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiAuthTest extends TestCase
@@ -11,10 +14,10 @@ class ApiAuthTest extends TestCase
     use RefreshDatabase;
 
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function user_can_login_via_api_using_workstation_and_tag()
     {
-        $workstation = \App\Models\Workstation::create([
+        $workstation = Workstation::create([
             'hash' => 'WS-HASH-123',
             'desc' => 'Main Lab',
         ]);
@@ -41,10 +44,10 @@ class ApiAuthTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function login_fails_with_invalid_tag()
     {
-        \App\Models\Workstation::create([
+        Workstation::create([
             'hash' => 'WS-HASH-123',
             'desc' => 'Main Lab',
         ]);
@@ -59,15 +62,15 @@ class ApiAuthTest extends TestCase
             ->assertJsonValidationErrors(['tag']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function login_fails_if_user_is_not_a_veterinarian_even_with_valid_tag()
     {
-        \App\Models\Workstation::create([
+        Workstation::create([
             'hash' => 'WS-HASH-123',
             'desc' => 'Main Lab',
         ]);
 
-        $rawTag = \App\Support\RfidGenerator::generateVetTag();
+        $rawTag = RfidGenerator::generateVetTag();
         $hashedTag = hash('sha256', $rawTag . config('app.tag_salt'));
 
         User::factory()->create([
@@ -85,7 +88,7 @@ class ApiAuthTest extends TestCase
             ->assertJsonValidationErrors(['tag']);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function authenticated_user_can_access_protected_cattle_endpoint()
     {
         $user = User::factory()->create();
@@ -98,10 +101,10 @@ class ApiAuthTest extends TestCase
         $response->assertStatus(200);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function api_login_is_rate_limited_after_too_many_attempts()
     {
-        \App\Models\Workstation::create([
+        Workstation::create([
             'hash' => 'WS-HASH-LIMIT',
             'desc' => 'Limit Lab',
         ]);

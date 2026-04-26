@@ -19,25 +19,25 @@ class DatabaseSeeder extends Seeder
 
         // Admin
         User::create([
-            'name'             => 'Sistema Admin',
-            'email'            => 'admin@cattlerfid.com',
-            'password'         => Hash::make('admin123'),
-            'is_veterinarian'  => false,
+            'name' => 'Sistema Admin',
+            'email' => 'admin@cattlerfid.com',
+            'password' => Hash::make('admin123'),
+            'is_veterinarian' => false,
         ]);
 
         // Specific Veterinarians
         $vets = [];
         $vets[] = User::create([
-            'name'            => 'Alexandre',
-            'email'           => 'alexandre@vet.com',
-            'password'        => Hash::make('password'),
+            'name' => 'Alexandre',
+            'email' => 'alexandre@vet.com',
+            'password' => Hash::make('password'),
             'is_veterinarian' => true,
         ]);
 
         $vets[] = User::create([
-            'name'            => 'Iury',
-            'email'           => 'iury@vet.com',
-            'password'        => Hash::make('password'),
+            'name' => 'Iury',
+            'email' => 'iury@vet.com',
+            'password' => Hash::make('password'),
             'is_veterinarian' => true,
         ]);
 
@@ -49,23 +49,23 @@ class DatabaseSeeder extends Seeder
         $vaccineTypeIds = VaccineType::pluck('id')->all();
 
         foreach ($cattleNames as $index => $name) {
-            $vet            = $vets[$index % 2];
-            $vaccineTypeId  = $vaccineTypeIds[$index % count($vaccineTypeIds)];
+            $vet = $vets[$index % 2];
+            $vaccineTypeId = $vaccineTypeIds[$index % count($vaccineTypeIds)];
 
             $animal = Cattle::create([
-                'name'              => $name,
-                'weight'            => rand(400, 600),
-                'rfid_tag'          => RfidGenerator::generateCattleTag(),
+                'name' => $name,
+                'weight' => rand(400, 600),
+                'rfid_tag' => RfidGenerator::generateCattleTag(),
                 'registration_date' => now()->toDateString(),
-                'user_id'           => $vet->id,
+                'user_id' => $vet->id,
             ]);
 
             Vaccine::create([
-                'rfid_tag'        => $animal->rfid_tag,
+                'rfid_tag' => $animal->rfid_tag,
                 'vaccine_type_id' => $vaccineTypeId,
-                'current_weight'  => $animal->weight,
+                'current_weight' => $animal->weight,
                 'vaccination_date' => now()->toDateString(),
-                'user_id'          => $vet->id,
+                'user_id' => $vet->id,
             ]);
         }
 

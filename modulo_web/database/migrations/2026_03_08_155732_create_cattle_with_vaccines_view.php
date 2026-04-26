@@ -8,7 +8,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        \DB::statement("
+        DB::statement("
             CREATE VIEW cattle_with_vaccines_view AS
             SELECT
                 c.id,
@@ -29,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        \DB::statement("DROP VIEW IF EXISTS cattle_with_vaccines_view");
+        DB::statement("DROP VIEW IF EXISTS cattle_with_vaccines_view");
     }
 };

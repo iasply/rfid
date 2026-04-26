@@ -1,6 +1,7 @@
 @props(['width' => '100%', 'maxWidth' => 'none', 'glass' => false])
 
-<div {{ $attributes->merge(['class' => 'card ' . ($glass ? 'glass' : ''), 'style' => "width: $width; max-width: $maxWidth;"]) }}>
+<div {{ $attributes->merge(['class' => 'card ' . ($glass ? 'glass' : ''), 'style' => "width: $width; max-width:
+    $maxWidth;"]) }}>
     {{ $slot }}
 </div>
 

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::table('vaccines', function (Blueprint $table) {
@@ -14,7 +13,7 @@ return new class extends Migration
             // VaccineController: ORDER BY vaccination_date DESC, id DESC (pagination)
             $table->index(['vaccination_date', 'id'], 'vaccines_date_id_index');
             // FK columns — SQLite does not auto-create indexes for foreign keys
-            $table->index('user_id',        'vaccines_user_id_index');
+            $table->index('user_id', 'vaccines_user_id_index');
             $table->index('workstation_id', 'vaccines_workstation_id_index');
             // AlertController whereIn rfid_tag; dashboard coverage subquery
             $table->index('rfid_tag', 'vaccines_rfid_tag_index');
@@ -22,7 +21,7 @@ return new class extends Migration
 
         Schema::table('cattle', function (Blueprint $table) {
             // FK column — no auto index in SQLite
-            $table->index('user_id',    'cattle_user_id_index');
+            $table->index('user_id', 'cattle_user_id_index');
             // CattleController: ORDER BY created_at DESC (pagination)
             $table->index('created_at', 'cattle_created_at_index');
         });

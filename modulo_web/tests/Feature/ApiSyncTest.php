@@ -5,14 +5,16 @@ namespace Tests\Feature;
 use App\Models\Cattle;
 use App\Models\User;
 use App\Models\VaccineType;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiSyncTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function can_save_vaccine_via_api_with_valid_token()
     {
         $vet = User::factory()->create([
@@ -20,7 +22,7 @@ class ApiSyncTest extends TestCase
         ]);
 
         $cattle = Cattle::create([
-            'rfid_tag' => \App\Support\RfidGenerator::generateCattleTag(),
+            'rfid_tag' => RfidGenerator::generateCattleTag(),
             'registration_date' => now()->toDateString(),
             'name' => 'Mimosa API',
             'weight' => 300.0,

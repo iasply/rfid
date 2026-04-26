@@ -19,16 +19,16 @@ class LargeTestDatasetSeeder extends Seeder
      * Based on the Brazilian MAPA/Embrapa bovine vaccination calendar.
      */
     private array $vaccineSeasons = [
-        'Febre Aftosa'           => [ 1,  1,  1,  2, 10,  2,  1,  1,  1,  2, 10,  2],
-        'Brucelose'              => [ 3,  3,  4,  5,  8,  4,  2,  2,  2,  2,  5,  3],
-        'Raiva'                  => [ 6,  6,  5,  3,  2,  1,  1,  2,  2,  3,  5,  7],
-        'Clostridiose'           => [ 2,  2,  3,  4,  6,  4,  3,  3,  4,  3,  4,  2],
-        'Carbúnculo Sintomático' => [ 2,  2,  3,  4,  6,  4,  3,  3,  4,  3,  3,  2],
-        'Leptospirose'           => [ 3,  3,  4,  4,  6,  3,  3,  3,  5,  6,  4,  3],
-        'IBR/BVD'                => [ 3,  4,  7,  4,  3,  2,  2,  3,  7,  4,  3,  2],
-        'Verminose'              => [ 1,  1,  1,  1, 10,  1,  8,  1,  8,  1,  6,  1],
-        'Tristeza Parasitária'   => [ 2,  2,  3,  3,  4,  5,  6,  6,  5,  4,  3,  2],
-        'Botulismo'              => [ 2,  2,  2,  3,  4,  6,  6,  5,  4,  4,  3,  2],
+        'Febre Aftosa' => [1, 1, 1, 2, 10, 2, 1, 1, 1, 2, 10, 2],
+        'Brucelose' => [3, 3, 4, 5, 8, 4, 2, 2, 2, 2, 5, 3],
+        'Raiva' => [6, 6, 5, 3, 2, 1, 1, 2, 2, 3, 5, 7],
+        'Clostridiose' => [2, 2, 3, 4, 6, 4, 3, 3, 4, 3, 4, 2],
+        'Carbúnculo Sintomático' => [2, 2, 3, 4, 6, 4, 3, 3, 4, 3, 3, 2],
+        'Leptospirose' => [3, 3, 4, 4, 6, 3, 3, 3, 5, 6, 4, 3],
+        'IBR/BVD' => [3, 4, 7, 4, 3, 2, 2, 3, 7, 4, 3, 2],
+        'Verminose' => [1, 1, 1, 1, 10, 1, 8, 1, 8, 1, 6, 1],
+        'Tristeza Parasitária' => [2, 2, 3, 3, 4, 5, 6, 6, 5, 4, 3, 2],
+        'Botulismo' => [2, 2, 2, 3, 4, 6, 6, 5, 4, 4, 3, 2],
     ];
 
     public function run(): void
@@ -39,17 +39,17 @@ class LargeTestDatasetSeeder extends Seeder
         User::where('is_veterinarian', true)->delete();
 
         $workstations = Workstation::factory()->count(5)->create();
-        $vets         = User::factory()->count(10)->veterinarian()->create();
+        $vets = User::factory()->count(10)->veterinarian()->create();
 
         // 300 cattle distributed evenly across vets
-        $allCattle   = collect();
+        $allCattle = collect();
         $totalCattle = 300;
-        $perVet      = intdiv($totalCattle, $vets->count());
-        $extra       = $totalCattle % $vets->count();
+        $perVet = intdiv($totalCattle, $vets->count());
+        $extra = $totalCattle % $vets->count();
 
         foreach ($vets as $i => $vet) {
-            $count     = $perVet + ($i < $extra ? 1 : 0);
-            $batch     = Cattle::factory()->count($count)->create(['user_id' => $vet->id]);
+            $count = $perVet + ($i < $extra ? 1 : 0);
+            $batch = Cattle::factory()->count($count)->create(['user_id' => $vet->id]);
             $allCattle = $allCattle->concat($batch);
         }
 
@@ -59,10 +59,10 @@ class LargeTestDatasetSeeder extends Seeder
             ->all();
 
         $vaccineTypeNames = array_keys($this->vaccineSeasons);
-        $yearStart        = Carbon::now()->subYear()->startOfDay();
-        $today            = Carbon::now()->startOfDay();
+        $yearStart = Carbon::now()->subYear()->startOfDay();
+        $today = Carbon::now()->startOfDay();
 
-        $wsIds  = $workstations->pluck('id')->all();
+        $wsIds = $workstations->pluck('id')->all();
         $vetIds = $vets->pluck('id')->all();
 
         $rows = [];
@@ -82,22 +82,22 @@ class LargeTestDatasetSeeder extends Seeder
 
                 $date = $this->seasonalDate($yearStart, $today, $typeName);
 
-                $daysAgo     = $today->diffInDays($date);
+                $daysAgo = $today->diffInDays($date);
                 $growthShare = rand(10, 30) / 100;
-                $factor      = 1 - ($growthShare * ($daysAgo / 365));
-                $pastWeight  = $animal->weight * max(0.70, $factor);
-                $noise       = $pastWeight * (rand(-20, 20) / 1000);
-                $weight      = round(max(80.0, $pastWeight + $noise), 2);
+                $factor = 1 - ($growthShare * ($daysAgo / 365));
+                $pastWeight = $animal->weight * max(0.70, $factor);
+                $noise = $pastWeight * (rand(-20, 20) / 1000);
+                $weight = round(max(80.0, $pastWeight + $noise), 2);
 
                 $rows[] = [
-                    'rfid_tag'         => $animal->rfid_tag,
-                    'vaccine_type_id'  => $vaccineTypeMap[$typeName],
-                    'current_weight'   => $weight,
+                    'rfid_tag' => $animal->rfid_tag,
+                    'vaccine_type_id' => $vaccineTypeMap[$typeName],
+                    'current_weight' => $weight,
                     'vaccination_date' => $date->toDateString(),
-                    'user_id'          => $vetIds[array_rand($vetIds)],
-                    'workstation_id'   => $wsIds[array_rand($wsIds)],
-                    'created_at'       => $date->toDateTimeString(),
-                    'updated_at'       => $date->toDateTimeString(),
+                    'user_id' => $vetIds[array_rand($vetIds)],
+                    'workstation_id' => $wsIds[array_rand($wsIds)],
+                    'created_at' => $date->toDateTimeString(),
+                    'updated_at' => $date->toDateTimeString(),
                 ];
             }
         }
@@ -119,7 +119,7 @@ class LargeTestDatasetSeeder extends Seeder
     {
         $weights = $this->vaccineSeasons[$vaccineType] ?? array_fill(0, 12, 1);
 
-        $pool   = [];
+        $pool = [];
         $cursor = $from->copy()->startOfMonth();
 
         while ($cursor->lte($to)) {
@@ -133,9 +133,9 @@ class LargeTestDatasetSeeder extends Seeder
         /** @var Carbon $chosenMonth */
         $chosenMonth = $pool[array_rand($pool)];
 
-        $dayStart  = $chosenMonth->copy()->startOfMonth()->max($from);
-        $dayEnd    = $chosenMonth->copy()->endOfMonth()->min($to);
-        $dayOffset = rand(0, max(0, (int) $dayEnd->diffInDays($dayStart)));
+        $dayStart = $chosenMonth->copy()->startOfMonth()->max($from);
+        $dayEnd = $chosenMonth->copy()->endOfMonth()->min($to);
+        $dayOffset = rand(0, max(0, (int)$dayEnd->diffInDays($dayStart)));
 
         return $dayStart->copy()->addDays($dayOffset);
     }

@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Request\Cattle;
 
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCattleRequest extends FormRequest
@@ -21,7 +22,7 @@ class StoreCattleRequest extends FormRequest
                 'string',
                 'unique:cattle,rfid_tag',
                 function ($attribute, $value, $fail) {
-                    if (!\App\Support\RfidGenerator::isCattleTag($value)) {
+                    if (!RfidGenerator::isCattleTag($value)) {
                         $fail(__('A tag RFID do animal é inválida ou não possui o prefixo esperado (C).'));
                     }
                 },

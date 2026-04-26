@@ -4,19 +4,21 @@ namespace Tests\Feature;
 
 use App\Models\Cattle;
 use App\Models\User;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class CattleUpdateApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function user_can_update_existing_cattle_without_rfid_collision()
     {
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
-        $tag = \App\Support\RfidGenerator::generateCattleTag();
+        $tag = RfidGenerator::generateCattleTag();
 
         $cattle = Cattle::create([
             'rfid_tag' => $tag,
@@ -47,12 +49,12 @@ class CattleUpdateApiTest extends TestCase
         $this->assertEquals(250.00, $cattle->fresh()->weight);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function updating_via_post_to_store_endpoint_fails_with_422_due_to_duplicate_rfid()
     {
         $user = User::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
-        $tag = \App\Support\RfidGenerator::generateCattleTag();
+        $tag = RfidGenerator::generateCattleTag();
 
         Cattle::create([
             'rfid_tag' => $tag,

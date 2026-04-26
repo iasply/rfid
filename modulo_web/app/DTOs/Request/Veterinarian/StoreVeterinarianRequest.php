@@ -2,6 +2,7 @@
 
 namespace App\DTOs\Request\Veterinarian;
 
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreVeterinarianRequest extends FormRequest
@@ -21,7 +22,7 @@ class StoreVeterinarianRequest extends FormRequest
                 'string',
                 'unique:users,vet_rfid',
                 function ($attribute, $value, $fail) {
-                    if (!\App\Support\RfidGenerator::isVetTag($value)) {
+                    if (!RfidGenerator::isVetTag($value)) {
                         $fail(__('A tag RFID do veterinário é inválida ou não possui o prefixo esperado (V).'));
                     }
                 },

@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Vaccine;
 use App\Models\Workstation;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class ExportTestDataCommand extends Command
 {
@@ -37,7 +36,7 @@ class ExportTestDataCommand extends Command
         $file = fopen($path, 'w');
 
         // Add UTF-8 BOM for Excel compatibility
-        fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+        fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
         // Header
         fputcsv($file, $columns);

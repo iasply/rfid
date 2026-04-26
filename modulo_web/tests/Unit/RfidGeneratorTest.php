@@ -3,11 +3,12 @@
 namespace Tests\Unit;
 
 use App\Support\RfidGenerator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class RfidGeneratorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function it_generates_valid_cattle_tags()
     {
         $tag = RfidGenerator::generateCattleTag();
@@ -15,7 +16,7 @@ class RfidGeneratorTest extends TestCase
         $this->assertStringStartsWith('C', $tag);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function it_generates_valid_vet_tags()
     {
         $tag = RfidGenerator::generateVetTag();
@@ -23,7 +24,7 @@ class RfidGeneratorTest extends TestCase
         $this->assertStringStartsWith('V', $tag);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function it_validates_various_tags()
     {
         // Valid tags

@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // ── 1. vaccine_types table ────────────────────────────────────────────
@@ -44,7 +43,7 @@ return new class extends Migration
         $now = now()->toDateTimeString();
         foreach ($unmatched as $typeName) {
             $newId = DB::table('vaccine_types')->insertGetId([
-                'name'       => $typeName,
+                'name' => $typeName,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
@@ -56,7 +55,7 @@ return new class extends Migration
 
         // ── 4. Drop all existing vaccine indexes before column manipulation ───
         $existing = collect(DB::select("PRAGMA index_list('vaccines')"))->pluck('name');
-        $toDrop   = [
+        $toDrop = [
             'vaccines_type_rfid_date_index',
             'vaccines_date_id_index',
             'vaccines_user_id_index',
@@ -65,7 +64,7 @@ return new class extends Migration
         ];
         foreach ($toDrop as $idx) {
             if ($existing->contains($idx)) {
-                Schema::table('vaccines', fn (Blueprint $t) => $t->dropIndex($idx));
+                Schema::table('vaccines', fn(Blueprint $t) => $t->dropIndex($idx));
             }
         }
 
@@ -76,12 +75,12 @@ return new class extends Migration
 
         // ── 6. Recreate all performance indexes (now on vaccine_type_id) ──────
         Schema::table('vaccines', function (Blueprint $table) {
-            $table->index('vaccine_type_id',                                    'vaccines_vaccine_type_id_index');
+            $table->index('vaccine_type_id', 'vaccines_vaccine_type_id_index');
             $table->index(['vaccine_type_id', 'rfid_tag', 'vaccination_date'], 'vaccines_type_rfid_date_index');
-            $table->index(['vaccination_date', 'id'],                          'vaccines_date_id_index');
-            $table->index('user_id',                                           'vaccines_user_id_index');
-            $table->index('workstation_id',                                    'vaccines_workstation_id_index');
-            $table->index('rfid_tag',                                          'vaccines_rfid_tag_index');
+            $table->index(['vaccination_date', 'id'], 'vaccines_date_id_index');
+            $table->index('user_id', 'vaccines_user_id_index');
+            $table->index('workstation_id', 'vaccines_workstation_id_index');
+            $table->index('rfid_tag', 'vaccines_rfid_tag_index');
         });
     }
 
@@ -97,7 +96,7 @@ return new class extends Migration
 
         // 3. Drop all vaccine indexes before column manipulation
         $existing = collect(DB::select("PRAGMA index_list('vaccines')"))->pluck('name');
-        $toDrop   = [
+        $toDrop = [
             'vaccines_vaccine_type_id_index',
             'vaccines_type_rfid_date_index',
             'vaccines_date_id_index',
@@ -107,7 +106,7 @@ return new class extends Migration
         ];
         foreach ($toDrop as $idx) {
             if ($existing->contains($idx)) {
-                Schema::table('vaccines', fn (Blueprint $t) => $t->dropIndex($idx));
+                Schema::table('vaccines', fn(Blueprint $t) => $t->dropIndex($idx));
             }
         }
 
@@ -119,10 +118,10 @@ return new class extends Migration
         // 5. Restore original performance indexes
         Schema::table('vaccines', function (Blueprint $table) {
             $table->index(['vaccine_type', 'rfid_tag', 'vaccination_date'], 'vaccines_type_rfid_date_index');
-            $table->index(['vaccination_date', 'id'],                       'vaccines_date_id_index');
-            $table->index('user_id',                                        'vaccines_user_id_index');
-            $table->index('workstation_id',                                 'vaccines_workstation_id_index');
-            $table->index('rfid_tag',                                       'vaccines_rfid_tag_index');
+            $table->index(['vaccination_date', 'id'], 'vaccines_date_id_index');
+            $table->index('user_id', 'vaccines_user_id_index');
+            $table->index('workstation_id', 'vaccines_workstation_id_index');
+            $table->index('rfid_tag', 'vaccines_rfid_tag_index');
         });
 
         Schema::dropIfExists('vaccine_types');

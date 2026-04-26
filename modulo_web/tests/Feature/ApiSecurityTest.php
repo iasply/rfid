@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ApiSecurityTest extends TestCase
@@ -29,8 +30,8 @@ class ApiSecurityTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    #[\PHPUnit\Framework\Attributes\DataProvider('protectedRoutesProvider')]
+    #[Test]
+    #[DataProvider('protectedRoutesProvider')]
     public function protected_endpoints_return_unauthorized_without_token(string $method, string $uri)
     {
         $response = $this->json($method, $uri);
@@ -38,7 +39,7 @@ class ApiSecurityTest extends TestCase
         $response->assertStatus(401);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function login_endpoint_is_accessible_without_token()
     {
         // We don't provide a tag/workstation, so it should fail with 422 (Validation), NOT 401

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\VaccineType;
 use App\Http\Controllers\Controller;
+use App\Models\VaccineType;
 use Illuminate\Http\JsonResponse;
 
 class VaccineTypeApiController extends Controller

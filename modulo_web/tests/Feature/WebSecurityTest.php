@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class WebSecurityTest extends TestCase
@@ -25,8 +27,8 @@ class WebSecurityTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
-    #[\PHPUnit\Framework\Attributes\DataProvider('protectedAdminRoutesProvider')]
+    #[Test]
+    #[DataProvider('protectedAdminRoutesProvider')]
     public function admin_routes_redirect_to_login_without_authentication(string $uri)
     {
         $response = $this->get($uri);
@@ -35,7 +37,7 @@ class WebSecurityTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function login_page_is_accessible_without_authentication()
     {
         $response = $this->get(route('login'));

@@ -12,8 +12,8 @@ class VaccineTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'          => fake()->unique()->word() . ' Vaccine',
-            'description'   => fake()->sentence(),
+            'name' => fake()->unique()->word() . ' Vaccine',
+            'description' => fake()->sentence(),
             'interval_days' => fake()->randomElement([120, 180, 365]),
             'season_months' => fake()->randomElements(range(1, 12), fake()->numberBetween(3, 12)),
         ];

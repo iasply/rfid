@@ -14,8 +14,8 @@ class DashboardController extends Controller
     {
         // ── KPI counters ──────────────────────────────────────────────────────
         $stats = [
-            'vets'     => User::where('is_veterinarian', true)->count(),
-            'cattle'   => Cattle::count(),
+            'vets' => User::where('is_veterinarian', true)->count(),
+            'cattle' => Cattle::count(),
             'vaccines' => Vaccine::count(),
         ];
 
@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ? round(($vaccinatedCattle / $stats['cattle']) * 100, 1)
             : 0;
 
-        $avgWeight = round((float) Cattle::avg('weight'), 2);
+        $avgWeight = round((float)Cattle::avg('weight'), 2);
 
         // Most-used vaccine type (join for name)
         $topVaccine = DB::table('vaccines')
@@ -49,7 +49,7 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->first();
         $topVet = $topVetRow
-            ? ['name' => $topVetRow->name, 'count' => (int) $topVetRow->total]
+            ? ['name' => $topVetRow->name, 'count' => (int)$topVetRow->total]
             : ['name' => '—', 'count' => 0];
 
         $neverVaccinated = DB::table('cattle')
@@ -69,12 +69,12 @@ class DashboardController extends Controller
             ->value('avg_days');
 
         $insights = [
-            'coverage_pct'       => $coveragePct,
-            'avg_weight'         => $avgWeight,
-            'top_vaccine'        => $topVaccine,
-            'top_vet'            => $topVet,
-            'never_vaccinated'   => $neverVaccinated,
-            'avg_days_since_vax' => $avgDaysSinceVax !== null ? (int) $avgDaysSinceVax : null,
+            'coverage_pct' => $coveragePct,
+            'avg_weight' => $avgWeight,
+            'top_vaccine' => $topVaccine,
+            'top_vet' => $topVet,
+            'never_vaccinated' => $neverVaccinated,
+            'avg_days_since_vax' => $avgDaysSinceVax !== null ? (int)$avgDaysSinceVax : null,
         ];
 
         // ── Chart datasets ────────────────────────────────────────────────────
@@ -94,16 +94,16 @@ class DashboardController extends Controller
             $labels = [];
             $values = [];
             for ($i = $months - 1; $i >= 0; $i--) {
-                $key      = now()->subMonths($i)->format('Y-m');
+                $key = now()->subMonths($i)->format('Y-m');
                 $labels[] = now()->subMonths($i)->translatedFormat('M/y');
-                $values[] = $raw->has($key) ? (int) $raw[$key]->total : 0;
+                $values[] = $raw->has($key) ? (int)$raw[$key]->total : 0;
             }
             return ['labels' => $labels, 'values' => $values];
         };
 
         $chartPeriods = [
-            '3m'  => $buildMonthly(3),
-            '6m'  => $buildMonthly(6),
+            '3m' => $buildMonthly(3),
+            '6m' => $buildMonthly(6),
             '12m' => $buildMonthly(12),
         ];
 
@@ -116,7 +116,7 @@ class DashboardController extends Controller
             ->get();
         $chartVaccineTypes = [
             'labels' => $vaccineTypesData->pluck('vaccine_type')->toArray(),
-            'values' => $vaccineTypesData->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
+            'values' => $vaccineTypesData->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
 
         // Cattle per veterinarian
@@ -129,7 +129,7 @@ class DashboardController extends Controller
             ->get();
         $chartCattlePerVet = [
             'labels' => $cattlePerVet->pluck('name')->toArray(),
-            'values' => $cattlePerVet->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
+            'values' => $cattlePerVet->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
 
         // Vaccines per workstation
@@ -144,7 +144,7 @@ class DashboardController extends Controller
             ->get();
         $chartVaccinesPerWorkstation = [
             'labels' => $vaccinesPerWorkstation->pluck('station')->toArray(),
-            'values' => $vaccinesPerWorkstation->pluck('total')->map(fn ($v) => (int) $v)->toArray(),
+            'values' => $vaccinesPerWorkstation->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
 
         // Average weight evolution by month
@@ -163,9 +163,9 @@ class DashboardController extends Controller
         $weightLabels = [];
         $weightValues = [];
         for ($i = 11; $i >= 0; $i--) {
-            $key            = now()->subMonths($i)->format('Y-m');
+            $key = now()->subMonths($i)->format('Y-m');
             $weightLabels[] = now()->subMonths($i)->translatedFormat('M/y');
-            $weightValues[] = $weightRaw->has($key) ? (float) $weightRaw[$key]->avg_weight : null;
+            $weightValues[] = $weightRaw->has($key) ? (float)$weightRaw[$key]->avg_weight : null;
         }
         $chartWeightEvolution = ['labels' => $weightLabels, 'values' => $weightValues];
 
@@ -182,7 +182,7 @@ class DashboardController extends Controller
             ->get();
         $chartWeightByWorkstation = [
             'labels' => $weightByStation->pluck('station')->toArray(),
-            'values' => $weightByStation->pluck('avg_weight')->map(fn ($v) => (float) $v)->toArray(),
+            'values' => $weightByStation->pluck('avg_weight')->map(fn($v) => (float)$v)->toArray(),
         ];
 
         // Vaccine type breakdown per workstation — stacked bar (join for name)
@@ -198,21 +198,21 @@ class DashboardController extends Controller
             ->orderBy('station')
             ->get();
 
-        $stationLabels  = $vaxByStation->pluck('station')->unique()->values()->toArray();
+        $stationLabels = $vaxByStation->pluck('station')->unique()->values()->toArray();
         $vaccineTypeSet = $vaxByStation->pluck('vaccine_type')->unique()->values()->toArray();
 
         $stackedDatasets = [];
         foreach ($vaccineTypeSet as $type) {
             $values = [];
             foreach ($stationLabels as $station) {
-                $row      = $vaxByStation->first(fn ($r) => $r->station === $station && $r->vaccine_type === $type);
-                $values[] = $row ? (int) $row->total : 0;
+                $row = $vaxByStation->first(fn($r) => $r->station === $station && $r->vaccine_type === $type);
+                $values[] = $row ? (int)$row->total : 0;
             }
             $stackedDatasets[] = ['label' => $type, 'values' => $values];
         }
 
         $chartVaccineTypeByWorkstation = [
-            'labels'   => $stationLabels,
+            'labels' => $stationLabels,
             'datasets' => $stackedDatasets,
         ];
 
@@ -226,11 +226,11 @@ class DashboardController extends Controller
             ->get();
         $chartWeightByVaccineType = [
             'labels' => $weightByVaccine->pluck('vaccine_type')->toArray(),
-            'values' => $weightByVaccine->pluck('avg_weight')->map(fn ($v) => (float) $v)->toArray(),
+            'values' => $weightByVaccine->pluck('avg_weight')->map(fn($v) => (float)$v)->toArray(),
         ];
 
         // Seasonal vaccination pattern
-        $monthNames  = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        $monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         $seasonalRaw = DB::table('vaccines')
             ->select(DB::raw("strftime('%m', vaccination_date) as month_num"), DB::raw('COUNT(*) as total'))
             ->groupBy('month_num')
@@ -239,8 +239,8 @@ class DashboardController extends Controller
             ->keyBy('month_num');
         $seasonalValues = [];
         for ($m = 1; $m <= 12; $m++) {
-            $key              = str_pad($m, 2, '0', STR_PAD_LEFT);
-            $seasonalValues[] = $seasonalRaw->has($key) ? (int) $seasonalRaw[$key]->total : 0;
+            $key = str_pad($m, 2, '0', STR_PAD_LEFT);
+            $seasonalValues[] = $seasonalRaw->has($key) ? (int)$seasonalRaw[$key]->total : 0;
         }
         $chartSeasonalVaccinations = ['labels' => $monthNames, 'values' => $seasonalValues];
 

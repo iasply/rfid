@@ -4,27 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\DTOs\Request\Cattle\StoreCattleRequest;
 use App\DTOs\Request\Cattle\UpdateCattleRequest;
+use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
+use App\Services\CattleService;
+use Carbon\Carbon;
 
 class CattleController extends Controller
 {
     public function __construct(
-        protected \App\Services\CattleService $cattleService
-    ) {
+        protected CattleService $cattleService
+    )
+    {
     }
 
     public function index()
     {
-        $q   = request('q');
+        $q = request('q');
         $col = request('col');
 
         $gattos = Cattle::with('user')
             ->when($q, function ($query) use ($q, $col) {
                 match ($col) {
-                    'name'     => $query->where('name', 'like', "%{$q}%"),
+                    'name' => $query->where('name', 'like', "%{$q}%"),
                     'rfid_tag' => $query->where('rfid_tag', 'like', "%{$q}%"),
-                    default    => $query->where(fn ($s) => $s
+                    default => $query->where(fn($s) => $s
                         ->where('name', 'like', "%{$q}%")
                         ->orWhere('rfid_tag', 'like', "%{$q}%")),
                 };
@@ -54,19 +58,19 @@ class CattleController extends Controller
 
         // Weight evolution — chronological, only records with a valid weight
         $chronological = $cattle->vaccines
-            ->filter(fn ($v) => $v->current_weight > 0)
+            ->filter(fn($v) => $v->current_weight > 0)
             ->sortBy('vaccination_date')
             ->values();
 
         $chartWeightOverTime = [
-            'labels' => $chronological->map(fn ($v) => \Carbon\Carbon::parse($v->vaccination_date)->format('d/m/Y'))->toArray(),
-            'values' => $chronological->map(fn ($v) => (float) $v->current_weight)->toArray(),
+            'labels' => $chronological->map(fn($v) => Carbon::parse($v->vaccination_date)->format('d/m/Y'))->toArray(),
+            'values' => $chronological->map(fn($v) => (float)$v->current_weight)->toArray(),
         ];
 
         // Vaccine type distribution for this animal (keyed by type name)
         $typeCounts = $cattle->vaccines
-            ->groupBy(fn ($v) => $v->vaccineType?->name ?? 'Desconhecida')
-            ->map(fn ($group) => $group->count())
+            ->groupBy(fn($v) => $v->vaccineType?->name ?? 'Desconhecida')
+            ->map(fn($group) => $group->count())
             ->sortDesc();
 
         $chartAnimalVaccineTypes = [
@@ -74,7 +78,7 @@ class CattleController extends Controller
             'values' => $typeCounts->values()->toArray(),
         ];
 
-        $vaccines = $cattle->vaccines->map(fn ($v) => \App\DTOs\Response\VaccineResponse::fromModel($v));
+        $vaccines = $cattle->vaccines->map(fn($v) => VaccineResponse::fromModel($v));
 
         return view('admin.cattle.show', compact('cattle', 'vaccines', 'chartWeightOverTime', 'chartAnimalVaccineTypes'));
     }

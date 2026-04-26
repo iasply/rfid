@@ -4,13 +4,14 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class VeterinarianRfidTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function creating_a_veterinarian_automatically_generates_vet_rfid_and_tag_hash()
     {
         $vet = User::create([
@@ -28,7 +29,7 @@ class VeterinarianRfidTest extends TestCase
         $this->assertNotNull($vet->tag_hash);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function creating_a_non_veterinarian_still_generates_a_tag_hash()
     {
         $user = User::create([
@@ -45,7 +46,7 @@ class VeterinarianRfidTest extends TestCase
         $this->assertEquals($expectedHash, $user->tag_hash);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function vet_rfid_is_not_overwritten_if_provided()
     {
         $customRfid = 'STATION-VET-001';

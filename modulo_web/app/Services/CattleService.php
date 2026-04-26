@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Cattle;
+use App\Support\RfidGenerator;
 use Illuminate\Support\Facades\DB;
 
 class CattleService
@@ -13,7 +14,7 @@ class CattleService
             $data['user_id'] = $userId;
 
             if (empty($data['rfid_tag']) || $data['rfid_tag'] === 'C') {
-                $data['rfid_tag'] = \App\Support\RfidGenerator::generateCattleTag();
+                $data['rfid_tag'] = RfidGenerator::generateCattleTag();
             }
 
             if (empty($data['registration_date'])) {

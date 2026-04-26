@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cattle;
+use App\Models\User;
+use App\Models\Vaccine;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -11,12 +15,12 @@ class CattleWithVaccinesEndpointTest extends TestCase
 
     public function test_cattle_with_vaccines_endpoint_returns_correct_data(): void
     {
-        $user = \App\Models\User::factory()->create();
-        $tag1 = \App\Support\RfidGenerator::generateCattleTag();
-        $tag2 = \App\Support\RfidGenerator::generateCattleTag();
+        $user = User::factory()->create();
+        $tag1 = RfidGenerator::generateCattleTag();
+        $tag2 = RfidGenerator::generateCattleTag();
 
         // Create cattle
-        $cattle1 = \App\Models\Cattle::create([
+        $cattle1 = Cattle::create([
             'rfid_tag' => $tag1,
             'name' => 'Boi 1',
             'weight' => 500,
@@ -24,7 +28,7 @@ class CattleWithVaccinesEndpointTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $cattle2 = \App\Models\Cattle::create([
+        $cattle2 = Cattle::create([
             'rfid_tag' => $tag2,
             'name' => 'Boi 2',
             'weight' => 600,
@@ -33,14 +37,14 @@ class CattleWithVaccinesEndpointTest extends TestCase
         ]);
 
         // Add 2 vaccines to cattle 1
-        \App\Models\Vaccine::create([
+        Vaccine::create([
             'rfid_tag' => $tag1,
             'vaccine_type' => 'Aftosa',
             'current_weight' => 500,
             'vaccination_date' => '2023-10-10',
             'user_id' => $user->id,
         ]);
-        \App\Models\Vaccine::create([
+        Vaccine::create([
             'rfid_tag' => $tag1,
             'vaccine_type' => 'Brucelose',
             'current_weight' => 510,
@@ -49,7 +53,7 @@ class CattleWithVaccinesEndpointTest extends TestCase
         ]);
 
         // Add 1 vaccine to cattle 2
-        \App\Models\Vaccine::create([
+        Vaccine::create([
             'rfid_tag' => $tag2,
             'vaccine_type' => 'Aftosa',
             'current_weight' => 600,

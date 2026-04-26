@@ -38,7 +38,7 @@ test.describe('Login Flow', () => {
 
         // 6th attempt should be blocked by rate limiter
         await loginPage.login(email, 'wrongpass');
-        await expect(loginPage.errorMessage).toHaveText(/(too many|muitas tentativas|segundos|seconds|attempts|bloqueado)/i, { timeout: 10000 });
+        await expect(loginPage.errorMessage).toHaveText(/(too many|muitas tentativas|segundos|seconds|attempts|bloqueado)/i, {timeout: 10000});
     });
 });
 

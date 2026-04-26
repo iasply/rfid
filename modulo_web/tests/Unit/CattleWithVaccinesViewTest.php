@@ -6,6 +6,7 @@ use App\Models\Cattle;
 use App\Models\CattleWithVaccinesView;
 use App\Models\User;
 use App\Models\Vaccine;
+use App\Support\RfidGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,8 +17,8 @@ class CattleWithVaccinesViewTest extends TestCase
     public function test_view_returns_correct_vaccines_count()
     {
         $user = User::factory()->create();
-        $tag1 = \App\Support\RfidGenerator::generateCattleTag();
-        $tag2 = \App\Support\RfidGenerator::generateCattleTag();
+        $tag1 = RfidGenerator::generateCattleTag();
+        $tag2 = RfidGenerator::generateCattleTag();
 
         // Create cattle
         $cattle1 = Cattle::create([

@@ -5,13 +5,14 @@ namespace Tests\Feature;
 use App\Models\Cattle;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class EntityTagTest extends TestCase
 {
     use RefreshDatabase;
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function cattle_is_created_with_automatic_rfid_tag_and_registration_date()
     {
         $response = $this->post(route('admin.cattle.store'), [
@@ -29,7 +30,7 @@ class EntityTagTest extends TestCase
         $this->assertEquals(auth()->id(), $cattle->user_id);
     }
 
-    #[\PHPUnit\Framework\Attributes\Test]
+    #[Test]
     public function veterinarian_is_created_with_automatic_username_tag()
     {
         $response = $this->post(route('admin.veterinarians.store'), [

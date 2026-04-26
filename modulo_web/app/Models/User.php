@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\RfidGenerator;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
@@ -32,7 +34,7 @@ class User extends Authenticatable
         static::creating(function ($user) {
             if ($user->is_veterinarian) {
                 if (!$user->vet_rfid || $user->vet_rfid === 'V') {
-                    $user->vet_rfid = \App\Support\RfidGenerator::generateVetTag();
+                    $user->vet_rfid = RfidGenerator::generateVetTag();
                 }
             } else {
                 if (!$user->vet_rfid) {
