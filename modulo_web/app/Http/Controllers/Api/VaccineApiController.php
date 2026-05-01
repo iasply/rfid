@@ -9,6 +9,7 @@ use App\Models\Cattle;
 use App\Models\Vaccine;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VaccineApiController extends Controller
 {
@@ -17,16 +18,20 @@ class VaccineApiController extends Controller
         $user = $request->user();
         $token = $user->currentAccessToken();
 
-        $vaccine = Vaccine::create(array_merge(
-            $request->validated(),
-            [
-                'user_id' => $user->id,
-                'workstation_id' => $token->workstation_id ?? null,
-            ],
-        ));
+        $vaccine = DB::transaction(function () use ($request, $user, $token) {
+            $vaccine = Vaccine::create(array_merge(
+                $request->validated(),
+                [
+                    'user_id' => $user->id,
+                    'workstation_id' => $token->workstation_id ?? null,
+                ],
+            ));
 
-        Cattle::where('rfid_tag', $request->rfid_tag)
-            ->update(['weight' => $request->current_weight]);
+            Cattle::where('rfid_tag', $request->rfid_tag)
+                ->update(['weight' => $request->current_weight]);
+
+            return $vaccine;
+        });
 
         $vaccine->load('user', 'workstation');
 

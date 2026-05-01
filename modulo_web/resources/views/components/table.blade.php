@@ -20,6 +20,7 @@
 <style>
     .table-container {
         width: 100%;
+        min-width: 0;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         border-radius: var(--radius-md);

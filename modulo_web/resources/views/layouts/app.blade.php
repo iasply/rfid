@@ -313,15 +313,6 @@
                class="nav-link {{ request()->routeIs('admin.alerts') ? 'active' : '' }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                 Avisos
-                @php
-                $alertCount = \Illuminate\Support\Facades\Cache::remember('alert_badge_count', 300, function () {
-                return \App\Models\Vaccine::selectRaw('rfid_tag, vaccine_type_id, MAX(vaccination_date) as last_vax')
-                ->groupBy('rfid_tag', 'vaccine_type_id')
-                ->get()
-                ->filter(fn($r) => \Carbon\Carbon::parse($r->last_vax)->addDays(150)->isPast())
-                ->count();
-                });
-                @endphp
                 @if($alertCount > 0)
                 <span class="nav-badge">{{ $alertCount > 99 ? '99+' : $alertCount }}</span>
                 @endif
