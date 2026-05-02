@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Sistema Admin',
             'email' => 'admin@cattlerfid.com',
-            'password' => Hash::make('admin123'),
+            'password' => Hash::make(env('ADMIN_PASSWORD') ?? 'admin123'),
             'is_veterinarian' => false,
         ]);
 
