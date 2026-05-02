@@ -2,36 +2,30 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTOs\Request\Vaccine\StoreVaccineRequest;
+use App\Http\Requests\Vaccine\StoreVaccineRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\VaccineResource;
-use App\Models\Cattle;
 use App\Models\Vaccine;
+use App\Services\VaccineService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class VaccineApiController extends Controller
 {
+    public function __construct(private VaccineService $vaccineService)
+    {
+    }
+
     public function store(StoreVaccineRequest $request): JsonResponse
     {
-        $user = $request->user();
+        $user  = $request->user();
         $token = $user->currentAccessToken();
 
-        $vaccine = DB::transaction(function () use ($request, $user, $token) {
-            $vaccine = Vaccine::create(array_merge(
-                $request->validated(),
-                [
-                    'user_id' => $user->id,
-                    'workstation_id' => $token->workstation_id ?? null,
-                ],
-            ));
-
-            Cattle::where('rfid_tag', $request->rfid_tag)
-                ->update(['weight' => $request->current_weight]);
-
-            return $vaccine;
-        });
+        $vaccine = $this->vaccineService->recordVaccination(
+            $request->validated(),
+            $user->id,
+            $token->workstation_id ?? null,
+        );
 
         $vaccine->load('user', 'workstation');
 

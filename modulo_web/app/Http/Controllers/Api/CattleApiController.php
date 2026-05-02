@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTOs\Request\Cattle\StoreCattleRequest;
-use App\DTOs\Request\Cattle\UpdateCattleRequest;
+use App\Http\Requests\Cattle\StoreCattleRequest;
+use App\Http\Requests\Cattle\UpdateCattleRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CattleResource;
 use App\Models\Cattle;

@@ -29,8 +29,5 @@ class Workstation extends Model
             }
         });
 
-        static::deleting(function ($workstation) {
-            return false;
-        });
     }
 }

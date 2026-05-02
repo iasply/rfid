@@ -27,11 +27,11 @@
             <a href="{{ route('admin.cattle.index') }}" class="search-clear">✕ Limpar</a>
             @endif
         </form>
-        <span class="result-count">{{ $gattos->total() }} animal(is)</span>
+        <span class="result-count">{{ $cattle->total() }} animal(is)</span>
     </div>
 
     <x-table :headers="['Tag RFID', 'Nome/Apelido', 'Cadastrado por', 'Peso Atual', 'Data Registro', 'Ações']">
-        @foreach($gattos as $animal)
+        @foreach($cattle as $animal)
         <tr data-testid="cattle-row">
             <td data-testid="cattle-tag"><code>{{ $animal->rfid_tag }}</code></td>
             <td data-testid="cattle-name">{{ $animal->name }}</td>
@@ -48,19 +48,19 @@
             </td>
         </tr>
         @endforeach
-        @if($gattos->isEmpty())
+        @if($cattle->isEmpty())
         <tr>
             <td colspan="6" style="text-align: center; color: var(--secondary);">Nenhum animal encontrado.</td>
         </tr>
         @endif
     </x-table>
 
-    @if($gattos->hasPages())
+    @if($cattle->hasPages())
     <div class="pagination-footer">
                 <span class="result-count">
-                    Exibindo {{ $gattos->firstItem() }}–{{ $gattos->lastItem() }} de {{ $gattos->total() }}
+                    Exibindo {{ $cattle->firstItem() }}–{{ $cattle->lastItem() }} de {{ $cattle->total() }}
                 </span>
-        {{ $gattos->links() }}
+        {{ $cattle->links() }}
     </div>
     @endif
 </x-card>

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\DTOs\Request\Cattle\StoreCattleRequest;
-use App\DTOs\Request\Cattle\UpdateCattleRequest;
+use App\Http\Requests\Cattle\StoreCattleRequest;
+use App\Http\Requests\Cattle\UpdateCattleRequest;
 use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Cattle;
@@ -23,7 +23,7 @@ class CattleController extends Controller
         $q = request('q');
         $col = request('col');
 
-        $gattos = Cattle::with('user')
+        $cattle = Cattle::with('user')
             ->when($q, function ($query) use ($q, $col) {
                 match ($col) {
                     'name' => $query->where('name', 'like', "%{$q}%"),
@@ -37,7 +37,7 @@ class CattleController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.cattle.index', compact('gattos'));
+        return view('admin.cattle.index', compact('cattle'));
     }
 
     public function create()
@@ -111,12 +111,5 @@ class CattleController extends Controller
         $this->cattleService->updateCattle($cattle, $request->validated());
 
         return redirect()->route('admin.cattle.index')->with('success', 'Dados do animal atualizados!');
-    }
-
-    public function destroy(Cattle $cattle)
-    {
-        $cattle->delete();
-
-        return redirect()->route('admin.cattle.index')->with('success', 'Registro removido.');
     }
 }

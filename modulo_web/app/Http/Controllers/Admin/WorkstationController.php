@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\DTOs\Request\Workstation\StoreWorkstationRequest;
-use App\DTOs\Request\Workstation\UpdateWorkstationRequest;
+use App\Http\Requests\Workstation\StoreWorkstationRequest;
+use App\Http\Requests\Workstation\UpdateWorkstationRequest;
 use App\DTOs\Response\WorkstationResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Workstation;

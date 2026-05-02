@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\DTOs\Request\Veterinarian\StoreVeterinarianRequest;
-use App\DTOs\Request\Veterinarian\UpdateVeterinarianRequest;
+use App\Http\Requests\Veterinarian\StoreVeterinarianRequest;
+use App\Http\Requests\Veterinarian\UpdateVeterinarianRequest;
 use App\DTOs\Response\VaccineResponse;
 use App\DTOs\Response\VeterinarianResponse;
 use App\Http\Controllers\Controller;

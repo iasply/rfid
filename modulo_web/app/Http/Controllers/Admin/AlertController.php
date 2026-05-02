@@ -117,28 +117,22 @@ class AlertController extends Controller
             $totalDueSoon += $rows->where('urgency', 'due_soon')->count();
             $totalNever += $rows->where('urgency', 'never')->count();
 
-            if ($typeFilter) {
-                $paginator = new LengthAwarePaginator(
-                    $rows->forPage($page, self::PER_PAGE)->values(),
-                    $total,
-                    self::PER_PAGE,
-                    $page,
-                    ['path' => request()->url(), 'query' => request()->except('page')]
-                );
-                $displayRows = collect($paginator->items());
-            } else {
-                $paginator = null;
-                $displayRows = $rows->take(self::PER_PAGE);
-            }
+            $paginator = new LengthAwarePaginator(
+                $rows->forPage($page, self::PER_PAGE)->values(),
+                $total,
+                self::PER_PAGE,
+                $page,
+                ['path' => request()->url(), 'query' => request()->except('page')]
+            );
 
             $alertsByType[$vt->name] = [
                 'description' => $vt->description ?? '',
                 'interval' => $interval,
                 'in_season' => $inSeason,
                 'total' => $total,
-                'has_more' => !$typeFilter && $total > self::PER_PAGE,
+                'has_more' => false,
                 'paginator' => $paginator,
-                'rows' => $displayRows,
+                'rows' => collect($paginator->items()),
             ];
         }
 

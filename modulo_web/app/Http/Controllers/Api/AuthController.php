@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DTOs\Request\Auth\TagLoginRequest;
+use App\Http\Requests\Auth\TagLoginRequest;
 use App\DTOs\Response\AuthResponse;
 use App\DTOs\Response\VeterinarianResponse;
 use App\DTOs\Response\WorkstationResponse;

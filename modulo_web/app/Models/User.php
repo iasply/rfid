@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Support\RfidGenerator;
 use Database\Factories\UserFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,7 +39,7 @@ class User extends Authenticatable
                 }
             } else {
                 if (!$user->vet_rfid) {
-                    $user->vet_rfid = 'USER-' . (static::max('id') + 1);
+                    $user->vet_rfid = 'USER-' . strtoupper(Str::random(8));
                 }
             }
 
