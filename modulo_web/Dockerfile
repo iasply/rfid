@@ -15,7 +15,7 @@ RUN npm run build
 # ──────────────────────────────────────────────
 # Stage 2: Runtime PHP-FPM
 # ──────────────────────────────────────────────
-FROM php:8.2-fpm
+FROM php:8.5-fpm
 
 WORKDIR /var/www/html
 
