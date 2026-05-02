@@ -4,29 +4,23 @@ import java.util.UUID;
 
 public class RfidGenerator {
 
-    /**
-     * Gera uma tag RFID padrão para gado (ex: C8F9A2B3D4).
-     */
+    private static final int RFID_RANDOM_PART_LENGTH = 10;
+    private static final int RFID_MAX_LENGTH = 16;
+
     public static String generateCattleTag() {
-        return "C" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+        return "C" + UUID.randomUUID().toString().replace("-", "").substring(0, RFID_RANDOM_PART_LENGTH).toUpperCase();
     }
 
-    /**
-     * Gera uma tag RFID padrão para Veterinários.
-     */
     public static String generateVetTag() {
-        return "V" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+        return "V" + UUID.randomUUID().toString().replace("-", "").substring(0, RFID_RANDOM_PART_LENGTH).toUpperCase();
     }
 
-    /**
-     * Valida se uma tag RFID segue o padrão do sistema (C/V + alfanumérico).
-     */
     public static boolean isValid(String rfid) {
         if (rfid == null || rfid.isEmpty()) {
             return false;
         }
 
-        if (rfid.length() < 2 || rfid.length() > 16) {
+        if (rfid.length() < 2 || rfid.length() > RFID_MAX_LENGTH) {
             return false;
         }
 

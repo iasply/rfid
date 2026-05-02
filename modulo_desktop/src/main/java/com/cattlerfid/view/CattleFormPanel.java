@@ -3,6 +3,7 @@ package com.cattlerfid.view;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
+import com.cattlerfid.util.DateUtils;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -177,17 +178,10 @@ public class CattleFormPanel extends JPanel {
             weightField.setText(cattle.getWeight() > 0 ? String.valueOf(cattle.getWeight()) : "");
 
             String dateStr = cattle.getRegistrationDate();
-            if (dateStr != null && dateStr.length() == 10 && dateStr.contains("-")) {
-                // YYYY-MM-DD to DD/MM/YYYY
-                String[] parts = dateStr.split("-");
-                dateField.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
-            } else {
-                dateField.setText(dateStr != null ? dateStr : "");
-            }
+            dateField.setText(DateUtils.toDisplayDate(dateStr));
         } else {
-            String today = java.time.LocalDate.now().toString(); // YYYY-MM-DD
-            String[] parts = today.split("-");
-            dateField.setText(parts[2] + "/" + parts[1] + "/" + parts[0]);
+            String today = java.time.LocalDate.now().toString();
+            dateField.setText(DateUtils.toDisplayDate(today));
             cattle.setRegistrationDate(today);
         }
     }
@@ -197,6 +191,11 @@ public class CattleFormPanel extends JPanel {
             double weight = 0.0;
             if (!weightField.getText().trim().isEmpty()) {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
+            }
+            if (weight < 0 || weight > 2000) {
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
+                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             cattle.setName(nameField.getText().trim());
@@ -220,6 +219,11 @@ public class CattleFormPanel extends JPanel {
             double weight = 0.0;
             if (!weightField.getText().trim().isEmpty()) {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
+            }
+            if (weight < 0 || weight > 2000) {
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
+                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             cattle.setName(nameField.getText().trim());

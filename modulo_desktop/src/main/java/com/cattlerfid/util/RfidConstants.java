@@ -27,6 +27,9 @@ public class RfidConstants {
     // Outros
     public static final String MSG_WROTE = "WROTE";
 
+    // Arduino-side read timeout (used in UI status messages)
+    public static final int SERIAL_READ_TIMEOUT_MS = 2500;
+
     private RfidConstants() {
 
     }

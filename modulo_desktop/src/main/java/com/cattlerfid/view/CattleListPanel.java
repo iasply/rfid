@@ -1,9 +1,11 @@
 package com.cattlerfid.view;
 
+import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.PagedResult;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.CattleApiService;
+import com.cattlerfid.util.DateUtils;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -15,7 +17,7 @@ import java.util.Optional;
 public class CattleListPanel extends JPanel {
 
     private final CattleApiService apiService;
-    private final com.cattlerfid.controller.CattleController controller;
+    private final CattleController controller;
     private final User loggedUser;
     private final NavigationManager navManager;
     private final MainPanel parentMainPanel;
@@ -33,7 +35,7 @@ public class CattleListPanel extends JPanel {
     private JButton editButton;
 
     public CattleListPanel(CattleApiService apiService,
-            com.cattlerfid.controller.CattleController controller,
+            CattleController controller,
             User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
@@ -181,11 +183,8 @@ public class CattleListPanel extends JPanel {
 
                     tableModel.setRowCount(0);
                     for (Cattle c : result.getData()) {
-                        String dateStr = c.getRegistrationDate() != null ? c.getRegistrationDate() : "N/A";
-                        if (dateStr.length() == 10 && dateStr.contains("-")) {
-                            String[] parts = dateStr.split("-");
-                            dateStr = parts[2] + "/" + parts[1] + "/" + parts[0];
-                        }
+                        String dateStr = c.getRegistrationDate() != null
+                            ? DateUtils.toDisplayDate(c.getRegistrationDate()) : "N/A";
                         tableModel.addRow(new Object[]{
                                 c.getRfidTag(),
                                 c.getName(),

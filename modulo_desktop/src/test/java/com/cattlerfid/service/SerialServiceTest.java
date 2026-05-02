@@ -2,9 +2,11 @@ package com.cattlerfid.service;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 class SerialServiceTest {
 
@@ -82,6 +84,64 @@ class SerialServiceTest {
         // Should not throw exception and should record in logs (can't easily assert logs here without changes but confirming it doesn't fail)
         service.sendCommand("<READ>");
         assertEquals(true, service.isOpen());
+    }
+
+    @Test
+    void testGetLogHistory_returnsDefensiveCopy() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        service.connect("SIM");
+
+        List<String> history1 = service.getLogHistory();
+        List<String> history2 = service.getLogHistory();
+
+        assertNotSame(history1, history2, "getLogHistory should return a new list each time");
+        history1.clear();
+        assertEquals(history2.size(), service.getLogHistory().size(),
+                "Modifying returned list must not affect service state");
+    }
+
+    @Test
+    void testLogListener_firesOnSimulatedMessage() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        AtomicReference<String> lastLog = new AtomicReference<>("");
+
+        service.addLogListener(lastLog::set);
+        service.injectMessage("SOME:MSG");
+
+        assertEquals(true, lastLog.get().contains("SOME:MSG"),
+                "Log listener should receive entries when messages arrive");
+    }
+
+    @Test
+    void testRemoveLogListener_stopsReceivingEntries() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        AtomicReference<Integer> callCount = new AtomicReference<>(0);
+
+        Runnable[] holder = new Runnable[1];
+        java.util.function.Consumer<String> listener = s -> callCount.updateAndGet(c -> c + 1);
+        service.addLogListener(listener);
+        service.injectMessage("MSG1");
+        service.removeLogListener(listener);
+        service.injectMessage("MSG2");
+
+        assertEquals(1, callCount.get(), "Listener should not fire after removal");
+    }
+
+    @Test
+    void testAddMessageListener_deduplicates() {
+        SerialService service = new SerialService();
+        service.setSimulationMode(true);
+        AtomicReference<Integer> callCount = new AtomicReference<>(0);
+
+        java.util.function.Consumer<String> listener = s -> callCount.updateAndGet(c -> c + 1);
+        service.addMessageListener(listener);
+        service.addMessageListener(listener); // add same twice
+        service.injectMessage("DEDUP:TEST");
+
+        assertEquals(1, callCount.get(), "Duplicate listeners should not fire twice");
     }
 
     class MockSerialService extends SerialService {

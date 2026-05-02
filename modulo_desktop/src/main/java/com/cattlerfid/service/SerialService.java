@@ -9,19 +9,21 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class SerialService {
 
-    private final List<Consumer<String>> messageListeners = new ArrayList<>();
-    private final StringBuilder messageBuffer = new StringBuilder();
+    private final List<Consumer<String>> messageListeners = new CopyOnWriteArrayList<>();
+    private final List<Consumer<String>> logListeners = new CopyOnWriteArrayList<>();
     private final List<String> logHistory = new ArrayList<>();
-    private final List<Consumer<String>> logListeners = new ArrayList<>();
-    private SerialPort activePort;
-    private OutputStream outputStream;
-    private boolean simulationMode = false;
+    // messageBuffer is only ever accessed from the single jSerialComm callback thread
+    private final StringBuilder messageBuffer = new StringBuilder();
+    private final Object portLock = new Object();
+    private volatile SerialPort activePort;
+    private volatile OutputStream outputStream;
+    private volatile boolean simulationMode = false;
 
-    // Usado pra testar localmente listando portas disponiveis
     public static String[] getAvailablePorts() {
         SerialPort[] ports = SerialPort.getCommPorts();
         String[] portNames = new String[ports.length];
@@ -44,7 +46,6 @@ public class SerialService {
         if (!simulationMode)
             return;
 
-        // Garante que a mensagem injetada tenha o formato <CONTEUDO>
         String formattedMessage = message;
         if (!formattedMessage.startsWith("<"))
             formattedMessage = "<" + formattedMessage;
@@ -62,20 +63,23 @@ public class SerialService {
     private void appendLog(String origin, String message) {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"));
         String entry = String.format("[%s] %-5s %s", time, origin, message);
-        logHistory.add(entry);
+        synchronized (logHistory) {
+            logHistory.add(entry);
+        }
         for (Consumer<String> listener : logListeners) {
             listener.accept(entry);
         }
     }
 
     public List<String> getLogHistory() {
-        return new ArrayList<>(logHistory);
+        synchronized (logHistory) {
+            return new ArrayList<>(logHistory);
+        }
     }
 
     public void addLogListener(Consumer<String> listener) {
-        if (!logListeners.contains(listener)) {
+        if (!logListeners.contains(listener))
             logListeners.add(listener);
-        }
     }
 
     public void removeLogListener(Consumer<String> listener) {
@@ -88,18 +92,18 @@ public class SerialService {
             return true;
         }
 
-        activePort = SerialPort.getCommPort(portName);
-        activePort.setComPortParameters(9600, 8, 1,
-                0); // 9600 baud rate, 8 bits de dados, 1 bit de parada, sem
-        // paridade
-        activePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
+        synchronized (portLock) {
+            activePort = SerialPort.getCommPort(portName);
+            activePort.setComPortParameters(9600, 8, 1, 0);
+            activePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
 
-        if (activePort.openPort()) {
-            outputStream = activePort.getOutputStream();
-            setupListener();
-            return true;
+            if (activePort.openPort()) {
+                outputStream = activePort.getOutputStream();
+                setupListener();
+                return true;
+            }
+            return false;
         }
-        return false;
     }
 
     public void disconnect() {
@@ -108,20 +112,24 @@ public class SerialService {
             return;
         }
 
-        if (activePort != null && activePort.isOpen()) {
-            activePort.removeDataListener();
-            activePort.closePort();
+        synchronized (portLock) {
+            if (activePort != null && activePort.isOpen()) {
+                activePort.removeDataListener();
+                outputStream = null;
+                activePort.closePort();
+            }
         }
     }
 
     public boolean isOpen() {
-        return simulationMode || (activePort != null && activePort.isOpen());
+        if (simulationMode) return true;
+        SerialPort port = activePort;
+        return port != null && port.isOpen();
     }
 
     public void addMessageListener(Consumer<String> listener) {
-        if (!messageListeners.contains(listener)) {
+        if (!messageListeners.contains(listener))
             messageListeners.add(listener);
-        }
     }
 
     public void removeMessageListener(Consumer<String> listener) {
@@ -133,28 +141,26 @@ public class SerialService {
     }
 
     public void requestWrite(String id, String data) {
-        if (data.length() > 16) {
+        if (data.length() > 16)
             data = data.substring(0, 16);
-        }
         sendCommand("<WRITE:" + id + ":" + data + ">\n");
     }
 
     public void sendCommand(String command) {
-        if (isOpen()) {
-            appendLog("OUT", command.trim() + (simulationMode ? " (Simulado)" : ""));
-            if (simulationMode) {
-                return;
-            }
-            try {
-                outputStream.write(command.getBytes());
-                outputStream.flush();
-            } catch (Exception e) {
-                appendLog("ERROR", "Falha ao enviar: " + e.getMessage());
-                e.printStackTrace();
-            }
-        } else {
+        if (!isOpen()) {
             appendLog("ERROR", "Porta fechada. Tentou enviar: " + command.trim());
-            System.err.println("Porta Serial não esta aberta para enviar comando: " + command);
+            return;
+        }
+        appendLog("OUT", command.trim() + (simulationMode ? " (Simulado)" : ""));
+        if (simulationMode) return;
+
+        OutputStream out = outputStream;
+        if (out == null) return;
+        try {
+            out.write(command.getBytes());
+            out.flush();
+        } catch (Exception e) {
+            appendLog("ERROR", "Falha ao enviar: " + e.getMessage());
         }
     }
 
@@ -169,41 +175,40 @@ public class SerialService {
             public void serialEvent(SerialPortEvent event) {
                 if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                     return;
+                SerialPort port = activePort;
+                if (port == null) return;
                 try {
-                    byte[] newData = new byte[activePort.bytesAvailable()];
-                    int numRead = activePort.readBytes(newData, newData.length);
+                    int available = port.bytesAvailable();
+                    if (available <= 0) return;
+                    byte[] newData = new byte[available];
+                    int numRead = port.readBytes(newData, newData.length);
                     for (int i = 0; i < numRead; i++) {
                         char c = (char) newData[i];
-
-                        if (c == '\r' || c == '\n') {
-                            continue;
-                        }
+                        if (c == '\r' || c == '\n') continue;
 
                         messageBuffer.append(c);
 
                         if (c == '>') {
                             String message = messageBuffer.toString().trim();
-                            messageBuffer.setLength(0); // Limpa o buffer para a proxima
+                            messageBuffer.setLength(0);
 
                             if (!message.isEmpty()) {
                                 appendLog("IN", message);
-
-                                int startPacketIdx = message.indexOf('<');
-                                if (startPacketIdx != -1 && message.endsWith(">")) {
-                                    String cleanMessage = message.substring(startPacketIdx + 1,
+                                int startIdx = message.indexOf('<');
+                                if (startIdx != -1 && message.endsWith(">")) {
+                                    String cleanMessage = message.substring(startIdx + 1,
                                             message.length() - 1);
                                     for (Consumer<String> listener : messageListeners) {
                                         listener.accept(cleanMessage);
                                     }
                                 } else {
-                                    appendLog("WARN",
-                                            "Pacote incompleto ou inválido ignorado: " + message);
+                                    appendLog("WARN", "Pacote incompleto ou inválido ignorado: " + message);
                                 }
                             }
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    appendLog("ERROR", "Erro na leitura serial: " + e.getMessage());
                 }
             }
         });

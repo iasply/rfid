@@ -1,9 +1,13 @@
 package com.cattlerfid.view;
 
+import com.cattlerfid.config.ApiConfig;
+import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
+import com.cattlerfid.service.CattleApiService;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -12,13 +16,13 @@ import java.awt.*;
 public class LoginPanel extends JPanel implements LoginController.LoginViewListener {
 
     private final LoginController controller;
-    private final com.cattlerfid.config.ApiConfig apiConfig;
+    private final ApiConfig apiConfig;
     private final NavigationManager navManager;
 
     private JLabel statusLabel;
     private JButton readCardButton;
 
-    public LoginPanel(LoginController controller, com.cattlerfid.config.ApiConfig apiConfig,
+    public LoginPanel(LoginController controller, ApiConfig apiConfig,
             NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
@@ -112,10 +116,8 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             }
 
             // Instancia o repositorio e controller global do sistema
-            com.cattlerfid.service.CattleApiService apiService = new com.cattlerfid.service.CattleApiService(
-                    apiConfig,
-                    user);
-            com.cattlerfid.controller.CattleController cattleController = new com.cattlerfid.controller.CattleController(
+            CattleApiService apiService = new CattleApiService(apiConfig, user);
+            CattleController cattleController = new CattleController(
                     apiService, controller.getSerialService());
 
             MainPanel mainPanel = new MainPanel(user, cattleController, navManager, apiConfig);
@@ -158,7 +160,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     public void onWaitingForCard() {
         SwingUtilities.invokeLater(() -> {
             readCardButton.setText("Lendo... Aproxime o cartão");
-            statusLabel.setText("Aguardando leitura do RFID (Timeout 2.5s)...");
+            statusLabel.setText("Aguardando leitura do RFID (Timeout " + (RfidConstants.SERIAL_READ_TIMEOUT_MS / 1000.0) + "s)...");
             statusLabel.setForeground(Color.BLUE);
         });
     }

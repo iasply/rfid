@@ -14,7 +14,13 @@ public class LoginController {
     private final AuthenticationService authService;
     private final SerialService serialService;
 
-    private LoginViewListener viewListener;
+    private LoginViewListener viewListener = new LoginViewListener() {
+        public void onLoginSuccess(User user) {}
+        public void onLoginError(String message) {}
+        public void onSerialConnected() {}
+        public void onSerialError(String message) {}
+        public void onWaitingForCard() {}
+    };
     private User loggedUser;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
@@ -30,19 +36,16 @@ public class LoginController {
     public void startSerialConnection(String portName) {
         if (serialService.connect(portName)) {
             serialService.addMessageListener(serialListener);
-            if (viewListener != null)
-                viewListener.onSerialConnected();
+            viewListener.onSerialConnected();
         } else {
-            if (viewListener != null)
-                viewListener.onSerialError("Não foi possível conectar na porta " + portName);
+            viewListener.onSerialError("Não foi possível conectar na porta " + portName);
         }
     }
 
     public void attachToActiveSerial() {
         if (serialService.isOpen()) {
             serialService.addMessageListener(serialListener);
-            if (viewListener != null)
-                viewListener.onSerialConnected();
+            viewListener.onSerialConnected();
         }
     }
 
@@ -52,12 +55,10 @@ public class LoginController {
 
     public void requestCardLogin() {
         if (!serialService.isOpen()) {
-            if (viewListener != null)
-                viewListener.onSerialError("Porta não conectada.");
+            viewListener.onSerialError("Porta não conectada.");
             return;
         }
-        if (viewListener != null)
-            viewListener.onWaitingForCard();
+        viewListener.onWaitingForCard();
         serialService.requestRead(RfidConstants.ID_LOGIN);
     }
 
@@ -65,7 +66,6 @@ public class LoginController {
         String[] parts = message.split(":");
 
         if (parts.length >= 3) {
-            // Valida se o pacote é para este controlador
             if (!parts[1].equals(RfidConstants.ID_LOGIN)) {
                 return;
             }
@@ -73,22 +73,18 @@ public class LoginController {
             if (parts[2].equals(RfidConstants.RES_OK)) {
                 String tagContent = parts[3].trim();
                 if (!RfidGenerator.isVetTag(tagContent)) {
-                    if (viewListener != null) {
-                        viewListener.onLoginError(
-                                "Tag RFID inválida para Login (Veterinário). Lido: '" + tagContent + "'");
-                    }
+                    viewListener.onLoginError(
+                            "Tag RFID inválida para Login (Veterinário). Lido: '" + tagContent + "'");
                     return;
                 }
                 attemptLogin(tagContent);
             } else if (parts[2].equals(RfidConstants.RES_ERR)) {
-                if (viewListener != null) {
-                    if (parts[3].equals(RfidConstants.ERR_NO_TAG))
-                        viewListener.onLoginError("Nenhuma Tag ou Crachá detectado a tempo.");
-                    else if (parts[3].equals(RfidConstants.ERR_AUTH))
-                        viewListener.onLoginError("Crachá com senha inválida ou não reconhecido.");
-                    else
-                        viewListener.onLoginError("Erro na leitura do chip: " + parts[3]);
-                }
+                if (parts[3].equals(RfidConstants.ERR_NO_TAG))
+                    viewListener.onLoginError("Nenhuma Tag ou Crachá detectado a tempo.");
+                else if (parts[3].equals(RfidConstants.ERR_AUTH))
+                    viewListener.onLoginError("Crachá com senha inválida ou não reconhecido.");
+                else
+                    viewListener.onLoginError("Erro na leitura do chip: " + parts[3]);
             }
         }
     }
@@ -97,12 +93,10 @@ public class LoginController {
         Optional<User> user = authService.authenticateByTag(tag);
         if (user.isPresent()) {
             this.loggedUser = user.get();
-            if (viewListener != null)
-                viewListener.onLoginSuccess(this.loggedUser);
+            viewListener.onLoginSuccess(this.loggedUser);
         } else {
-            if (viewListener != null)
-                viewListener.onLoginError(
-                        "Acesso Negado: Tag não cadastrada como funcionário VET.");
+            viewListener.onLoginError(
+                    "Acesso Negado: Tag não cadastrada como funcionário VET.");
         }
     }
 
@@ -116,13 +110,9 @@ public class LoginController {
 
     public interface LoginViewListener {
         void onLoginSuccess(User user);
-
         void onLoginError(String message);
-
         void onSerialConnected();
-
         void onSerialError(String message);
-
         void onWaitingForCard();
     }
 }

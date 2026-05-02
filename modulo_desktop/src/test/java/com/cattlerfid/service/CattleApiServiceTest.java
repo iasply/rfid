@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import com.cattlerfid.model.PagedResult;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,6 +110,31 @@ public class CattleApiServiceTest {
         boolean result = apiService.saveVaccine(vaccine);
 
         assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Should parse paginated cattle using meta object from Laravel ResourceCollection")
+    void should_parse_paginated_cattle_from_meta() throws IOException, InterruptedException {
+        String json = "{"
+                + "\"data\":[{\"rfid_tag\":\"C001\",\"name\":\"Mimosa\",\"weight\":400.0,\"registration_date\":\"2024-01-15\",\"vaccines_count\":2}],"
+                + "\"links\":{\"first\":\"http://test.com?page=1\",\"last\":\"http://test.com?page=3\",\"prev\":null,\"next\":\"http://test.com?page=2\"},"
+                + "\"meta\":{\"current_page\":1,\"from\":1,\"last_page\":3,\"per_page\":15,\"to\":15,\"total\":42}"
+                + "}";
+
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
+                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.body()).thenReturn(json);
+
+        PagedResult<Cattle> result = apiService.getCattleWithVaccinesPaginated(1);
+
+        assertEquals(1, result.getData().size());
+        assertEquals("Mimosa", result.getData().get(0).getName());
+        assertEquals(1, result.getCurrentPage());
+        assertEquals(3, result.getLastPage());
+        assertEquals(42, result.getTotal());
+        assertEquals(2, result.getData().get(0).getVaccinesCount());
     }
 
     @Test

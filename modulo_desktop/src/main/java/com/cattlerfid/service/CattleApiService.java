@@ -97,10 +97,12 @@ public class CattleApiService {
                 Type listType = new TypeToken<ArrayList<Cattle>>() {
                 }.getType();
                 List<Cattle> data = client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
-                int currentPage = obj.get("current_page").getAsInt();
-                int lastPage = obj.get("last_page").getAsInt();
-                int total = obj.get("total").getAsInt();
-                int perPage = obj.get("per_page").getAsInt();
+                // Laravel ResourceCollection wraps pagination info inside "meta"
+                JsonObject meta = obj.getAsJsonObject("meta");
+                int currentPage = meta.get("current_page").getAsInt();
+                int lastPage = meta.get("last_page").getAsInt();
+                int total = meta.get("total").getAsInt();
+                int perPage = meta.get("per_page").getAsInt();
                 return new PagedResult<>(data, currentPage, lastPage, total, perPage);
             }
         } catch (IOException | InterruptedException e) {

@@ -8,8 +8,16 @@ import java.util.function.Consumer;
 public class ConnectionController {
 
     private final SerialService serialService;
-    private ConnectionViewListener viewListener;
-    private boolean testingConnection = false;
+
+    private ConnectionViewListener viewListener = new ConnectionViewListener() {
+        public void onSerialConnected() {}
+        public void onSerialDisconnected() {}
+        public void onSerialError(String message) {}
+        public void onWaitingForTestTag() {}
+        public void onTestTagReadSuccess(String tagContent) {}
+    };
+    private enum State { IDLE, TESTING }
+    private State state = State.IDLE;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
 
     public ConnectionController(SerialService serialService) {
@@ -23,8 +31,7 @@ public class ConnectionController {
     public void startSerialConnection(String portName) {
         if (serialService.connect(portName)) {
             serialService.addMessageListener(serialListener);
-            if (viewListener != null)
-                viewListener.onSerialConnected();
+            viewListener.onSerialConnected();
         } else {
             viewListener.onSerialError("Não foi possível conectar na porta " + portName);
         }
@@ -32,9 +39,7 @@ public class ConnectionController {
 
     public void disconnectSerial() {
         serialService.disconnect();
-        if (viewListener != null) {
-            viewListener.onSerialDisconnected();
-        }
+        viewListener.onSerialDisconnected();
     }
 
     public void detachSerial() {
@@ -43,41 +48,34 @@ public class ConnectionController {
 
     public void requestTestRead() {
         if (!serialService.isOpen()) {
-            if (viewListener != null)
-                viewListener.onSerialError("Porta não conectada.");
+            viewListener.onSerialError("Porta não conectada.");
             return;
         }
-        testingConnection = true;
-        if (viewListener != null)
-            viewListener.onWaitingForTestTag();
+        state = State.TESTING;
+        viewListener.onWaitingForTestTag();
         serialService.requestRead(RfidConstants.ID_CONN);
     }
 
     private void handleIncomingSerialMessage(String message) {
-        if (!testingConnection)
+        if (state != State.TESTING)
             return;
 
         String[] parts = message.split(":");
         if (parts.length >= 3) {
-            // Valida se o pacote é para este controlador
             if (!parts[1].equals(RfidConstants.ID_CONN)) {
                 return;
             }
 
             if (parts[2].equals(RfidConstants.RES_OK)) {
                 String tagContent = parts[3].trim();
-                testingConnection = false;
-                if (viewListener != null) {
-                    viewListener.onTestTagReadSuccess(tagContent);
-                }
+                state = State.IDLE;
+                viewListener.onTestTagReadSuccess(tagContent);
             } else if (parts[2].equals(RfidConstants.RES_ERR)) {
-                if (viewListener != null) {
-                    if (parts[3].equals(RfidConstants.ERR_NO_TAG))
-                        viewListener.onSerialError(
-                                "Nenhuma Tag detectada a tempo. Tente novamente.");
-                    else
-                        viewListener.onSerialError("Erro na leitura da tag de teste: " + parts[2]);
-                }
+                if (parts[3].equals(RfidConstants.ERR_NO_TAG))
+                    viewListener.onSerialError(
+                            "Nenhuma Tag detectada a tempo. Tente novamente.");
+                else
+                    viewListener.onSerialError("Erro na leitura da tag de teste: " + parts[3]);
             }
         }
     }
@@ -92,13 +90,9 @@ public class ConnectionController {
 
     public interface ConnectionViewListener {
         void onSerialConnected();
-
         void onSerialDisconnected();
-
         void onSerialError(String message);
-
         void onWaitingForTestTag();
-
         void onTestTagReadSuccess(String tagContent);
     }
 }

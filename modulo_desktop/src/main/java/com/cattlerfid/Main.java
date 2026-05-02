@@ -1,5 +1,6 @@
 package com.cattlerfid;
 
+import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
@@ -14,12 +15,11 @@ public class Main {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("[Main] Failed to apply FlatLaf look and feel: " + e.getMessage());
         }
 
         SwingUtilities.invokeLater(() -> {
-
-            com.cattlerfid.config.ApiConfig apiConfig = new com.cattlerfid.config.ApiConfig();
+            ApiConfig apiConfig = new ApiConfig();
             AuthenticationService authService = new AuthenticationService(apiConfig);
             SerialService serialService = new SerialService();
 
@@ -31,8 +31,6 @@ public class Main {
 
             appFrame.setVisible(true);
             appFrame.showPanel("Connection", connectionPanel);
-
-            System.out.println("Sistema Modulo Desktop iniciado (Single-Window Mode).");
         });
     }
 }

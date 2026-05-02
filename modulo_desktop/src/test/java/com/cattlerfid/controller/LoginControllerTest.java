@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -165,5 +166,23 @@ class LoginControllerTest {
     @Test
     void testGetSerialService() {
         assertEquals(serialServiceMock, controller.getSerialService());
+    }
+
+    @Test
+    void testNoListenerSet_requestCardLoginDoesNotThrowNPE() {
+        LoginController noListenerController = new LoginController(authServiceMock, serialServiceMock);
+        when(serialServiceMock.isOpen()).thenReturn(false);
+
+        assertDoesNotThrow(noListenerController::requestCardLogin,
+                "Controller without viewListener must not throw NPE");
+    }
+
+    @Test
+    void testNoListenerSet_handleMessageDoesNotThrowNPE() {
+        LoginController noListenerController = new LoginController(authServiceMock, serialServiceMock);
+        String msg = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00";
+
+        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg),
+                "handleIncomingSerialMessage without viewListener must not throw NPE");
     }
 }

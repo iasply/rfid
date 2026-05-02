@@ -1,9 +1,11 @@
 package com.cattlerfid.view;
 
+import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -13,7 +15,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
     private final ConnectionController controller;
     private final AuthenticationService authService;
-    private final com.cattlerfid.config.ApiConfig apiConfig;
+    private final ApiConfig apiConfig;
     private final NavigationManager navManager;
 
     private JLabel statusLabel;
@@ -23,7 +25,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton testReadButton;
 
     public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-            com.cattlerfid.config.ApiConfig apiConfig, NavigationManager navManager) {
+            ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.apiConfig = apiConfig;
@@ -177,7 +179,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     public void onWaitingForTestTag() {
         SwingUtilities.invokeLater(() -> {
             testReadButton.setText("Lendo... Aproxime qualquer tag");
-            statusLabel.setText("Aguardando leitura do RFID (Timeout 2.5s)...");
+            statusLabel.setText("Aguardando leitura do RFID (Timeout " + (RfidConstants.SERIAL_READ_TIMEOUT_MS / 1000.0) + "s)...");
             statusLabel.setForeground(Color.BLUE);
         });
     }

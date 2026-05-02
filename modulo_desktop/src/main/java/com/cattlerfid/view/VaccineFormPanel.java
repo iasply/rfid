@@ -5,6 +5,7 @@ import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.model.VaccineType;
+import com.cattlerfid.util.DateUtils;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -173,6 +174,11 @@ public class VaccineFormPanel extends JPanel {
             if (!weightField.getText().trim().isEmpty()) {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
+            if (weight < 0 || weight > 2000) {
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
+                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             LocalDate date = LocalDate.parse(dateField.getText().trim(),
                     DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -181,12 +187,7 @@ public class VaccineFormPanel extends JPanel {
             v.setRfidTag(cattle.getRfidTag());
             v.setVaccineTypeId(selectedType.getId());
             v.setCurrentWeight(weight);
-
-            // Convert DD/MM/YYYY (UI) → YYYY-MM-DD (API)
-            String[] parts = dateField.getText().trim().split("/");
-            if (parts.length == 3) {
-                v.setVaccinationDate(parts[2] + "-" + parts[1] + "-" + parts[0]);
-            }
+            v.setVaccinationDate(DateUtils.toIsoDate(dateField.getText().trim()));
 
             controller.saveVaccineData(v, cattle, weight);
             navManager.showPanel("Main", parentMainPanel);

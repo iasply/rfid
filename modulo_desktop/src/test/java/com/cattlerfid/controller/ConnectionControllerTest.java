@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.function.Consumer;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -130,5 +131,22 @@ class ConnectionControllerTest {
 
         verify(serialServiceMock).disconnect();
         verify(viewListenerMock).onSerialDisconnected();
+    }
+
+    @Test
+    void testNoListenerSet_doesNotThrowNPE() {
+        ConnectionController noListenerController = new ConnectionController(serialServiceMock);
+        when(serialServiceMock.isOpen()).thenReturn(false);
+
+        assertDoesNotThrow(noListenerController::requestTestRead,
+                "Controller without viewListener must not throw NPE");
+    }
+
+    @Test
+    void testNoListenerSet_disconnectDoesNotThrowNPE() {
+        ConnectionController noListenerController = new ConnectionController(serialServiceMock);
+
+        assertDoesNotThrow(noListenerController::disconnectSerial,
+                "disconnectSerial without viewListener must not throw NPE");
     }
 }

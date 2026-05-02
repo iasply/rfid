@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
@@ -254,5 +255,23 @@ class CattleControllerTest {
     void testGetters() {
         assertEquals(serialServiceMock, controller.getSerialService());
         assertEquals(apiServiceMock, controller.getApiService());
+    }
+
+    @Test
+    void testNoListenerSet_readTagDoesNotThrowNPE() {
+        CattleController noListenerController = new CattleController(apiServiceMock, serialServiceMock);
+        when(serialServiceMock.isOpen()).thenReturn(false);
+
+        assertDoesNotThrow(noListenerController::requestReadTag,
+                "Controller without viewListener must not throw NPE on requestReadTag");
+    }
+
+    @Test
+    void testNoListenerSet_handleMessageDoesNotThrowNPE() {
+        CattleController noListenerController = new CattleController(apiServiceMock, serialServiceMock);
+        String msg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00";
+
+        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg),
+                "handleIncomingSerialMessage without viewListener must not throw NPE");
     }
 }

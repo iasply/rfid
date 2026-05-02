@@ -1,5 +1,6 @@
 package com.cattlerfid.view;
 
+import com.cattlerfid.config.ApiConfig;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.Cattle;
@@ -11,6 +12,7 @@ import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainPanel extends JPanel implements CattleController.CattleViewListener {
@@ -18,27 +20,40 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private final User loggedUser;
     private final CattleController cattleController;
     private final NavigationManager navManager;
-    private final com.cattlerfid.config.ApiConfig apiConfig;
+    private final ApiConfig apiConfig;
 
     private JLabel statusLabel;
     private JButton scanCattleButton;
 
     private CattleFormPanel activeCattleForm;
-    private List<VaccineType> vaccineTypes;
+    private List<VaccineType> vaccineTypes = new ArrayList<>();
 
     public MainPanel(User loggedUser, CattleController cattleController,
-            NavigationManager navManager,
-            com.cattlerfid.config.ApiConfig apiConfig) {
+            NavigationManager navManager, ApiConfig apiConfig) {
         this.loggedUser = loggedUser;
         this.cattleController = cattleController;
         this.navManager = navManager;
         this.apiConfig = apiConfig;
         this.cattleController.setViewListener(this);
 
-        // Fetch available vaccine types once at startup so forms can show a dropdown
-        this.vaccineTypes = cattleController.getApiService().getVaccineTypes();
-
         setupUI();
+        loadVaccineTypesAsync();
+    }
+
+    private void loadVaccineTypesAsync() {
+        new SwingWorker<List<VaccineType>, Void>() {
+            protected List<VaccineType> doInBackground() {
+                return cattleController.getApiService().getVaccineTypes();
+            }
+
+            protected void done() {
+                try {
+                    vaccineTypes = get();
+                } catch (Exception ex) {
+                    System.err.println("[MainPanel] Failed to load vaccine types: " + ex.getMessage());
+                }
+            }
+        }.execute();
     }
 
     private void setupUI() {
@@ -62,11 +77,9 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             if (confirm == JOptionPane.YES_OPTION) {
                 cattleController.detachSerial();
 
-                // Notifica o servidor para revogar o token (Logout real)
                 AuthenticationService authService = new AuthenticationService(apiConfig);
                 authService.logout(loggedUser.getAccessToken());
 
-                // Abre a tela de Login
                 LoginController loginController = new LoginController(authService,
                         cattleController.getSerialService());
                 LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
@@ -85,8 +98,8 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 "<html><center>IDENTIFICAR<br>E VACINAR</center></html>");
         scanCattleButton.setPreferredSize(new Dimension(220, 120));
         scanCattleButton.setFont(UIStyles.HEADER_FONT);
-        scanCattleButton.setBackground(UIStyles.WARNING); // Gold/Amber accent
-        scanCattleButton.setForeground(UIStyles.PRIMARY_DARK); // Better contrast
+        scanCattleButton.setBackground(UIStyles.WARNING);
+        scanCattleButton.setForeground(UIStyles.PRIMARY_DARK);
         scanCattleButton.addActionListener(e -> {
             statusLabel.setText("Aproxime a Tag do Animal...");
             cattleController.requestReadTag();
@@ -96,20 +109,16 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 .createPrimaryButton("<html><center>CADASTRAR<br>MANUAL</center></html>");
         manualRegisterButton.setPreferredSize(new Dimension(220, 120));
         manualRegisterButton.setFont(UIStyles.HEADER_FONT);
-        manualRegisterButton.setBackground(UIStyles.PRIMARY); // Emerald
+        manualRegisterButton.setBackground(UIStyles.PRIMARY);
         manualRegisterButton.addActionListener(e -> {
             statusLabel.setText("Preparando formulário manual...");
 
-            // Gera uma TAG automática garantindo até 16 bytes e unicidade padronizada
             String generatedTag = RfidGenerator.generateCattleTag();
-
             Cattle newCattle = new Cattle();
             newCattle.setRfidTag(generatedTag);
 
-            System.out.println("-> Abrindo Formulário Manual do Gado para: " + generatedTag);
             activeCattleForm = new CattleFormPanel(newCattle, true, true, cattleController,
-                    loggedUser, navManager,
-                    this);
+                    loggedUser, navManager, this);
             navManager.showPanel("ManualRegister", activeCattleForm);
         });
 
@@ -117,11 +126,10 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 "<html><center>LISTAR<br>REBANHO</center></html>");
         listButton.setPreferredSize(new Dimension(220, 120));
         listButton.setFont(UIStyles.HEADER_FONT);
-        listButton.setBackground(UIStyles.SECONDARY); // Slate
+        listButton.setBackground(UIStyles.SECONDARY);
         listButton.addActionListener(e -> {
             CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(),
-                    cattleController,
-                    loggedUser, navManager, this);
+                    cattleController, loggedUser, navManager, this);
             navManager.showPanel("List", listPanel);
         });
 
@@ -130,7 +138,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         centerPanel.add(listButton);
         add(centerPanel, BorderLayout.CENTER);
 
-        // Bottom Status
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(UIStyles.SECONDARY);
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -154,7 +161,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     public void onRfidReadSuccess(Cattle cattle, boolean isNew) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Animal Encontrado (" + cattle.getRfidTag() + ")");
-            System.out.println("-> Abrindo Formulário de Vacina para: " + cattle.getRfidTag());
             VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser,
                     navManager, this, vaccineTypes);
             navManager.showPanel("Vaccine", form);
@@ -200,11 +206,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!",
                     "Sucesso",
                     JOptionPane.INFORMATION_MESSAGE);
-            if (activeCattleForm != null) {
-                activeCattleForm = null;
-                // Transition will be handled by the form closing itself or auto-saving
-                // mechanism.
-            }
+            activeCattleForm = null;
         });
     }
 
