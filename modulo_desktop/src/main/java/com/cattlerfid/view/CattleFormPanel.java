@@ -9,7 +9,7 @@ import com.cattlerfid.view.utils.UIStyles;
 import javax.swing.*;
 import java.awt.*;
 
-public class CattleFormPanel extends JPanel {
+public class CattleFormPanel extends JPanel implements CattleController.CattleViewListener {
 
     private final Cattle cattle;
     private final boolean isNew;
@@ -37,6 +37,7 @@ public class CattleFormPanel extends JPanel {
         this.navManager = navManager;
         this.parentMainPanel = parentMainPanel;
 
+        controller.setViewListener(this);
         setupUI();
         populateFields();
     }
@@ -56,13 +57,7 @@ public class CattleFormPanel extends JPanel {
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 30));
-        backButton.addActionListener(e -> {
-            // Aborta edição e volta
-            if (parentMainPanel != null) {
-                parentMainPanel.setActiveCattleForm(null); // Clear ref
-            }
-            navManager.showPanel("Main", parentMainPanel);
-        });
+        backButton.addActionListener(e -> navigateBack());
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -154,19 +149,17 @@ public class CattleFormPanel extends JPanel {
 
         writeTagButton = UIStyles.createPrimaryButton("1. Gravar Tag Física");
         writeTagButton.setPreferredSize(new Dimension(220, 40));
-        writeTagButton.setBackground(UIStyles.WARNING); // Gold for Tag writing
+        writeTagButton.setBackground(UIStyles.WARNING);
         writeTagButton.setForeground(UIStyles.PRIMARY_DARK);
         writeTagButton.addActionListener(e -> writeTagAction());
-        // Apenas habilita gravação física se for manual
         writeTagButton.setVisible(isManual);
         buttonPanel.add(writeTagButton);
 
         saveDbButton = UIStyles.createSuccessButton("2. Salvar no Banco");
         saveDbButton.setPreferredSize(new Dimension(220, 40));
-        saveDbButton.setBackground(UIStyles.PRIMARY); // Emerald for Saving
+        saveDbButton.setBackground(UIStyles.PRIMARY);
         saveDbButton.addActionListener(e -> saveDbAction());
-        saveDbButton.setEnabled(
-                !isManual || !isNew); // Habilita direto se for edição ou se não for manual
+        saveDbButton.setEnabled(!isManual || !isNew);
         buttonPanel.add(saveDbButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -201,16 +194,13 @@ public class CattleFormPanel extends JPanel {
             cattle.setName(nameField.getText().trim());
             cattle.setWeight(weight);
 
-            if (isManual) {
-                writeTagButton.setEnabled(false);
-                writeTagButton.setText("Gravando na Tag...");
-                controller.requestWriteTag(cattle.getRfidTag());
-            }
+            writeTagButton.setEnabled(false);
+            writeTagButton.setText("Gravando na Tag...");
+            controller.requestWriteTag(cattle.getRfidTag());
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
-                    "Erro de Digitação",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -229,45 +219,66 @@ public class CattleFormPanel extends JPanel {
             cattle.setName(nameField.getText().trim());
             cattle.setWeight(weight);
 
-            // The dateField is not editable, so its value is already set during
-            // populateFields
-            // or initialization for new cattle. No need to re-read and format here for
-            // cattle.setRegistrationDate.
-
             controller.saveCattleData(cattle);
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
-                    "Erro de Digitação",
-                    JOptionPane.ERROR_MESSAGE);
-            saveDbButton.setEnabled(true);
+                    "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // Callback para quando a gravação física der erro
-    public void resetSubmitButton() {
-        writeTagButton.setEnabled(true);
-        writeTagButton.setText("Tentar Gravar Tag Novamente");
-    }
-
-    // Callback para sucesso físico
-    public void onTagWriteSuccess() {
-        writeTagButton.setEnabled(false);
-        writeTagButton.setText("Tag Gravada!");
-        writeTagButton.setBackground(new Color(144, 238, 144)); // Verde claro
-
-        saveDbButton.setEnabled(true);
-        saveDbAction(); // Salva automaticamente ao dar sucesso
-
-        // Transição de sucesso
-        if (parentMainPanel != null) {
-            parentMainPanel.setActiveCattleForm(null);
-        }
+    private void navigateBack() {
+        controller.setViewListener(parentMainPanel);
         navManager.showPanel("Main", parentMainPanel);
     }
 
-    // Getter para os dados montados
-    public Cattle getPendingCattle() {
-        return cattle;
+    // ── CattleViewListener ────────────────────────────────────────────────────
+
+    @Override
+    public void onRfidReadSuccess(Cattle cattle) {}
+
+    @Override
+    public void onRfidReadError(String message) {
+        SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(this, message, "Aviso RFID",
+                        JOptionPane.WARNING_MESSAGE));
+    }
+
+    @Override
+    public void onRfidWriteSuccess() {
+        SwingUtilities.invokeLater(() -> {
+            writeTagButton.setEnabled(false);
+            writeTagButton.setText("Tag Gravada!");
+            writeTagButton.setBackground(new Color(144, 238, 144));
+            saveDbButton.setEnabled(true);
+            saveDbAction();
+        });
+    }
+
+    @Override
+    public void onRfidWriteError(String message) {
+        SwingUtilities.invokeLater(() -> {
+            writeTagButton.setEnabled(true);
+            writeTagButton.setText("Tentar Gravar Tag Novamente");
+            JOptionPane.showMessageDialog(this,
+                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.",
+                    "Erro ao Gravar RFID", JOptionPane.ERROR_MESSAGE);
+        });
+    }
+
+    @Override
+    public void onApiSaveSuccess() {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!",
+                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            navigateBack();
+        });
+    }
+
+    @Override
+    public void onApiSaveError(String message) {
+        SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(this, message, "Erro Base de Dados",
+                        JOptionPane.ERROR_MESSAGE));
     }
 }

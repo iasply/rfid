@@ -107,7 +107,7 @@ class CattleControllerTest {
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
         verify(apiServiceMock).getCattleByTag("CVACA00000000001");
-        verify(viewListenerMock).onRfidReadSuccess(existingCattle, false);
+        verify(viewListenerMock).onRfidReadSuccess(existingCattle );
     }
 
     @Test

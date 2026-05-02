@@ -25,7 +25,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     private JLabel statusLabel;
     private JButton scanCattleButton;
 
-    private CattleFormPanel activeCattleForm;
     private List<VaccineType> vaccineTypes = new ArrayList<>();
 
     public MainPanel(User loggedUser, CattleController cattleController,
@@ -117,9 +116,9 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             Cattle newCattle = new Cattle();
             newCattle.setRfidTag(generatedTag);
 
-            activeCattleForm = new CattleFormPanel(newCattle, true, true, cattleController,
+            CattleFormPanel form = new CattleFormPanel(newCattle, true, true, cattleController,
                     loggedUser, navManager, this);
-            navManager.showPanel("ManualRegister", activeCattleForm);
+            navManager.showPanel("ManualRegister", form);
         });
 
         JButton listButton = UIStyles.createPrimaryButton(
@@ -158,7 +157,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     }
 
     @Override
-    public void onRfidReadSuccess(Cattle cattle, boolean isNew) {
+    public void onRfidReadSuccess(Cattle cattle) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Animal Encontrado (" + cattle.getRfidTag() + ")");
             VaccineFormPanel form = new VaccineFormPanel(cattle, cattleController, loggedUser,
@@ -176,38 +175,14 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
     }
 
     @Override
-    public void onRfidWriteSuccess() {
-        SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Tag gravada com sucesso!");
-            if (activeCattleForm != null && activeCattleForm.isVisible()) {
-                activeCattleForm.onTagWriteSuccess();
-            }
-        });
-    }
+    public void onRfidWriteSuccess() {}
 
     @Override
-    public void onRfidWriteError(String message) {
-        SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Erro de Escrita: " + message);
-            JOptionPane.showMessageDialog(this,
-                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.",
-                    "Erro ao Gravar RFID",
-                    JOptionPane.ERROR_MESSAGE);
-            if (activeCattleForm != null) {
-                activeCattleForm.resetSubmitButton();
-            }
-        });
-    }
+    public void onRfidWriteError(String message) {}
 
     @Override
     public void onApiSaveSuccess() {
-        SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Dados salvos com sucesso.");
-            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!",
-                    "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
-            activeCattleForm = null;
-        });
+        SwingUtilities.invokeLater(() -> statusLabel.setText("Dados salvos com sucesso."));
     }
 
     @Override
@@ -216,13 +191,6 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             statusLabel.setText("Falha no Banco: " + message);
             JOptionPane.showMessageDialog(this, message, "Erro Base de Dados",
                     JOptionPane.ERROR_MESSAGE);
-            if (activeCattleForm != null) {
-                activeCattleForm.resetSubmitButton();
-            }
         });
-    }
-
-    public void setActiveCattleForm(CattleFormPanel activeCattleForm) {
-        this.activeCattleForm = activeCattleForm;
     }
 }

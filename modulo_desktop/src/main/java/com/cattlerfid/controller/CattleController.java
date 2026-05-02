@@ -15,7 +15,7 @@ public class CattleController {
     private final SerialService serialService;
 
     private CattleViewListener viewListener = new CattleViewListener() {
-        public void onRfidReadSuccess(Cattle cattle, boolean isNew) {}
+        public void onRfidReadSuccess(Cattle cattle ) {}
         public void onRfidReadError(String message) {}
         public void onRfidWriteSuccess() {}
         public void onRfidWriteError(String message) {}
@@ -154,7 +154,7 @@ public class CattleController {
 
         if (existing.isPresent()) {
             currentEditingCattle = existing.get();
-            viewListener.onRfidReadSuccess(currentEditingCattle, false);
+            viewListener.onRfidReadSuccess(currentEditingCattle);
         } else {
             viewListener.onRfidReadError(
                     "Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
@@ -174,7 +174,7 @@ public class CattleController {
     }
 
     public interface CattleViewListener {
-        void onRfidReadSuccess(Cattle cattle, boolean isNew);
+        void onRfidReadSuccess(Cattle cattle);
         void onRfidReadError(String message);
         void onRfidWriteSuccess();
         void onRfidWriteError(String message);

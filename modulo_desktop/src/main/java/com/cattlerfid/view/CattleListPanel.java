@@ -229,11 +229,6 @@ public class CattleListPanel extends JPanel {
             Cattle target = targetOpt.get();
             CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser,
                     navManager, parentMainPanel);
-
-            if (parentMainPanel != null) {
-                parentMainPanel.setActiveCattleForm(form);
-            }
-
             navManager.showPanel("EditCattle", form);
         } else {
             JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.",
