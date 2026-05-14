@@ -3,6 +3,7 @@ package com.cattlerfid.view;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.util.DateUtils;
 import com.cattlerfid.view.utils.UIStyles;
 
@@ -57,7 +58,13 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 30));
-        backButton.addActionListener(e -> navigateBack());
+        backButton.addActionListener(DebounceUtil.debounce(e -> {
+            // Aborta edição e volta
+            if (parentMainPanel != null) {
+                parentMainPanel.setActiveCattleForm(null); // Clear ref
+            }
+            navManager.showPanel("Main", parentMainPanel);
+        }, DebounceUtil.NAV_MS));
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -151,14 +158,15 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         writeTagButton.setPreferredSize(new Dimension(220, 40));
         writeTagButton.setBackground(UIStyles.WARNING);
         writeTagButton.setForeground(UIStyles.PRIMARY_DARK);
-        writeTagButton.addActionListener(e -> writeTagAction());
+        writeTagButton.addActionListener(DebounceUtil.debounce(e -> writeTagAction()));
+        // Apenas habilita gravação física se for manual
         writeTagButton.setVisible(isManual);
         buttonPanel.add(writeTagButton);
 
         saveDbButton = UIStyles.createSuccessButton("2. Salvar no Banco");
         saveDbButton.setPreferredSize(new Dimension(220, 40));
         saveDbButton.setBackground(UIStyles.PRIMARY);
-        saveDbButton.addActionListener(e -> saveDbAction());
+        saveDbButton.addActionListener(DebounceUtil.debounce(e -> saveDbAction()));
         saveDbButton.setEnabled(!isManual || !isNew);
         buttonPanel.add(saveDbButton);
 

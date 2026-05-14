@@ -5,6 +5,7 @@ import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.PagedResult;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.CattleApiService;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.util.DateUtils;
 import com.cattlerfid.view.utils.UIStyles;
 
@@ -115,7 +116,7 @@ public class CattleListPanel extends JPanel {
         prevButton = new JButton("< Anterior");
         prevButton.setFont(UIStyles.BODY_FONT);
         prevButton.setEnabled(false);
-        prevButton.addActionListener(e -> loadPage(currentPage - 1));
+        prevButton.addActionListener(DebounceUtil.debounce(e -> loadPage(currentPage - 1)));
 
         pageLabel = new JLabel("Carregando…");
         pageLabel.setFont(UIStyles.BODY_FONT);
@@ -124,7 +125,7 @@ public class CattleListPanel extends JPanel {
         nextButton = new JButton("Próxima >");
         nextButton.setFont(UIStyles.BODY_FONT);
         nextButton.setEnabled(false);
-        nextButton.addActionListener(e -> loadPage(currentPage + 1));
+        nextButton.addActionListener(DebounceUtil.debounce(e -> loadPage(currentPage + 1)));
 
         paginationPanel.add(prevButton);
         paginationPanel.add(pageLabel);
@@ -138,20 +139,20 @@ public class CattleListPanel extends JPanel {
 
         JButton logButton = new JButton("Logs Serial");
         logButton.setFont(new Font("Arial", Font.PLAIN, 10));
-        logButton.addActionListener(e -> {
+        logButton.addActionListener(DebounceUtil.debounce(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(controller.getSerialService());
             logFrame.setVisible(true);
-        });
+        }, DebounceUtil.NAV_MS));
         bottomPanel.add(logButton);
 
         editButton = UIStyles.createSuccessButton("Editar Selecionado");
         editButton.setPreferredSize(new Dimension(200, 35));
-        editButton.addActionListener(e -> openEditDialog());
+        editButton.addActionListener(DebounceUtil.debounce(e -> openEditDialog()));
         bottomPanel.add(editButton);
 
         JButton closeBtn = UIStyles.createBackButton("< Menu");
         closeBtn.setPreferredSize(new Dimension(100, 35));
-        closeBtn.addActionListener(e -> navManager.showPanel("Main", parentMainPanel));
+        closeBtn.addActionListener(DebounceUtil.debounce(e -> navManager.showPanel("Main", parentMainPanel), DebounceUtil.NAV_MS));
         bottomPanel.add(closeBtn);
 
         southContainer.add(bottomPanel, BorderLayout.SOUTH);

@@ -8,6 +8,7 @@ import com.cattlerfid.model.User;
 import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.util.RfidGenerator;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -69,7 +70,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         headerPanel.add(welcomeLabel, BorderLayout.WEST);
 
         JButton logoutButton = UIStyles.createBackButton("Sair (Logout)");
-        logoutButton.addActionListener(e -> {
+        logoutButton.addActionListener(DebounceUtil.debounce(e -> {
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Tem certeza que deseja deslogar do sistema?", "Logout",
                     JOptionPane.YES_NO_OPTION);
@@ -85,7 +86,7 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
                 navManager.showPanel("Login", loginPanel);
                 loginController.attachToActiveSerial();
             }
-        });
+        }));
         headerPanel.add(logoutButton, BorderLayout.EAST);
 
         add(headerPanel, BorderLayout.NORTH);
@@ -99,17 +100,17 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
         scanCattleButton.setFont(UIStyles.HEADER_FONT);
         scanCattleButton.setBackground(UIStyles.WARNING);
         scanCattleButton.setForeground(UIStyles.PRIMARY_DARK);
-        scanCattleButton.addActionListener(e -> {
+        scanCattleButton.addActionListener(DebounceUtil.debounce(e -> {
             statusLabel.setText("Aproxime a Tag do Animal...");
             cattleController.requestReadTag();
-        });
+        }));
 
         JButton manualRegisterButton = UIStyles
                 .createPrimaryButton("<html><center>CADASTRAR<br>MANUAL</center></html>");
         manualRegisterButton.setPreferredSize(new Dimension(220, 120));
         manualRegisterButton.setFont(UIStyles.HEADER_FONT);
         manualRegisterButton.setBackground(UIStyles.PRIMARY);
-        manualRegisterButton.addActionListener(e -> {
+        manualRegisterButton.addActionListener(DebounceUtil.debounce(e -> {
             statusLabel.setText("Preparando formulário manual...");
 
             String generatedTag = RfidGenerator.generateCattleTag();
@@ -119,18 +120,18 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
             CattleFormPanel form = new CattleFormPanel(newCattle, true, true, cattleController,
                     loggedUser, navManager, this);
             navManager.showPanel("ManualRegister", form);
-        });
+        }, DebounceUtil.NAV_MS));
 
         JButton listButton = UIStyles.createPrimaryButton(
                 "<html><center>LISTAR<br>REBANHO</center></html>");
         listButton.setPreferredSize(new Dimension(220, 120));
         listButton.setFont(UIStyles.HEADER_FONT);
         listButton.setBackground(UIStyles.SECONDARY);
-        listButton.addActionListener(e -> {
+        listButton.addActionListener(DebounceUtil.debounce(e -> {
             CattleListPanel listPanel = new CattleListPanel(cattleController.getApiService(),
                     cattleController, loggedUser, navManager, this);
             navManager.showPanel("List", listPanel);
-        });
+        }, DebounceUtil.NAV_MS));
 
         centerPanel.add(scanCattleButton);
         centerPanel.add(manualRegisterButton);
@@ -146,10 +147,10 @@ public class MainPanel extends JPanel implements CattleController.CattleViewList
 
         JButton logButton = new JButton("Ver Logs Serial");
         logButton.setFont(new Font("Arial", Font.PLAIN, 10));
-        logButton.addActionListener(e -> {
+        logButton.addActionListener(DebounceUtil.debounce(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(cattleController.getSerialService());
             logFrame.setVisible(true);
-        });
+        }, DebounceUtil.NAV_MS));
 
         bottomPanel.add(statusLabel, BorderLayout.CENTER);
         bottomPanel.add(logButton, BorderLayout.EAST);

@@ -1,5 +1,6 @@
 package com.cattlerfid.view;
 
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.service.SerialService;
 
 import javax.swing.*;
@@ -47,13 +48,13 @@ public class SerialLogFrame extends JFrame {
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
 
-        sendButton.addActionListener(e -> {
+        sendButton.addActionListener(DebounceUtil.debounce(e -> {
             String text = inputField.getText();
             if (!text.isEmpty()) {
                 serialService.sendCommand(text + "\n");
                 inputField.setText("");
             }
-        });
+        }));
         inputField.addActionListener(e -> sendButton.doClick());
 
         JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -81,21 +82,21 @@ public class SerialLogFrame extends JFrame {
             readSimPanel.add(tagInputField, BorderLayout.CENTER);
             readSimPanel.add(simReadButton, BorderLayout.EAST);
 
-            simReadButton.addActionListener(e -> {
+            simReadButton.addActionListener(DebounceUtil.debounce(e -> {
                 String tag = tagInputField.getText().trim();
                 if (!tag.isEmpty()) {
                     serialService.injectMessage("READ:OK:" + tag);
                 }
-            });
+            }));
 
             // Linha 2: Simular Escrita
             JPanel writeSimPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JButton simWriteOkButton = new JButton("Simular Sucesso Gravação");
             JButton simWriteErrButton = new JButton("Simular Erro Gravação");
 
-            simWriteOkButton.addActionListener(e -> serialService.injectMessage("WRITE:OK"));
-            simWriteErrButton.addActionListener(
-                    e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU"));
+            simWriteOkButton.addActionListener(DebounceUtil.debounce(e -> serialService.injectMessage("WRITE:OK")));
+            simWriteErrButton.addActionListener(DebounceUtil.debounce(
+                    e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU")));
 
             writeSimPanel.add(simWriteOkButton);
             writeSimPanel.add(simWriteErrButton);

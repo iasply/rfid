@@ -8,6 +8,7 @@ import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
 import com.cattlerfid.util.RfidConstants;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -47,7 +48,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 35));
-        backButton.addActionListener(e -> {
+        backButton.addActionListener(DebounceUtil.debounce(e -> {
             controller.detachSerial();
 
             // Desliga a porta para liberá-la antes de voltar pro scanner raw de hardware
@@ -59,15 +60,15 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig,
                     navManager);
             navManager.showPanel("Connection", connPanel);
-        });
+        }, DebounceUtil.NAV_MS));
         headerPanel.add(backButton, BorderLayout.WEST);
 
         JButton logButton = new JButton("Ver Logs Serial");
         logButton.setFont(new Font("Arial", Font.PLAIN, 10));
-        logButton.addActionListener(e -> {
+        logButton.addActionListener(DebounceUtil.debounce(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(controller.getSerialService());
             logFrame.setVisible(true);
-        });
+        }, DebounceUtil.NAV_MS));
         headerPanel.add(logButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -86,7 +87,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         readCardButton = UIStyles.createPrimaryButton("Aproximar Crachá (READ)");
         readCardButton.setPreferredSize(new Dimension(250, 50));
         readCardButton.setEnabled(false);
-        readCardButton.addActionListener(e -> controller.requestCardLogin());
+        readCardButton.addActionListener(DebounceUtil.debounce(e -> controller.requestCardLogin()));
         buttonPanel.add(readCardButton);
 
         centerPanel.add(buttonPanel);

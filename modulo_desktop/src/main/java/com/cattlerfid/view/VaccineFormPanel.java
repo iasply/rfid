@@ -6,6 +6,7 @@ import com.cattlerfid.model.User;
 import com.cattlerfid.model.Vaccine;
 import com.cattlerfid.model.VaccineType;
 import com.cattlerfid.util.DateUtils;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -55,7 +56,7 @@ public class VaccineFormPanel extends JPanel {
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 30));
-        backButton.addActionListener(e -> navManager.showPanel("Main", parentMainPanel));
+        backButton.addActionListener(DebounceUtil.debounce(e -> navManager.showPanel("Main", parentMainPanel), DebounceUtil.NAV_MS));
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -136,7 +137,7 @@ public class VaccineFormPanel extends JPanel {
         submitButton = UIStyles.createSuccessButton("Registrar Vacina");
         submitButton.setPreferredSize(new Dimension(250, 45));
         submitButton.setBackground(UIStyles.PRIMARY);
-        submitButton.addActionListener(e -> saveAction());
+        submitButton.addActionListener(DebounceUtil.debounce(e -> saveAction()));
         buttonPanel.add(submitButton);
 
         add(buttonPanel, BorderLayout.SOUTH);

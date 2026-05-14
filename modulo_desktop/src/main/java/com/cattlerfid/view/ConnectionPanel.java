@@ -6,6 +6,7 @@ import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
 import com.cattlerfid.util.RfidConstants;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -51,10 +52,10 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
         JButton logButton = new JButton("Ver Logs Serial");
         logButton.setFont(new Font("Arial", Font.PLAIN, 10));
-        logButton.addActionListener(e -> {
+        logButton.addActionListener(DebounceUtil.debounce(e -> {
             SerialLogFrame logFrame = new SerialLogFrame(controller.getSerialService());
             logFrame.setVisible(true);
-        });
+        }, DebounceUtil.NAV_MS));
         headerPanel.add(logButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
@@ -82,13 +83,13 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
         connectPortButton = UIStyles.createPrimaryButton("Conectar");
         connectPortButton.setPreferredSize(new Dimension(130, 35));
-        connectPortButton.addActionListener(e -> connectSerial());
+        connectPortButton.addActionListener(DebounceUtil.debounce(e -> connectSerial()));
         portPanel.add(connectPortButton);
 
         disconnectButton = UIStyles.createBackButton("Desconectar");
         disconnectButton.setPreferredSize(new Dimension(130, 35));
         disconnectButton.setEnabled(false);
-        disconnectButton.addActionListener(e -> controller.disconnectSerial());
+        disconnectButton.addActionListener(DebounceUtil.debounce(e -> controller.disconnectSerial()));
         portPanel.add(disconnectButton);
 
         centerPanel.add(portPanel);
@@ -103,7 +104,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         testReadButton = UIStyles.createPrimaryButton("Realizar Teste Inicial de Leitura");
         testReadButton.setPreferredSize(new Dimension(300, 45));
         testReadButton.setEnabled(false);
-        testReadButton.addActionListener(e -> controller.requestTestRead());
+        testReadButton.addActionListener(DebounceUtil.debounce(e -> controller.requestTestRead()));
         testPanel.add(testReadButton);
 
         centerPanel.add(testPanel);
