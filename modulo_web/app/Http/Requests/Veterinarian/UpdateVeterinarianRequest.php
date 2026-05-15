@@ -9,6 +9,13 @@ class UpdateVeterinarianRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $user = auth()->user();
+        $veterinarian = $this->route('veterinarian');
+
+        if ($user && $user->is_veterinarian && $veterinarian && $user->id !== $veterinarian->id) {
+            return false;
+        }
+
         return auth()->check();
     }
 

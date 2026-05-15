@@ -86,6 +86,8 @@ class VeterinarianController extends Controller
 
     public function edit(User $veterinarian)
     {
+        $this->authorizeVetEdit($veterinarian);
+
         $dto = VeterinarianResponse::fromModel($veterinarian);
 
         return view('admin.veterinarians.edit', ['veterinarian' => $dto]);
@@ -93,6 +95,8 @@ class VeterinarianController extends Controller
 
     public function update(UpdateVeterinarianRequest $request, User $veterinarian)
     {
+        $this->authorizeVetEdit($veterinarian);
+
         $data = $request->validated();
 
         if (!empty($data['password'])) {
@@ -113,5 +117,14 @@ class VeterinarianController extends Controller
 
         return redirect()->route('admin.veterinarians.index')
             ->with('success', 'Veterinário removido.');
+    }
+
+    private function authorizeVetEdit(User $veterinarian): void
+    {
+        $user = auth()->user();
+
+        if ($user->is_veterinarian && $user->id !== $veterinarian->id) {
+            abort(403, 'Você não tem permissão para editar outro veterinário.');
+        }
     }
 }
