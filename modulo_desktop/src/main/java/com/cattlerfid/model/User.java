@@ -1,6 +1,7 @@
 package com.cattlerfid.model;
 
 public class User {
+
     private int id;
     private String name;
     private String email;
@@ -17,7 +18,6 @@ public class User {
         this.vet_rfid = username;
         this.name = fullName;
     }
-
 
     public int getId() {
         return id;

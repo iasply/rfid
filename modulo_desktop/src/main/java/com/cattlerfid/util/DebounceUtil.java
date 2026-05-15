@@ -18,6 +18,7 @@ public final class DebounceUtil {
     public static ActionListener debounce(final ActionListener delegate, final long delayMs) {
         final AtomicLong lastFired = new AtomicLong(0L);
         return new ActionListener() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 long now = System.currentTimeMillis();

@@ -2,11 +2,7 @@ package com.cattlerfid.service;
 
 import com.cattlerfid.config.ApiClient;
 import com.cattlerfid.config.ApiConfig;
-import com.cattlerfid.model.Cattle;
-import com.cattlerfid.model.PagedResult;
-import com.cattlerfid.model.User;
-import com.cattlerfid.model.Vaccine;
-import com.cattlerfid.model.VaccineType;
+import com.cattlerfid.model.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -60,8 +56,7 @@ public class CattleApiService {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Cattle>>() {
-                }.getType();
+                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -77,8 +72,7 @@ public class CattleApiService {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Cattle>>() {
-                }.getType();
+                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -94,8 +88,7 @@ public class CattleApiService {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Cattle>>() {
-                }.getType();
+                Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
                 List<Cattle> data = client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
                 // Laravel ResourceCollection wraps pagination info inside "meta"
                 JsonObject meta = obj.getAsJsonObject("meta");
@@ -113,8 +106,7 @@ public class CattleApiService {
 
     public boolean saveCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
-        HttpRequest request = authenticatedRequestBuilder("/cattle")
-                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+        HttpRequest request = authenticatedRequestBuilder("/cattle").POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -127,8 +119,7 @@ public class CattleApiService {
 
     public boolean updateCattle(Cattle cattle) {
         String body = client.getGson().toJson(cattle);
-        HttpRequest request = authenticatedRequestBuilder("/cattle/" + cattle.getId())
-                .PUT(HttpRequest.BodyPublishers.ofString(body)).build();
+        HttpRequest request = authenticatedRequestBuilder("/cattle/" + cattle.getId()).PUT(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -141,8 +132,7 @@ public class CattleApiService {
 
     public boolean saveVaccine(Vaccine vaccine) {
         String body = client.getGson().toJson(vaccine);
-        HttpRequest request = authenticatedRequestBuilder("/vaccines")
-                .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+        HttpRequest request = authenticatedRequestBuilder("/vaccines").POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -157,15 +147,13 @@ public class CattleApiService {
         if (rfidTag == null || rfidTag.isBlank())
             return new ArrayList<>();
 
-        HttpRequest request = authenticatedRequestBuilder(
-                "/vaccines?rfid_tag=" + rfidTag).GET().build();
+        HttpRequest request = authenticatedRequestBuilder("/vaccines?rfid_tag=" + rfidTag).GET().build();
 
         try {
             HttpResponse<String> response = client.send(request);
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
-                Type listType = new TypeToken<ArrayList<Vaccine>>() {
-                }.getType();
+                Type listType = new TypeToken<ArrayList<Vaccine>>() {}.getType();
                 return client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
             }
         } catch (IOException | InterruptedException e) {
@@ -182,8 +170,7 @@ public class CattleApiService {
             if (response.statusCode() == 200) {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 JsonArray data = obj.getAsJsonArray("data");
-                Type listType = new TypeToken<ArrayList<VaccineType>>() {
-                }.getType();
+                Type listType = new TypeToken<ArrayList<VaccineType>>() {}.getType();
                 return client.getGson().fromJson(data, listType);
             }
         } catch (IOException | InterruptedException e) {

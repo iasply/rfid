@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class CattleControllerTest {
@@ -59,15 +57,13 @@ class CattleControllerTest {
     @Test
     void testRequestWriteTagConnected() {
         controller.requestWriteTag("C1234567890");
-        verify(serialServiceMock).requestRead(
-                RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
+        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
     }
 
     @Test
     void testHandleMessageWriteReadUserTagBlocked() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage(
-                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VADMIN01:FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":VADMIN01:FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Bloqueado"));
         verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
@@ -76,8 +72,7 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNewTagAllowed() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage(
-                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":COLDTAG123:FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_OK + ":COLDTAG123:FW:92");
 
         verify(serialServiceMock).requestWrite(RfidConstants.ID_CATTLE, "C123456");
     }
@@ -88,8 +83,7 @@ class CattleControllerTest {
     @Test
     void testHandleMessageWriteReadNoTagError() {
         controller.requestWriteTag("C123456");
-        controller.handleIncomingSerialMessage(
-                "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92");
+        controller.handleIncomingSerialMessage("RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:92");
 
         verify(viewListenerMock).onRfidWriteError(contains("Nenhuma Tag detectada"));
         verify(serialServiceMock, never()).requestWrite(anyString(), anyString());
@@ -101,13 +95,12 @@ class CattleControllerTest {
         Cattle existingCattle = new Cattle("CVACA00000000001", "Mimosa", 400, "2023-01-01");
         existingCattle.setId(10);
 
-        when(apiServiceMock.getCattleByTag("CVACA00000000001")).thenReturn(
-                Optional.of(existingCattle));
+        when(apiServiceMock.getCattleByTag("CVACA00000000001")).thenReturn(Optional.of(existingCattle));
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
         verify(apiServiceMock).getCattleByTag("CVACA00000000001");
-        verify(viewListenerMock).onRfidReadSuccess(existingCattle );
+        verify(viewListenerMock).onRfidReadSuccess(existingCattle);
     }
 
     @Test
@@ -119,9 +112,7 @@ class CattleControllerTest {
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
         verify(apiServiceMock).getCattleByTag("CDESCONHECIDO12");
-        verify(viewListenerMock)
-                .onRfidReadError(
-                        "Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
+        verify(viewListenerMock).onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
 
         Cattle c = controller.getCurrentEditingCattle();
         assertNull(c);
@@ -182,9 +173,7 @@ class CattleControllerTest {
     }
 
     /**
-     * Regression test for the 422 error fix.
-     * saveVaccineData should NOT call saveCattle/updateCattle because the server
-     * handles it.
+     * Regression test for the 422 error fix. saveVaccineData should NOT call saveCattle/updateCattle because the server handles it.
      */
     @Test
     void testSaveVaccineData_shouldOnlyCallSaveVaccine() {
@@ -220,8 +209,7 @@ class CattleControllerTest {
 
         controller.handleIncomingSerialMessage(simulatedSerialMsg);
 
-        verify(viewListenerMock).onRfidReadError(
-                contains("Formato de Tag animal inválido ou inválida para o sistema"));
+        verify(viewListenerMock).onRfidReadError(contains("Formato de Tag animal inválido ou inválida para o sistema"));
     }
 
     @Test
@@ -262,8 +250,7 @@ class CattleControllerTest {
         CattleController noListenerController = new CattleController(apiServiceMock, serialServiceMock);
         when(serialServiceMock.isOpen()).thenReturn(false);
 
-        assertDoesNotThrow(noListenerController::requestReadTag,
-                "Controller without viewListener must not throw NPE on requestReadTag");
+        assertDoesNotThrow(noListenerController::requestReadTag, "Controller without viewListener must not throw NPE on requestReadTag");
     }
 
     @Test
@@ -271,7 +258,6 @@ class CattleControllerTest {
         CattleController noListenerController = new CattleController(apiServiceMock, serialServiceMock);
         String msg = "RES:" + RfidConstants.ID_CATTLE + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00";
 
-        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg),
-                "handleIncomingSerialMessage without viewListener must not throw NPE");
+        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg), "handleIncomingSerialMessage without viewListener must not throw NPE");
     }
 }

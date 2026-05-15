@@ -2,8 +2,8 @@ package com.cattlerfid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-
 public class Vaccine {
+
     private String id;
 
     @SerializedName("rfid_tag")
@@ -30,8 +30,7 @@ public class Vaccine {
     public Vaccine() {
     }
 
-    public Vaccine(String id, String rfidTag, String vaccinationDate, long vaccineTypeId,
-            double currentWeight) {
+    public Vaccine(String id, String rfidTag, String vaccinationDate, long vaccineTypeId, double currentWeight) {
         this.id = id;
         this.rfidTag = rfidTag;
         this.vaccinationDate = vaccinationDate;

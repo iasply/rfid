@@ -85,8 +85,7 @@ class ConnectionControllerTest {
         Consumer<String> messageHandler = captor.getValue();
 
         // 1. Enviamos MSG mas a boolean testingConnection está False por padrao
-        messageHandler.accept(
-                "RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_OK + ":QUALQUER_TAG :FW:92");
+        messageHandler.accept("RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_OK + ":QUALQUER_TAG :FW:92");
         verify(viewListenerMock, never()).onTestTagReadSuccess(anyString());
 
         // 2. Simulamos o clique no botão Testar
@@ -115,8 +114,7 @@ class ConnectionControllerTest {
         controller.requestTestRead();
 
         // Dispara mensagem de erro vindo do Arduino
-        messageHandler.accept(
-                "RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00");
+        messageHandler.accept("RES:" + RfidConstants.ID_CONN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00");
         verify(viewListenerMock).onSerialError("Nenhuma Tag detectada a tempo. Tente novamente.");
     }
 
@@ -138,15 +136,13 @@ class ConnectionControllerTest {
         ConnectionController noListenerController = new ConnectionController(serialServiceMock);
         when(serialServiceMock.isOpen()).thenReturn(false);
 
-        assertDoesNotThrow(noListenerController::requestTestRead,
-                "Controller without viewListener must not throw NPE");
+        assertDoesNotThrow(noListenerController::requestTestRead, "Controller without viewListener must not throw NPE");
     }
 
     @Test
     void testNoListenerSet_disconnectDoesNotThrowNPE() {
         ConnectionController noListenerController = new ConnectionController(serialServiceMock);
 
-        assertDoesNotThrow(noListenerController::disconnectSerial,
-                "disconnectSerial without viewListener must not throw NPE");
+        assertDoesNotThrow(noListenerController::disconnectSerial, "disconnectSerial without viewListener must not throw NPE");
     }
 }

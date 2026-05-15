@@ -10,8 +10,7 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Testa o carregamento de configurações do ApiConfig,
- * com foco nas novas chaves SSL.
+ * Testa o carregamento de configurações do ApiConfig, com foco nas novas chaves SSL.
  */
 class ApiConfigTest {
 
@@ -48,8 +47,7 @@ class ApiConfigTest {
     }
 
     @Test
-    void givenEnvWithoutWorkstationHash_shouldReturnEmpty(@TempDir Path tempDir) throws
-            IOException {
+    void givenEnvWithoutWorkstationHash_shouldReturnEmpty(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "API_BASE_URL=http://localhost/api\n");
 
         ApiConfig config = new ApiConfig(env.toString());
@@ -60,8 +58,7 @@ class ApiConfigTest {
     // ── SSL_TRUST_ALL ─────────────────────────────────────────────────────
 
     @Test
-    void givenSslTrustAllTrue_isTrustAllCertsShouldBeTrue(@TempDir Path tempDir) throws
-            IOException {
+    void givenSslTrustAllTrue_isTrustAllCertsShouldBeTrue(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "SSL_TRUST_ALL=true\n");
 
         ApiConfig config = new ApiConfig(env.toString());
@@ -70,8 +67,7 @@ class ApiConfigTest {
     }
 
     @Test
-    void givenSslTrustAllTrueUppercase_isTrustAllCertsShouldBeTrue(@TempDir Path tempDir) throws
-            IOException {
+    void givenSslTrustAllTrueUppercase_isTrustAllCertsShouldBeTrue(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "SSL_TRUST_ALL=TRUE\n");
 
         ApiConfig config = new ApiConfig(env.toString());
@@ -80,8 +76,7 @@ class ApiConfigTest {
     }
 
     @Test
-    void givenSslTrustAllFalse_isTrustAllCertsShouldBeFalse(@TempDir Path tempDir) throws
-            IOException {
+    void givenSslTrustAllFalse_isTrustAllCertsShouldBeFalse(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "SSL_TRUST_ALL=false\n");
 
         ApiConfig config = new ApiConfig(env.toString());
@@ -90,8 +85,7 @@ class ApiConfigTest {
     }
 
     @Test
-    void givenNoSslTrustAll_isTrustAllCertsShouldDefaultToFalse(@TempDir Path tempDir) throws
-            IOException {
+    void givenNoSslTrustAll_isTrustAllCertsShouldDefaultToFalse(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "API_BASE_URL=https://example.com/api\n");
 
         ApiConfig config = new ApiConfig(env.toString());
@@ -103,11 +97,7 @@ class ApiConfigTest {
 
     @Test
     void givenEnvWithComments_shouldIgnoreCommentLines(@TempDir Path tempDir) throws IOException {
-        Path env = writeEnv(tempDir,
-                "# URL da API\n" +
-                        "API_BASE_URL=https://cattle.io/api\n" +
-                        "# SSL desabilitado\n" +
-                        "SSL_TRUST_ALL=false\n");
+        Path env = writeEnv(tempDir, "# URL da API\n" + "API_BASE_URL=https://cattle.io/api\n" + "# SSL desabilitado\n" + "SSL_TRUST_ALL=false\n");
 
         ApiConfig config = new ApiConfig(env.toString());
 

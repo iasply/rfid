@@ -11,16 +11,14 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Testa a criação do HttpClient via HttpClientFactory,
- * garantindo que o SSL_TRUST_ALL seja respeitado.
+ * Testa a criação do HttpClient via HttpClientFactory, garantindo que o SSL_TRUST_ALL seja respeitado.
  */
 class HttpClientFactoryTest {
 
     // ── SSL_TRUST_ALL=false → HttpClient padrão (CA do sistema) ──────────
 
     @Test
-    void givenTrustAllFalse_shouldReturnStandardHttpClient(@TempDir Path tempDir)
-            throws IOException {
+    void givenTrustAllFalse_shouldReturnStandardHttpClient(@TempDir Path tempDir) throws IOException {
         // Arrange – .env sem SSL_TRUST_ALL (default false)
         Path envFile = tempDir.resolve(".env");
         Files.writeString(envFile, "API_BASE_URL=https://example.com/api\n");
@@ -38,13 +36,10 @@ class HttpClientFactoryTest {
     // ── SSL_TRUST_ALL=true → HttpClient com trust-all SSLContext ─────────
 
     @Test
-    void givenTrustAllTrue_shouldReturnTrustAllHttpClient(@TempDir Path tempDir)
-            throws IOException {
+    void givenTrustAllTrue_shouldReturnTrustAllHttpClient(@TempDir Path tempDir) throws IOException {
         // Arrange
         Path envFile = tempDir.resolve(".env");
-        Files.writeString(envFile,
-                "API_BASE_URL=https://localhost/api\n" +
-                        "SSL_TRUST_ALL=true\n");
+        Files.writeString(envFile, "API_BASE_URL=https://localhost/api\n" + "SSL_TRUST_ALL=true\n");
 
         ApiConfig config = new ApiConfig(envFile.toString());
 
@@ -59,8 +54,7 @@ class HttpClientFactoryTest {
     // ── SSL_TRUST_ALL com valor inválido → default false ─────────────────
 
     @Test
-    void givenTrustAllInvalidValue_shouldDefaultToFalse(@TempDir Path tempDir)
-            throws IOException {
+    void givenTrustAllInvalidValue_shouldDefaultToFalse(@TempDir Path tempDir) throws IOException {
         Path envFile = tempDir.resolve(".env");
         Files.writeString(envFile, "SSL_TRUST_ALL=yes\n");  // valor inválido
 

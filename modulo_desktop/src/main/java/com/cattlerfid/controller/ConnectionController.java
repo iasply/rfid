@@ -10,16 +10,19 @@ public class ConnectionController {
     private final SerialService serialService;
 
     private ConnectionViewListener viewListener = new ConnectionViewListener() {
+
         public void onSerialConnected() {}
+
         public void onSerialDisconnected() {}
+
         public void onSerialError(String message) {}
+
         public void onWaitingForTestTag() {}
+
         public void onTestTagReadSuccess(String tagContent) {}
     };
-    private enum State { IDLE, TESTING }
     private State state = State.IDLE;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
-
     public ConnectionController(SerialService serialService) {
         this.serialService = serialService;
     }
@@ -72,8 +75,7 @@ public class ConnectionController {
                 viewListener.onTestTagReadSuccess(tagContent);
             } else if (parts[2].equals(RfidConstants.RES_ERR)) {
                 if (parts[3].equals(RfidConstants.ERR_NO_TAG))
-                    viewListener.onSerialError(
-                            "Nenhuma Tag detectada a tempo. Tente novamente.");
+                    viewListener.onSerialError("Nenhuma Tag detectada a tempo. Tente novamente.");
                 else
                     viewListener.onSerialError("Erro na leitura da tag de teste: " + parts[3]);
             }
@@ -88,11 +90,21 @@ public class ConnectionController {
         serialService.setSimulationMode(active);
     }
 
+    private enum State {
+        IDLE,
+        TESTING
+    }
+
     public interface ConnectionViewListener {
+
         void onSerialConnected();
+
         void onSerialDisconnected();
+
         void onSerialError(String message);
+
         void onWaitingForTestTag();
+
         void onTestTagReadSuccess(String tagContent);
     }
 }

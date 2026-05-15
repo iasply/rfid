@@ -5,8 +5,8 @@ import com.cattlerfid.controller.ConnectionController;
 import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.SerialService;
-import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.util.DebounceUtil;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -25,8 +25,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     private JButton disconnectButton;
     private JButton testReadButton;
 
-    public ConnectionPanel(ConnectionController controller, AuthenticationService authService,
-            ApiConfig apiConfig, NavigationManager navManager) {
+    public ConnectionPanel(ConnectionController controller, AuthenticationService authService, ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.authService = authService;
         this.apiConfig = apiConfig;
@@ -188,14 +187,11 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     @Override
     public void onTestTagReadSuccess(String tagContent) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    "Teste concluído com sucesso!\nConteúdo Lido: " + tagContent + "\nAvançando para o Login.",
-                    "Hardware Validado", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Teste concluído com sucesso!\nConteúdo Lido: " + tagContent + "\nAvançando para o Login.", "Hardware Validado", JOptionPane.INFORMATION_MESSAGE);
 
             controller.detachSerial();
 
-            LoginController loginController = new LoginController(authService,
-                    controller.getSerialService());
+            LoginController loginController = new LoginController(authService, controller.getSerialService());
             LoginPanel loginPanel = new LoginPanel(loginController, apiConfig, navManager);
 
             navManager.showPanel("Login", loginPanel);

@@ -17,8 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Real integration test hitting the PHP API.
- * Requires the Laravel server to be running at http://127.0.0.1:8000
+ * Real integration test hitting the PHP API. Requires the Laravel server to be running at http://127.0.0.1:8000
  */
 @Tag("integration")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

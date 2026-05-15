@@ -122,7 +122,8 @@ public class SerialService {
     }
 
     public boolean isOpen() {
-        if (simulationMode) return true;
+        if (simulationMode)
+            return true;
         SerialPort port = activePort;
         return port != null && port.isOpen();
     }
@@ -152,10 +153,12 @@ public class SerialService {
             return;
         }
         appendLog("OUT", command.trim() + (simulationMode ? " (Simulado)" : ""));
-        if (simulationMode) return;
+        if (simulationMode)
+            return;
 
         OutputStream out = outputStream;
-        if (out == null) return;
+        if (out == null)
+            return;
         try {
             out.write(command.getBytes());
             out.flush();
@@ -166,6 +169,7 @@ public class SerialService {
 
     private void setupListener() {
         activePort.addDataListener(new SerialPortDataListener() {
+
             @Override
             public int getListeningEvents() {
                 return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
@@ -176,15 +180,18 @@ public class SerialService {
                 if (event.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE)
                     return;
                 SerialPort port = activePort;
-                if (port == null) return;
+                if (port == null)
+                    return;
                 try {
                     int available = port.bytesAvailable();
-                    if (available <= 0) return;
+                    if (available <= 0)
+                        return;
                     byte[] newData = new byte[available];
                     int numRead = port.readBytes(newData, newData.length);
                     for (int i = 0; i < numRead; i++) {
                         char c = (char) newData[i];
-                        if (c == '\r' || c == '\n') continue;
+                        if (c == '\r' || c == '\n')
+                            continue;
 
                         messageBuffer.append(c);
 
@@ -196,8 +203,7 @@ public class SerialService {
                                 appendLog("IN", message);
                                 int startIdx = message.indexOf('<');
                                 if (startIdx != -1 && message.endsWith(">")) {
-                                    String cleanMessage = message.substring(startIdx + 1,
-                                            message.length() - 1);
+                                    String cleanMessage = message.substring(startIdx + 1, message.length() - 1);
                                     for (Consumer<String> listener : messageListeners) {
                                         listener.accept(cleanMessage);
                                     }

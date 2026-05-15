@@ -39,8 +39,7 @@ class CattleTest {
     @Test
     void testCattleDeserializationWithVaccinesCount() {
         String tag = RfidGenerator.generateCattleTag();
-        String json = "{\"rfid_tag\":\"" + tag
-                + "\",\"name\":\"Boi Bandido\",\"weight\":450.5,\"registration_date\":\"2026-03-07\",\"vaccines_count\":5}";
+        String json = "{\"rfid_tag\":\"" + tag + "\",\"name\":\"Boi Bandido\",\"weight\":450.5,\"registration_date\":\"2026-03-07\",\"vaccines_count\":5}";
         com.google.gson.Gson gson = new com.google.gson.Gson();
         Cattle cattle = gson.fromJson(json, Cattle.class);
 

@@ -55,8 +55,7 @@ public class AuthenticationServiceTest {
         String successJson = "{\"user\": {\"id\": 1, \"name\": \"Dr. Vet\", \"is_veterinarian\": true}, \"access_token\": \"token123\"}";
 
         when(apiConfig.getWorkstationHash()).thenReturn(workstation);
-        when(apiClient.newRequestBuilder(anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newRequestBuilder(anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(successJson);
@@ -73,8 +72,7 @@ public class AuthenticationServiceTest {
     @DisplayName("Should return empty when login fails")
     void should_return_empty_when_login_fails() throws IOException, InterruptedException {
         when(apiConfig.getWorkstationHash()).thenReturn("hash");
-        when(apiClient.newRequestBuilder(anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newRequestBuilder(anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(401);
 

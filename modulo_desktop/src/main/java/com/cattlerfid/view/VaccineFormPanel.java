@@ -29,9 +29,7 @@ public class VaccineFormPanel extends JPanel {
     private JTextField weightField;
     private JButton submitButton;
 
-    public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser,
-            NavigationManager navManager, MainPanel parentMainPanel,
-            List<VaccineType> vaccineTypes) {
+    public VaccineFormPanel(Cattle cattle, CattleController controller, User loggedUser, NavigationManager navManager, MainPanel parentMainPanel, List<VaccineType> vaccineTypes) {
         this.cattle = cattle;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -50,8 +48,7 @@ public class VaccineFormPanel extends JPanel {
         headerPanel.setBackground(UIStyles.BACKGROUND);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel titleLabel = UIStyles.createTitleLabel(
-                "Registro de Vacinação - " + cattle.getRfidTag());
+        JLabel titleLabel = UIStyles.createTitleLabel("Registro de Vacinação - " + cattle.getRfidTag());
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
@@ -73,8 +70,7 @@ public class VaccineFormPanel extends JPanel {
         addRow(cardPanel, gbc, 0, "Tag RFID:", makeReadonlyField(cattle.getRfidTag()));
 
         // Nome
-        addRow(cardPanel, gbc, 1, "Nome do Animal:",
-                makeReadonlyField(cattle.getName() != null ? cattle.getName() : ""));
+        addRow(cardPanel, gbc, 1, "Nome do Animal:", makeReadonlyField(cattle.getName() != null ? cattle.getName() : ""));
 
         // Veterinário
         addRow(cardPanel, gbc, 2, "Veterinário:", makeReadonlyField(loggedUser.getName()));
@@ -107,8 +103,7 @@ public class VaccineFormPanel extends JPanel {
         cardPanel.add(wLabel, gbc);
 
         gbc.gridx = 1;
-        weightField = new JTextField(
-                cattle.getWeight() > 0 ? String.valueOf(cattle.getWeight()) : "");
+        weightField = new JTextField(cattle.getWeight() > 0 ? String.valueOf(cattle.getWeight()) : "");
         weightField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(weightField, gbc);
 
@@ -120,8 +115,7 @@ public class VaccineFormPanel extends JPanel {
         cardPanel.add(dLabel, gbc);
 
         gbc.gridx = 1;
-        dateField = new JTextField(
-                LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        dateField = new JTextField(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         dateField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(dateField, gbc);
 
@@ -151,8 +145,7 @@ public class VaccineFormPanel extends JPanel {
         return f;
     }
 
-    private void addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText,
-            JComponent field) {
+    private void addRow(JPanel panel, GridBagConstraints gbc, int row, String labelText, JComponent field) {
         gbc.gridx = 0;
         gbc.gridy = row;
         JLabel label = new JLabel(labelText);
@@ -166,8 +159,7 @@ public class VaccineFormPanel extends JPanel {
         try {
             VaccineType selectedType = (VaccineType) vaccineTypeCombo.getSelectedItem();
             if (selectedType == null) {
-                JOptionPane.showMessageDialog(this, "Selecione um tipo de vacina.", "Aviso",
-                        JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Selecione um tipo de vacina.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -176,13 +168,11 @@ public class VaccineFormPanel extends JPanel {
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
             if (weight < 0 || weight > 2000) {
-                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
-                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.", "Peso inválido", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            LocalDate date = LocalDate.parse(dateField.getText().trim(),
-                    DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDate date = LocalDate.parse(dateField.getText().trim(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
             Vaccine v = new Vaccine();
             v.setRfidTag(cattle.getRfidTag());
@@ -194,12 +184,9 @@ public class VaccineFormPanel extends JPanel {
             navManager.showPanel("Main", parentMainPanel);
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
-                    "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, "Data inválida. Use formato DD/MM/AAAA.", "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Data inválida. Use formato DD/MM/AAAA.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

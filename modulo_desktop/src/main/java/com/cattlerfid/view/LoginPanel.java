@@ -7,8 +7,8 @@ import com.cattlerfid.controller.LoginController;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.AuthenticationService;
 import com.cattlerfid.service.CattleApiService;
-import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.util.DebounceUtil;
+import com.cattlerfid.util.RfidConstants;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -23,8 +23,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private JLabel statusLabel;
     private JButton readCardButton;
 
-    public LoginPanel(LoginController controller, ApiConfig apiConfig,
-            NavigationManager navManager) {
+    public LoginPanel(LoginController controller, ApiConfig apiConfig, NavigationManager navManager) {
         this.controller = controller;
         this.apiConfig = apiConfig;
         this.navManager = navManager;
@@ -55,10 +54,8 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             controller.getSerialService().disconnect();
 
             AuthenticationService authService = new AuthenticationService(apiConfig);
-            ConnectionController connController = new ConnectionController(
-                    controller.getSerialService());
-            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig,
-                    navManager);
+            ConnectionController connController = new ConnectionController(controller.getSerialService());
+            ConnectionPanel connPanel = new ConnectionPanel(connController, authService, apiConfig, navManager);
             navManager.showPanel("Connection", connPanel);
         }, DebounceUtil.NAV_MS));
         headerPanel.add(backButton, BorderLayout.WEST);
@@ -104,9 +101,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     @Override
     public void onLoginSuccess(User user) {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    "Bem-vindo(a), " + user.getName() + "!",
-                    "Acesso Liberado", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Bem-vindo(a), " + user.getName() + "!", "Acesso Liberado", JOptionPane.INFORMATION_MESSAGE);
 
             // Sucesso! Esconde esta tela e abre a MainPanel
             controller.detachSerial();
@@ -118,8 +113,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
 
             // Instancia o repositorio e controller global do sistema
             CattleApiService apiService = new CattleApiService(apiConfig, user);
-            CattleController cattleController = new CattleController(
-                    apiService, controller.getSerialService());
+            CattleController cattleController = new CattleController(apiService, controller.getSerialService());
 
             MainPanel mainPanel = new MainPanel(user, cattleController, navManager, apiConfig);
             navManager.showPanel("Main", mainPanel);
@@ -133,8 +127,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
             readCardButton.setText("Aproximar Crachá (READ)");
             statusLabel.setText(message);
             statusLabel.setForeground(Color.RED);
-            JOptionPane.showMessageDialog(this, message, "Erro de Login",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Erro de Login", JOptionPane.ERROR_MESSAGE);
         });
     }
 
@@ -152,8 +145,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText(message);
             statusLabel.setForeground(Color.RED);
-            JOptionPane.showMessageDialog(this, message, "Erro da Porta",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message, "Erro da Porta", JOptionPane.ERROR_MESSAGE);
         });
     }
 

@@ -15,11 +15,17 @@ public class CattleController {
     private final SerialService serialService;
 
     private CattleViewListener viewListener = new CattleViewListener() {
-        public void onRfidReadSuccess(Cattle cattle ) {}
+
+        public void onRfidReadSuccess(Cattle cattle) {}
+
         public void onRfidReadError(String message) {}
+
         public void onRfidWriteSuccess() {}
+
         public void onRfidWriteError(String message) {}
+
         public void onApiSaveSuccess() {}
+
         public void onApiSaveError(String message) {}
     };
     private Cattle currentEditingCattle;
@@ -74,8 +80,7 @@ public class CattleController {
         }
     }
 
-    public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle,
-            double currentWeight) {
+    public void saveVaccineData(com.cattlerfid.model.Vaccine vaccine, Cattle cattle, double currentWeight) {
         boolean vaccineSuccess = apiService.saveVaccine(vaccine);
 
         if (vaccineSuccess) {
@@ -100,8 +105,7 @@ public class CattleController {
                     if (pendingWriteData != null) {
                         if (RfidGenerator.isVetTag(readTag)) {
                             pendingWriteData = null;
-                            viewListener.onRfidWriteError(
-                                    "Bloqueado: Não é permitido sobrescrever uma Tag de Usuário.");
+                            viewListener.onRfidWriteError("Bloqueado: Não é permitido sobrescrever uma Tag de Usuário.");
                         } else {
                             serialService.requestWrite(RfidConstants.ID_CATTLE, pendingWriteData);
                             pendingWriteData = null;
@@ -118,15 +122,13 @@ public class CattleController {
                     if (cmdError.equals(RfidConstants.ERR_NO_TAG)) {
                         viewListener.onRfidWriteError("Nenhuma Tag detectada para gravação.");
                     } else {
-                        viewListener.onRfidWriteError(
-                                "Erro de leitura antes de gravar: " + cmdError);
+                        viewListener.onRfidWriteError("Erro de leitura antes de gravar: " + cmdError);
                     }
                     return;
                 }
 
                 if (cmdError.equals(RfidConstants.ERR_WRITE_FAILED)) {
-                    viewListener.onRfidWriteError(
-                            "Erro no barramento SPI ao gravar dados na Tag.");
+                    viewListener.onRfidWriteError("Erro no barramento SPI ao gravar dados na Tag.");
                 } else if (cmdError.equals(RfidConstants.ERR_NO_TAG)) {
                     viewListener.onRfidReadError("Nenhuma Tag detectada.");
                 } else if (cmdError.equals(RfidConstants.ERR_AUTH)) {
@@ -141,11 +143,9 @@ public class CattleController {
     private void processTagRead(String rfidTag) {
         if (!RfidGenerator.isCattleTag(rfidTag)) {
             if (RfidGenerator.isVetTag(rfidTag)) {
-                viewListener.onRfidReadError(
-                        "Atenção: Você leu uma Tag de Usuário (Veterinário) ao invés de um Animal.");
+                viewListener.onRfidReadError("Atenção: Você leu uma Tag de Usuário (Veterinário) ao invés de um Animal.");
             } else {
-                viewListener.onRfidReadError(
-                        "Formato de Tag animal inválido ou inválida para o sistema. Lido: " + rfidTag);
+                viewListener.onRfidReadError("Formato de Tag animal inválido ou inválida para o sistema. Lido: " + rfidTag);
             }
             return;
         }
@@ -156,8 +156,7 @@ public class CattleController {
             currentEditingCattle = existing.get();
             viewListener.onRfidReadSuccess(currentEditingCattle);
         } else {
-            viewListener.onRfidReadError(
-                    "Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
+            viewListener.onRfidReadError("Animal não encontrado na base de dados. Por favor, cadastre-o primeiro.");
         }
     }
 
@@ -174,11 +173,17 @@ public class CattleController {
     }
 
     public interface CattleViewListener {
+
         void onRfidReadSuccess(Cattle cattle);
+
         void onRfidReadError(String message);
+
         void onRfidWriteSuccess();
+
         void onRfidWriteError(String message);
+
         void onApiSaveSuccess();
+
         void onApiSaveError(String message);
     }
 }

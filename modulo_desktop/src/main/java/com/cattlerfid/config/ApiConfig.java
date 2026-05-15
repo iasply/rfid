@@ -52,8 +52,7 @@ public class ApiConfig {
                 }
             }
         } catch (IOException e) {
-            System.err.println(
-                    "[ApiConfig] .env file not found — using defaults. Error: " + e.getMessage());
+            System.err.println("[ApiConfig] .env file not found — using defaults. Error: " + e.getMessage());
         }
         return map;
     }

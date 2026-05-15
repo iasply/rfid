@@ -5,8 +5,8 @@ import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.PagedResult;
 import com.cattlerfid.model.User;
 import com.cattlerfid.service.CattleApiService;
-import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.util.DateUtils;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -35,9 +35,7 @@ public class CattleListPanel extends JPanel {
     private JLabel pageLabel;
     private JButton editButton;
 
-    public CattleListPanel(CattleApiService apiService,
-            CattleController controller,
-            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+    public CattleListPanel(CattleApiService apiService, CattleController controller, User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.apiService = apiService;
         this.controller = controller;
         this.loggedUser = loggedUser;
@@ -66,8 +64,9 @@ public class CattleListPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // ── Table ────────────────────────────────────────────────────────────────────
-        String[] columnNames = {"Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas"};
+        String[] columnNames = { "Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas" };
         tableModel = new DefaultTableModel(columnNames, 0) {
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -84,9 +83,9 @@ public class CattleListPanel extends JPanel {
         table.getTableHeader().setForeground(Color.WHITE);
 
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (!isSelected) {
                     c.setBackground(row % 2 == 0 ? Color.WHITE : UIStyles.BACKGROUND);
@@ -169,6 +168,7 @@ public class CattleListPanel extends JPanel {
         pageLabel.setText("Carregando…");
 
         new SwingWorker<PagedResult<Cattle>, Void>() {
+
             @Override
             protected PagedResult<Cattle> doInBackground() {
                 return apiService.getCattleWithVaccinesPaginated(page);
@@ -184,15 +184,8 @@ public class CattleListPanel extends JPanel {
 
                     tableModel.setRowCount(0);
                     for (Cattle c : result.getData()) {
-                        String dateStr = c.getRegistrationDate() != null
-                            ? DateUtils.toDisplayDate(c.getRegistrationDate()) : "N/A";
-                        tableModel.addRow(new Object[]{
-                                c.getRfidTag(),
-                                c.getName(),
-                                c.getWeight(),
-                                dateStr,
-                                c.getVaccinesCount()
-                        });
+                        String dateStr = c.getRegistrationDate() != null ? DateUtils.toDisplayDate(c.getRegistrationDate()) : "N/A";
+                        tableModel.addRow(new Object[] { c.getRfidTag(), c.getName(), c.getWeight(), dateStr, c.getVaccinesCount() });
                     }
 
                     updatePaginationControls();
@@ -218,8 +211,7 @@ public class CattleListPanel extends JPanel {
     private void openEditDialog() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, "Selecione um animal na lista para editar.",
-                    "Nenhum animal selecionado", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Selecione um animal na lista para editar.", "Nenhum animal selecionado", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -228,12 +220,10 @@ public class CattleListPanel extends JPanel {
 
         if (targetOpt.isPresent()) {
             Cattle target = targetOpt.get();
-            CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser,
-                    navManager, parentMainPanel);
+            CattleFormPanel form = new CattleFormPanel(target, false, true, controller, loggedUser, navManager, parentMainPanel);
             navManager.showPanel("EditCattle", form);
         } else {
-            JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.",
-                    "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erro: Animal não encontrado na base de dados.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

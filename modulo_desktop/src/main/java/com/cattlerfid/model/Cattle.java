@@ -3,10 +3,10 @@ package com.cattlerfid.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Represents a Cattle animal.
- * Matches CattleResponse DTO fields.
+ * Represents a Cattle animal. Matches CattleResponse DTO fields.
  */
 public class Cattle {
+
     private int id;
 
     @SerializedName("rfid_tag")

@@ -1,7 +1,7 @@
 package com.cattlerfid.view;
 
-import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.service.SerialService;
+import com.cattlerfid.util.DebounceUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -95,8 +95,7 @@ public class SerialLogFrame extends JFrame {
             JButton simWriteErrButton = new JButton("Simular Erro Gravação");
 
             simWriteOkButton.addActionListener(DebounceUtil.debounce(e -> serialService.injectMessage("WRITE:OK")));
-            simWriteErrButton.addActionListener(DebounceUtil.debounce(
-                    e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU")));
+            simWriteErrButton.addActionListener(DebounceUtil.debounce(e -> serialService.injectMessage("WRITE:ERR:GRAVACAO_FALHOU")));
 
             writeSimPanel.add(simWriteOkButton);
             writeSimPanel.add(simWriteErrButton);

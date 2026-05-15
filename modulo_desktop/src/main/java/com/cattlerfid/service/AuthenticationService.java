@@ -11,7 +11,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-
 public class AuthenticationService {
 
     private final ApiClient client;
@@ -30,8 +29,7 @@ public class AuthenticationService {
         }
 
         if (!RfidGenerator.isVetTag(rawRfidTag)) {
-            System.err.println(
-                    "[AuthenticationService] Invalid RFID tag for vet login: " + rawRfidTag);
+            System.err.println("[AuthenticationService] Invalid RFID tag for vet login: " + rawRfidTag);
             return Optional.empty();
         }
 
@@ -43,9 +41,7 @@ public class AuthenticationService {
 
         String body = client.getGson().toJson(new LoginRequest(workstationHash, rawRfidTag));
 
-        HttpRequest request = client.newRequestBuilder("/login")
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
+        HttpRequest request = client.newRequestBuilder("/login").POST(HttpRequest.BodyPublishers.ofString(body)).build();
 
         try {
             HttpResponse<String> response = client.send(request);
@@ -57,8 +53,7 @@ public class AuthenticationService {
                 return Optional.of(user);
             }
 
-            System.err.println(
-                    "[AuthenticationService] Login refused. Status: " + response.statusCode());
+            System.err.println("[AuthenticationService] Login refused. Status: " + response.statusCode());
             return Optional.empty();
 
         } catch (IOException | InterruptedException e) {
@@ -74,14 +69,11 @@ public class AuthenticationService {
             return;
         }
 
-        HttpRequest request = client.newAuthenticatedRequestBuilder("/logout", token)
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
+        HttpRequest request = client.newAuthenticatedRequestBuilder("/logout", token).POST(HttpRequest.BodyPublishers.noBody()).build();
 
         // Fire and forget logout
         client.sendAsync(request);
     }
 
-    private record LoginRequest(String workstation, String tag) {
-    }
+    private record LoginRequest(String workstation, String tag) {}
 }

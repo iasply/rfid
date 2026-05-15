@@ -37,23 +37,18 @@ public class ApiClient {
 
     public CompletableFuture<HttpResponse<String>> sendAsync(HttpRequest request) {
         logRequest(request);
-        return http.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    logResponse(response);
-                    return response;
-                });
+        return http.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
+            logResponse(response);
+            return response;
+        });
     }
 
     public HttpRequest.Builder newRequestBuilder(String path) {
-        return HttpRequest.newBuilder()
-                .uri(java.net.URI.create(config.url(path)))
-                .header("Content-Type", "application/json")
-                .header("Accept", "application/json");
+        return HttpRequest.newBuilder().uri(java.net.URI.create(config.url(path))).header("Content-Type", "application/json").header("Accept", "application/json");
     }
 
     public HttpRequest.Builder newAuthenticatedRequestBuilder(String path, String token) {
-        return newRequestBuilder(path)
-                .header("Authorization", "Bearer " + token);
+        return newRequestBuilder(path).header("Authorization", "Bearer " + token);
     }
 
     public Gson getGson() {
@@ -70,8 +65,7 @@ public class ApiClient {
         String headers = request.headers().map().toString();
 
         if (headers.contains("Authorization=[Bearer ")) {
-            headers = headers.replaceAll("Authorization=\\[Bearer [^\\]]+\\]",
-                    "Authorization=[Bearer ********]");
+            headers = headers.replaceAll("Authorization=\\[Bearer [^\\]]+\\]", "Authorization=[Bearer ********]");
         }
 
         System.out.println("\n[API REQUEST]");
@@ -80,9 +74,9 @@ public class ApiClient {
         System.out.println("Headers: " + headers);
 
         request.bodyPublisher().ifPresent(publisher -> {
-            java.net.http.HttpResponse.BodySubscriber<String> subscriber = java.net.http.HttpResponse.BodySubscribers.ofString(
-                    java.nio.charset.StandardCharsets.UTF_8);
+            java.net.http.HttpResponse.BodySubscriber<String> subscriber = java.net.http.HttpResponse.BodySubscribers.ofString(java.nio.charset.StandardCharsets.UTF_8);
             publisher.subscribe(new java.util.concurrent.Flow.Subscriber<java.nio.ByteBuffer>() {
+
                 @Override
                 public void onSubscribe(java.util.concurrent.Flow.Subscription s) {
                     s.request(Long.MAX_VALUE);

@@ -75,8 +75,6 @@ public class UIStyles {
      * Applies a clean shadow/card border to a panel.
      */
     public static Border createCardBorder() {
-        return BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
-                BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true), BorderFactory.createEmptyBorder(20, 20, 20, 20));
     }
 }

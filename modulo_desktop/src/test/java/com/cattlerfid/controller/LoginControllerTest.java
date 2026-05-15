@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -77,8 +75,7 @@ class LoginControllerTest {
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
-        verify(viewListenerMock).onLoginError(
-                "Acesso Negado: Tag não cadastrada como funcionário VET.");
+        verify(viewListenerMock).onLoginError("Acesso Negado: Tag não cadastrada como funcionário VET.");
         assertNull(controller.getLoggedUser());
     }
 
@@ -88,9 +85,7 @@ class LoginControllerTest {
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 
-        verify(viewListenerMock)
-                .onLoginError(
-                        "Tag RFID inválida para Login (Veterinário). Lido: 'UNKNOWN12345678'");
+        verify(viewListenerMock).onLoginError("Tag RFID inválida para Login (Veterinário). Lido: 'UNKNOWN12345678'");
         assertNull(controller.getLoggedUser());
         verify(authServiceMock, never()).authenticateByTag(any());
     }
@@ -173,8 +168,7 @@ class LoginControllerTest {
         LoginController noListenerController = new LoginController(authServiceMock, serialServiceMock);
         when(serialServiceMock.isOpen()).thenReturn(false);
 
-        assertDoesNotThrow(noListenerController::requestCardLogin,
-                "Controller without viewListener must not throw NPE");
+        assertDoesNotThrow(noListenerController::requestCardLogin, "Controller without viewListener must not throw NPE");
     }
 
     @Test
@@ -182,7 +176,6 @@ class LoginControllerTest {
         LoginController noListenerController = new LoginController(authServiceMock, serialServiceMock);
         String msg = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_ERR + ":" + RfidConstants.ERR_NO_TAG + ":FW:00";
 
-        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg),
-                "handleIncomingSerialMessage without viewListener must not throw NPE");
+        assertDoesNotThrow(() -> noListenerController.handleIncomingSerialMessage(msg), "handleIncomingSerialMessage without viewListener must not throw NPE");
     }
 }

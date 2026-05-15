@@ -11,6 +11,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.*;
 
 public class Main {
+
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
@@ -26,8 +27,7 @@ public class Main {
             ConnectionController connectionController = new ConnectionController(serialService);
 
             ApplicationFrame appFrame = new ApplicationFrame();
-            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService,
-                    apiConfig, appFrame);
+            ConnectionPanel connectionPanel = new ConnectionPanel(connectionController, authService, apiConfig, appFrame);
 
             appFrame.setVisible(true);
             appFrame.showPanel("Connection", connectionPanel);

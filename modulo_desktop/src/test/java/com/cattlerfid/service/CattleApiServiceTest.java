@@ -1,10 +1,7 @@
 package com.cattlerfid.service;
 
 import com.cattlerfid.config.ApiClient;
-import com.cattlerfid.model.Cattle;
-import com.cattlerfid.model.User;
-import com.cattlerfid.model.Vaccine;
-import com.cattlerfid.model.VaccineType;
+import com.cattlerfid.model.*;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import com.cattlerfid.model.PagedResult;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,8 +48,7 @@ public class CattleApiServiceTest {
         String tag = "C001";
         String json = "{\"rfid_tag\":\"C001\",\"name\":\"Mimosa\"}";
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(json);
@@ -69,8 +64,7 @@ public class CattleApiServiceTest {
     void should_return_all_cattle() throws IOException, InterruptedException {
         String json = "{\"data\": [{\"rfid_tag\":\"C001\"}, {\"rfid_tag\":\"C002\"}]}";
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(json);
@@ -85,8 +79,7 @@ public class CattleApiServiceTest {
     void should_save_cattle_successfully() throws IOException, InterruptedException {
         Cattle cattle = new Cattle("C001", "Mimosa", 400.0, "2024-03-14");
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(201);
 
@@ -102,8 +95,7 @@ public class CattleApiServiceTest {
         vaccine.setRfidTag("C001");
         vaccine.setVaccineTypeId(1L);
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(201);
 
@@ -115,14 +107,11 @@ public class CattleApiServiceTest {
     @Test
     @DisplayName("Should parse paginated cattle using meta object from Laravel ResourceCollection")
     void should_parse_paginated_cattle_from_meta() throws IOException, InterruptedException {
-        String json = "{"
-                + "\"data\":[{\"rfid_tag\":\"C001\",\"name\":\"Mimosa\",\"weight\":400.0,\"registration_date\":\"2024-01-15\",\"vaccines_count\":2}],"
+        String json = "{" + "\"data\":[{\"rfid_tag\":\"C001\",\"name\":\"Mimosa\",\"weight\":400.0,\"registration_date\":\"2024-01-15\",\"vaccines_count\":2}],"
                 + "\"links\":{\"first\":\"http://test.com?page=1\",\"last\":\"http://test.com?page=3\",\"prev\":null,\"next\":\"http://test.com?page=2\"},"
-                + "\"meta\":{\"current_page\":1,\"from\":1,\"last_page\":3,\"per_page\":15,\"to\":15,\"total\":42}"
-                + "}";
+                + "\"meta\":{\"current_page\":1,\"from\":1,\"last_page\":3,\"per_page\":15,\"to\":15,\"total\":42}" + "}";
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(json);
@@ -142,8 +131,7 @@ public class CattleApiServiceTest {
     void should_fetch_vaccine_types_successfully() throws IOException, InterruptedException {
         String json = "{\"data\": [{\"id\":1,\"name\":\"Febre Aftosa\",\"interval_days\":180}, {\"id\":2,\"name\":\"Brucelose\",\"interval_days\":365}]}";
 
-        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(
-                HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
+        when(apiClient.newAuthenticatedRequestBuilder(anyString(), anyString())).thenReturn(HttpRequest.newBuilder().uri(java.net.URI.create("http://test.com")));
         when(apiClient.send(any(HttpRequest.class))).thenReturn(httpResponse);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpResponse.body()).thenReturn(json);

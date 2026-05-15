@@ -3,8 +3,8 @@ package com.cattlerfid.view;
 import com.cattlerfid.controller.CattleController;
 import com.cattlerfid.model.Cattle;
 import com.cattlerfid.model.User;
-import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.util.DateUtils;
+import com.cattlerfid.util.DebounceUtil;
 import com.cattlerfid.view.utils.UIStyles;
 
 import javax.swing.*;
@@ -27,9 +27,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
     private JButton writeTagButton;
     private JButton saveDbButton;
 
-    public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual,
-            CattleController controller,
-            User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
+    public CattleFormPanel(Cattle cattle, boolean isNew, boolean isManual, CattleController controller, User loggedUser, NavigationManager navManager, MainPanel parentMainPanel) {
         this.cattle = cattle;
         this.isNew = isNew;
         this.isManual = isManual;
@@ -52,17 +50,12 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         headerPanel.setBackground(UIStyles.BACKGROUND);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel titleLabel = UIStyles.createTitleLabel(
-                isNew ? "Novo Cadastro de Animal" : "Editando Animal");
+        JLabel titleLabel = UIStyles.createTitleLabel(isNew ? "Novo Cadastro de Animal" : "Editando Animal");
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
         backButton.setPreferredSize(new Dimension(100, 30));
         backButton.addActionListener(DebounceUtil.debounce(e -> {
-            // Aborta edição e volta
-            if (parentMainPanel != null) {
-                parentMainPanel.setActiveCattleForm(null); // Clear ref
-            }
             navManager.showPanel("Main", parentMainPanel);
         }, DebounceUtil.NAV_MS));
         headerPanel.add(backButton, BorderLayout.WEST);
@@ -194,8 +187,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
             if (weight < 0 || weight > 2000) {
-                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
-                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.", "Peso inválido", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -207,8 +199,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
             controller.requestWriteTag(cattle.getRfidTag());
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
-                    "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -219,8 +210,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
                 weight = Double.parseDouble(weightField.getText().replace(",", "."));
             }
             if (weight < 0 || weight > 2000) {
-                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.",
-                        "Peso inválido", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Peso deve estar entre 0 e 2000 kg.", "Peso inválido", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -230,8 +220,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
             controller.saveCattleData(cattle);
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.",
-                    "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Peso inválido. Use formato número decimal.", "Erro de Digitação", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -247,9 +236,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
 
     @Override
     public void onRfidReadError(String message) {
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(this, message, "Aviso RFID",
-                        JOptionPane.WARNING_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, message, "Aviso RFID", JOptionPane.WARNING_MESSAGE));
     }
 
     @Override
@@ -268,25 +255,20 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         SwingUtilities.invokeLater(() -> {
             writeTagButton.setEnabled(true);
             writeTagButton.setText("Tentar Gravar Tag Novamente");
-            JOptionPane.showMessageDialog(this,
-                    message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.",
-                    "Erro ao Gravar RFID", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, message + "\nPosicione a TAG sob o leitor corretamente e tente novamente.", "Erro ao Gravar RFID", JOptionPane.ERROR_MESSAGE);
         });
     }
 
     @Override
     public void onApiSaveSuccess() {
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!",
-                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Registro concluído e salvo no servidor!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             navigateBack();
         });
     }
 
     @Override
     public void onApiSaveError(String message) {
-        SwingUtilities.invokeLater(() ->
-                JOptionPane.showMessageDialog(this, message, "Erro Base de Dados",
-                        JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(this, message, "Erro Base de Dados", JOptionPane.ERROR_MESSAGE));
     }
 }
