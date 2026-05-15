@@ -16,5 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            if (! $request->expectsJson()) {
+                return redirect()->route('login')
+                    ->with('error', 'Sua sessão expirou. Por favor, faça login novamente.');
+            }
+        });
     })->create();

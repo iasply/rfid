@@ -15,7 +15,36 @@ test.describe('Login Flow', () => {
         // After login, we expect to be redirected to the dashboard
         await expect(page).toHaveURL(/\/admin\/dashboard/);
         // Check for some element that confirms we are on the dashboard
-        await expect(page.locator('body')).toContainText('Resumo do Sistema');
+        await expect(page.locator('body')).toContainText('Painel de Controle');
+    });
+
+    test('should logout and allow login again without 419', async ({page}) => {
+        await loginPage.login('admin@cattlerfid.com', 'admin123');
+        await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+        // Click the sidebar logout button (first "Sair do Sistema" on desktop)
+        await page.getByRole('button', {name: 'Sair do Sistema'}).first().click();
+
+        // Should redirect back to login
+        await expect(page).toHaveURL(/\/login/);
+        await expect(loginPage.submitButton).toBeVisible();
+
+        // Login again — must not hit 419
+        await loginPage.login('admin@cattlerfid.com', 'admin123');
+        await expect(page).toHaveURL(/\/admin\/dashboard/);
+        await expect(page.locator('body')).toContainText('Painel de Controle');
+    });
+
+    test('should redirect to dashboard when already logged in navigates to /login', async ({page}) => {
+        await loginPage.login('admin@cattlerfid.com', 'admin123');
+        await expect(page).toHaveURL(/\/admin\/dashboard/);
+
+        // Navigate directly to /login while already authenticated
+        await page.goto('/login');
+
+        // Must redirect to dashboard — no 419, no login form
+        await expect(page).toHaveURL(/\/admin\/dashboard/);
+        await expect(page.locator('body')).toContainText('Painel de Controle');
     });
 
     test('should show error with invalid credentials', async ({page}) => {

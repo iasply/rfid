@@ -16,7 +16,9 @@ class LoginController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        return view('auth.login');
+        return response()
+            ->view('auth.login')
+            ->header('Cache-Control', 'no-store');
     }
 
     public function login(Request $request)

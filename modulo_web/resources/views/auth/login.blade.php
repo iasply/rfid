@@ -91,7 +91,15 @@
                 <x-input label="Senha" name="password" type="password" required placeholder="••••••••"
                          data-testid="login-password"/>
 
-                @if($errors->any())
+                @if(session('error'))
+                <div
+                    data-testid="login-error"
+                    style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+                            <span style="color: var(--danger); font-size: 0.875rem; font-weight: 600;">
+                                {{ session('error') }}
+                            </span>
+                </div>
+                @elseif($errors->any())
                 <div
                     data-testid="login-error"
                     style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
