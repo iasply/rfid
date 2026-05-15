@@ -11,7 +11,7 @@
 
         <x-input label="E-mail" name="email" type="email" required placeholder="joao@exemplo.com"/>
 
-        <x-input label="Senha de Acesso" name="password" type="password" required/>
+        <x-input label="Senha de Acesso" name="password" type="password" required showToggle="true"/>
 
         <x-button type="submit" fullWidth style="margin-top: 1rem;" data-testid="vet-submit-button">
             Cadastrar Veterinário
