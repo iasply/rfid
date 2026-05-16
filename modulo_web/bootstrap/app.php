@@ -27,6 +27,14 @@ return Application::configure(basePath: dirname(__DIR__))
                         'url'   => $request->fullUrl(),
                         'error' => $sessionError->getMessage(),
                     ]);
+                    try {
+                        $request->session()->regenerateToken();
+                    } catch (\Throwable $tokenError) {
+                        \Illuminate\Support\Facades\Log::error('419: falha ao regenerar token após sessão corrompida', [
+                            'url'   => $request->fullUrl(),
+                            'error' => $tokenError->getMessage(),
+                        ]);
+                    }
                 }
                 return redirect()->route('login')
                     ->with('error', 'Sua sessão expirou. Por favor, faça login novamente.');
