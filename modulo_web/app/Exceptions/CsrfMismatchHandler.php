@@ -23,10 +23,35 @@ class CsrfMismatchHandler
         }
 
         $this->logMismatch($request);
+
+        // Sessão ainda válida (usuário autenticado): regenera o token e
+        // devolve pro dashboard. NÃO desloga — 419 é falha de form, não
+        // motivo pra invalidar uma sessão legítima.
+        if (auth()->check()) {
+            $this->regenerateTokenOnly($request);
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        // Não autenticado: limpa qualquer resíduo e manda pro login fresco.
         $this->cleanupSession($request);
         $this->flashError($request);
-
         return redirect()->route('login');
+    }
+
+    private function regenerateTokenOnly(Request $request): void
+    {
+        try {
+            $request->session()->regenerateToken();
+            Log::info('session: 419 com usuário autenticado — só regeneramos token', [
+                'url'        => $request->fullUrl(),
+                'user_id'    => auth()->id(),
+                'session_id' => $request->session()->getId(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('419: falha ao regenerar token (usuário autenticado)', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     private function isCsrfMismatch(HttpException $e): bool

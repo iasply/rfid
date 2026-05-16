@@ -77,7 +77,7 @@
         </div>
 
         <x-card glass="true" style="padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-            <form action="{{ route('login.post') }}" method="POST">
+            <form id="login-form" action="{{ route('login.post') }}" method="POST">
                 @csrf
 
                 <h2
@@ -111,6 +111,24 @@
         </x-card>
     </div>
 </div>
+<script>
+    // Previne double-submit do form de login (mobile Chrome tende a re-disparar
+    // o submit em double-tap, bfcache, autofill, etc. — gerando 419 com token
+    // stale na segunda submissão).
+    (function () {
+        const form = document.getElementById('login-form');
+        if (!form) return;
+        form.addEventListener('submit', function (e) {
+            if (form.dataset.submitted === '1') {
+                e.preventDefault();
+                return;
+            }
+            form.dataset.submitted = '1';
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = true;
+        });
+    })();
+</script>
 </body>
 
 </html>
