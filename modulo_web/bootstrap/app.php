@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->replace(
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
@@ -22,6 +26,12 @@ return Application::configure(basePath: dirname(__DIR__))
                     auth()->logout();
                     $request->session()->invalidate();
                     $request->session()->regenerateToken();
+                    \Illuminate\Support\Facades\Log::info('session: 419 — logout + invalidate + regenerateToken', [
+                        'url'        => $request->fullUrl(),
+                        'ip'         => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                        'session_id' => $request->session()->getId(),
+                    ]);
                 } catch (\Throwable $sessionError) {
                     \Illuminate\Support\Facades\Log::warning('419: falha ao limpar sessão corrompida', [
                         'url'   => $request->fullUrl(),
