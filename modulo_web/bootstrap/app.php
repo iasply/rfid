@@ -18,7 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
             if (! $request->expectsJson()) {
-                $request->session()->regenerateToken();
+                try {
+                    auth()->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                } catch (\Throwable $sessionError) {
+                    \Illuminate\Support\Facades\Log::warning('419: falha ao limpar sessão corrompida', [
+                        'url'   => $request->fullUrl(),
+                        'error' => $sessionError->getMessage(),
+                    ]);
+                }
                 return redirect()->route('login')
                     ->with('error', 'Sua sessão expirou. Por favor, faça login novamente.');
             }
