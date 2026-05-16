@@ -25,6 +25,22 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
             if (! $request->expectsJson()) {
+                \Illuminate\Support\Facades\Log::warning('419: CSRF token mismatch', [
+                    'request' => [
+                        'url'            => $request->fullUrl(),
+                        'method'         => $request->method(),
+                        'ip'             => $request->ip(),
+                        'user_agent'     => $request->userAgent(),
+                        'header_xcsrf'   => $request->header('X-CSRF-TOKEN'),
+                        'form_token'     => $request->input('_token'),
+                    ],
+                    'session' => [
+                        'id'             => $request->session()->getId(),
+                        'token'          => $request->session()->token(),
+                        'user_id'        => auth()->id(),
+                    ],
+                ]);
+
                 try {
                     auth()->logout();
                     $request->session()->invalidate();
