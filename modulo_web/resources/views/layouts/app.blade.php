@@ -433,6 +433,12 @@
     </main>
 </div>
 @stack('scripts')
+<script>
+    // força reload ao restaurar do bfcache — evita CSRF token stale no mobile
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) window.location.reload();
+    });
+</script>
 </body>
 
 </html>

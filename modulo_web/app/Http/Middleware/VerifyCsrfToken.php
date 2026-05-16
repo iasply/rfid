@@ -13,14 +13,28 @@ class VerifyCsrfToken extends \Illuminate\Foundation\Http\Middleware\VerifyCsrfT
         try {
             return parent::handle($request, $next);
         } catch (TokenMismatchException $e) {
+            $sessionToken   = $request->session()->token();
+            $requestToken   = $this->getTokenFromRequest($request);
+
             Log::warning('419: CSRF token mismatch', [
-                'url'           => $request->fullUrl(),
-                'method'        => $request->method(),
-                'ip'            => $request->ip(),
-                'user_agent'    => $request->userAgent(),
-                'session_token' => $request->session()->token(),
-                'request_token' => $this->getTokenFromRequest($request),
-                'user_id'       => auth()->id(),
+                // o que veio na requisição
+                'request' => [
+                    'url'              => $request->fullUrl(),
+                    'method'           => $request->method(),
+                    'ip'               => $request->ip(),
+                    'user_agent'       => $request->userAgent(),
+                    'header_xcsrf'     => $request->header('X-CSRF-TOKEN'),
+                    'header_xsrf'      => $request->header('X-XSRF-TOKEN'),
+                    'form_token'       => $request->input('_token'),
+                    'resolved_token'   => $requestToken,
+                ],
+                // o que está no banco (sessão)
+                'session' => [
+                    'id'               => $request->session()->getId(),
+                    'token'            => $sessionToken,
+                    'token_match'      => $sessionToken === $requestToken,
+                    'user_id'          => auth()->id(),
+                ],
             ]);
             throw $e;
         }
