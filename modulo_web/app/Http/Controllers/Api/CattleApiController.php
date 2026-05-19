@@ -26,7 +26,7 @@ class CattleApiController extends Controller
 
     public function indexWithVaccines(): JsonResponse
     {
-        $items = Cattle::withCount('vaccines')->paginate(15);
+        $items = Cattle::withCount('vaccines')->orderBy('registration_date', 'desc')->paginate(15);
 
         return response()->json(CattleResource::collection($items)->response()->getData(true));
     }
