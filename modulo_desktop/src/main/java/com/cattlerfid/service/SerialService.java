@@ -17,7 +17,7 @@ public class SerialService {
     private final List<Consumer<String>> messageListeners = new CopyOnWriteArrayList<>();
     private final List<Consumer<String>> logListeners = new CopyOnWriteArrayList<>();
     private final List<String> logHistory = new ArrayList<>();
-    // messageBuffer is only ever accessed from the single jSerialComm callback thread
+
     private final StringBuilder messageBuffer = new StringBuilder();
     private final Object portLock = new Object();
     private volatile SerialPort activePort;

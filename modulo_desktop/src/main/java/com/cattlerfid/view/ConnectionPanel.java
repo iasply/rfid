@@ -37,16 +37,13 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
-        // Panels do not have setTitle, pack, etc.
 
-        // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Header - Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIStyles.PRIMARY_DARK);
         JLabel titleLabel = UIStyles.createTitleLabel("Configuração de Hardware");
-        titleLabel.setForeground(Color.WHITE); // Contrast
+        titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton logButton = new JButton("Ver Logs Serial");
@@ -58,7 +55,6 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
         headerPanel.add(logButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Center Panel (Config e Status)
         JPanel centerPanel = new JPanel(new GridLayout(3, 1, 5, 15));
         centerPanel.setBorder(UIStyles.createCardBorder());
         centerPanel.setBackground(Color.WHITE);
@@ -108,7 +104,6 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
         centerPanel.add(testPanel);
 
-        // Wrapper for true centering
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setBackground(UIStyles.BACKGROUND);
         wrapperPanel.add(centerPanel);
@@ -123,8 +118,6 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
             connectPortButton.setEnabled(false);
             portSelector.setEnabled(false);
 
-            // Operação assíncrona para não freezar a Interface Gráfica com a API Serial
-            // travando em IO
             new Thread(() -> {
                 controller.startSerialConnection(port);
             }).start();
@@ -135,7 +128,7 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
     public void onSerialConnected() {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Arduino Conectado! Faça um teste de leitura.");
-            statusLabel.setForeground(UIStyles.PRIMARY); // Premium Emerald
+            statusLabel.setForeground(UIStyles.PRIMARY);
             connectPortButton.setEnabled(false);
             portSelector.setEnabled(false);
             disconnectButton.setEnabled(true);
@@ -196,7 +189,6 @@ public class ConnectionPanel extends JPanel implements ConnectionController.Conn
 
             navManager.showPanel("Login", loginPanel);
 
-            // Religa o canal Serial ouvindo direto pro LoginController
             loginController.attachToActiveSerial();
         });
     }

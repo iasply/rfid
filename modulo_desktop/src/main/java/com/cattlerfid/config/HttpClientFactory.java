@@ -7,21 +7,11 @@ import java.net.http.HttpClient;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
-/**
- * Factory para criação do HttpClient com suporte a SSL (Incluindo Let's Encrypt). ⚠ Nunca use SSL_TRUST_ALL=true em produção.
- */
 public class HttpClientFactory {
 
     private HttpClientFactory() {
     }
 
-    /**
-     * Cria um HttpClient configurado conforme as flags do {@link ApiConfig}.
-     *
-     * @param config
-     *         configuração da API (lê SSL_TRUST_ALL)
-     * @return HttpClient pronto para uso
-     */
     public static HttpClient create(ApiConfig config) {
         HttpClient.Builder builder = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).followRedirects(HttpClient.Redirect.NORMAL);
 

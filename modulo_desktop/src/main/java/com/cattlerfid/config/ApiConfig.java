@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Configuração carregada do arquivo .env.
- */
 public class ApiConfig {
 
     private static final String ENV_FILE = ".env";
@@ -18,16 +15,10 @@ public class ApiConfig {
     private final boolean trustAllCerts;
     private final String sslDevCertPath;
 
-    /**
-     * Construtor padrão que lê .env.
-     */
     public ApiConfig() {
         this(ENV_FILE);
     }
 
-    /**
-     * Construtor para testes.
-     */
     public ApiConfig(String envFilePath) {
         Map<String, String> env = loadEnv(envFilePath);
         this.baseUrl = env.getOrDefault("API_BASE_URL", "http://127.0.0.1:8000/api");
@@ -65,9 +56,6 @@ public class ApiConfig {
         return workstationHash;
     }
 
-    /**
-     * Verifica se deve confiar em todos os certificados (SSL_TRUST_ALL).
-     */
     public boolean isTrustAllCerts() {
         return trustAllCerts;
     }
@@ -76,9 +64,6 @@ public class ApiConfig {
         return sslDevCertPath;
     }
 
-    /**
-     * Convenience: full URL for a given path (e.g. "/login")
-     */
     public String url(String path) {
         return baseUrl + path;
     }

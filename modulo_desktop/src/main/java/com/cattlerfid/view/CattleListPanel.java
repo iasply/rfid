@@ -49,7 +49,6 @@ public class CattleListPanel extends JPanel {
         setLayout(new BorderLayout(15, 15));
         setBackground(UIStyles.BACKGROUND);
 
-        // ── Header ──────────────────────────────────────────────────────────────────
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(UIStyles.BACKGROUND);
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -63,7 +62,6 @@ public class CattleListPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // ── Table ────────────────────────────────────────────────────────────────────
         String[] columnNames = { "Tag RFID", "Nome/Apelido", "Peso (kg)", "Data Registro", "Vacinas Aplicadas" };
         tableModel = new DefaultTableModel(columnNames, 0) {
 
@@ -104,11 +102,9 @@ public class CattleListPanel extends JPanel {
 
         add(centerWrapper, BorderLayout.CENTER);
 
-        // ── Bottom: pagination + action buttons ──────────────────────────────────────
         JPanel southContainer = new JPanel(new BorderLayout());
         southContainer.setBackground(UIStyles.BACKGROUND);
 
-        // Pagination bar
         JPanel paginationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         paginationPanel.setBackground(UIStyles.BACKGROUND);
 
@@ -132,7 +128,6 @@ public class CattleListPanel extends JPanel {
 
         southContainer.add(paginationPanel, BorderLayout.NORTH);
 
-        // Action buttons bar
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         bottomPanel.setBackground(UIStyles.BACKGROUND);
 

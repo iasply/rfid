@@ -23,17 +23,15 @@ class RfidGeneratorTest {
 
     @Test
     void should_validate_various_tags() {
-        // Valid tags
+
         assertTrue(RfidGenerator.isValid("C12345"), "Short valid tag");
         assertTrue(RfidGenerator.isValid("VABC12345678901"), "Long valid tag (16 chars)");
 
-        // Specialized checks
         assertTrue(RfidGenerator.isCattleTag("C12345"), "Should be cattle tag");
         assertFalse(RfidGenerator.isCattleTag("V12345"), "Should not be cattle tag");
         assertTrue(RfidGenerator.isVetTag("V12345"), "Should be vet tag");
         assertFalse(RfidGenerator.isVetTag("C12345"), "Should not be vet tag");
 
-        // Invalid tags
         assertFalse(RfidGenerator.isValid(""), "Empty tag");
         assertFalse(RfidGenerator.isValid(null), "Null tag");
         assertFalse(RfidGenerator.isValid("A123"), "Wrong prefix");

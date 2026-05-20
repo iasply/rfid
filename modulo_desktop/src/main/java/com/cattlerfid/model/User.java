@@ -8,7 +8,6 @@ public class User {
     private String vet_rfid;
     private boolean is_veterinarian;
 
-    // Session-only: the Bearer token returned at login
     private transient String accessToken;
 
     public User() {

@@ -34,7 +34,7 @@ public class SerialLogFrame extends JFrame {
         logArea.setEditable(false);
         logArea.setFont(new Font("Consolas", Font.PLAIN, 12));
         logArea.setBackground(new Color(30, 30, 30));
-        logArea.setForeground(new Color(0, 255, 0)); // Estilo terminal
+        logArea.setForeground(new Color(0, 255, 0));
 
         JScrollPane scrollPane = new JScrollPane(logArea);
         add(scrollPane, BorderLayout.CENTER);
@@ -69,12 +69,10 @@ public class SerialLogFrame extends JFrame {
 
         actionPanel.add(inputPanel, BorderLayout.CENTER);
 
-        // Painel de Simulação (Apenas visivel se em modo simulação)
         if (serialService.isSimulationMode()) {
             JPanel simulationPanel = new JPanel(new GridLayout(2, 1, 5, 5));
             simulationPanel.setBorder(BorderFactory.createTitledBorder("Simulação de Hardware"));
 
-            // Linha 1: Simular Leitura
             JPanel readSimPanel = new JPanel(new BorderLayout(5, 0));
             JTextField tagInputField = new JTextField("1234567890123456");
             JButton simReadButton = new JButton("Simular Leitura (IN)");
@@ -89,7 +87,6 @@ public class SerialLogFrame extends JFrame {
                 }
             }));
 
-            // Linha 2: Simular Escrita
             JPanel writeSimPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             JButton simWriteOkButton = new JButton("Simular Sucesso Gravação");
             JButton simWriteErrButton = new JButton("Simular Erro Gravação");
@@ -111,28 +108,26 @@ public class SerialLogFrame extends JFrame {
     }
 
     private void loadHistoryAndSubscribe() {
-        // Puxa o que ja passou
+
         List<String> history = serialService.getLogHistory();
         for (String line : history) {
             logArea.append(line + "\n");
         }
 
-        // Se inscreve para receber novos logs em tempo real
         serialService.addLogListener(logListener);
     }
 
     private void onLogAppended(String newLine) {
         SwingUtilities.invokeLater(() -> {
             logArea.append(newLine + "\n");
-            // Faz auto-scroll pra ultima linha
+
             logArea.setCaretPosition(logArea.getDocument().getLength());
         });
     }
 
     @Override
     public void dispose() {
-        // Remove listener de tela limpa ao fechar para evitar leaks de memoria,
-        // caso o servico Serial sobreviva mais tempo do que a janela.
+
         serialService.removeLogListener(logListener);
         super.dispose();
     }

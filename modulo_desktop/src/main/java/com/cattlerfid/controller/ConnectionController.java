@@ -23,6 +23,7 @@ public class ConnectionController {
     };
     private State state = State.IDLE;
     private final Consumer<String> serialListener = this::handleIncomingSerialMessage;
+
     public ConnectionController(SerialService serialService) {
         this.serialService = serialService;
     }

@@ -71,7 +71,6 @@ public class AuthenticationService {
 
         HttpRequest request = client.newAuthenticatedRequestBuilder("/logout", token).POST(HttpRequest.BodyPublishers.noBody()).build();
 
-        // Fire and forget logout
         client.sendAsync(request);
     }
 

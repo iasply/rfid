@@ -43,7 +43,6 @@ public class VaccineFormPanel extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBackground(UIStyles.BACKGROUND);
 
-        // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIStyles.BACKGROUND);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -57,7 +56,6 @@ public class VaccineFormPanel extends JPanel {
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Form card
         JPanel cardPanel = new JPanel(new GridBagLayout());
         cardPanel.setBackground(Color.WHITE);
         cardPanel.setBorder(UIStyles.createCardBorder());
@@ -66,16 +64,12 @@ public class VaccineFormPanel extends JPanel {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Tag RFID
         addRow(cardPanel, gbc, 0, "Tag RFID:", makeReadonlyField(cattle.getRfidTag()));
 
-        // Nome
         addRow(cardPanel, gbc, 1, "Nome do Animal:", makeReadonlyField(cattle.getName() != null ? cattle.getName() : ""));
 
-        // Veterinário
         addRow(cardPanel, gbc, 2, "Veterinário:", makeReadonlyField(loggedUser.getName()));
 
-        // Tipo da Vacina (dropdown)
         gbc.gridx = 0;
         gbc.gridy = 3;
         JLabel vLabel = new JLabel("Tipo da Vacina:");
@@ -85,7 +79,7 @@ public class VaccineFormPanel extends JPanel {
         gbc.gridx = 1;
         DefaultComboBoxModel<VaccineType> comboModel = new DefaultComboBoxModel<>();
         if (vaccineTypes == null || vaccineTypes.isEmpty()) {
-            comboModel.addElement(null);  // fallback — won't happen if server is reachable
+            comboModel.addElement(null);
         } else {
             for (VaccineType vt : vaccineTypes) {
                 comboModel.addElement(vt);
@@ -95,7 +89,6 @@ public class VaccineFormPanel extends JPanel {
         vaccineTypeCombo.setFont(UIStyles.BODY_FONT);
         cardPanel.add(vaccineTypeCombo, gbc);
 
-        // Peso
         gbc.gridx = 0;
         gbc.gridy = 4;
         JLabel wLabel = new JLabel("Peso Atual (kg):");
@@ -107,7 +100,6 @@ public class VaccineFormPanel extends JPanel {
         weightField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(weightField, gbc);
 
-        // Data
         gbc.gridx = 0;
         gbc.gridy = 5;
         JLabel dLabel = new JLabel("Data Aplicação:");
@@ -124,7 +116,6 @@ public class VaccineFormPanel extends JPanel {
         wrapperPanel.add(cardPanel);
         add(wrapperPanel, BorderLayout.CENTER);
 
-        // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         buttonPanel.setBackground(UIStyles.BACKGROUND);
 

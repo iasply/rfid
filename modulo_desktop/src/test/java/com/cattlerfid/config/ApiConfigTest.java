@@ -9,12 +9,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Testa o carregamento de configurações do ApiConfig, com foco nas novas chaves SSL.
- */
 class ApiConfigTest {
-
-    // ── URL base ─────────────────────────────────────────────────────────
 
     @Test
     void givenEnvWithBaseUrl_shouldReadCorrectly(@TempDir Path tempDir) throws IOException {
@@ -35,8 +30,6 @@ class ApiConfigTest {
         assertEquals("http://127.0.0.1:8000/api", config.getBaseUrl());
     }
 
-    // ── Workstation Hash ──────────────────────────────────────────────────
-
     @Test
     void givenEnvWithWorkstationHash_shouldReadCorrectly(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "API_WORKSTATION_HASH=WS-ABC123\n");
@@ -54,8 +47,6 @@ class ApiConfigTest {
 
         assertEquals("", config.getWorkstationHash());
     }
-
-    // ── SSL_TRUST_ALL ─────────────────────────────────────────────────────
 
     @Test
     void givenSslTrustAllTrue_isTrustAllCertsShouldBeTrue(@TempDir Path tempDir) throws IOException {
@@ -93,8 +84,6 @@ class ApiConfigTest {
         assertFalse(config.isTrustAllCerts());
     }
 
-    // ── Robustez ──────────────────────────────────────────────────────────
-
     @Test
     void givenEnvWithComments_shouldIgnoreCommentLines(@TempDir Path tempDir) throws IOException {
         Path env = writeEnv(tempDir, "# URL da API\n" + "API_BASE_URL=https://cattle.io/api\n" + "# SSL desabilitado\n" + "SSL_TRUST_ALL=false\n");
@@ -107,15 +96,13 @@ class ApiConfigTest {
 
     @Test
     void givenMissingEnvFile_shouldUseDefaultsWithoutException() {
-        // Não deve lançar exceção — apenas logar e usar defaults
+
         ApiConfig config = new ApiConfig("/tmp/nao_existe_cattle_rfid.env");
 
         assertEquals("http://127.0.0.1:8000/api", config.getBaseUrl());
         assertEquals("", config.getWorkstationHash());
         assertFalse(config.isTrustAllCerts());
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────
 
     private Path writeEnv(Path dir, String content) throws IOException {
         Path file = dir.resolve(".env");

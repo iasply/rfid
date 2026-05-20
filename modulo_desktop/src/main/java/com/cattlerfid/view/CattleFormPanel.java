@@ -45,7 +45,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         setLayout(new BorderLayout(10, 10));
         setBackground(UIStyles.BACKGROUND);
 
-        // Header Title
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(UIStyles.BACKGROUND);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -61,7 +60,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         headerPanel.add(backButton, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Form Container with Card Styling
         JPanel cardPanel = new JPanel(new GridBagLayout());
         cardPanel.setBackground(Color.WHITE);
         cardPanel.setBorder(UIStyles.createCardBorder());
@@ -70,7 +68,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // RFID Tag
         gbc.gridx = 0;
         gbc.gridy = 0;
         JLabel tagLabel = new JLabel("RFID Tag:");
@@ -84,7 +81,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         tagField.setBackground(UIStyles.SECONDARY);
         cardPanel.add(tagField, gbc);
 
-        // Responsável
         gbc.gridx = 0;
         gbc.gridy = 1;
         JLabel respLabel = new JLabel("Responsável:");
@@ -98,7 +94,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         userField.setBackground(UIStyles.SECONDARY);
         cardPanel.add(userField, gbc);
 
-        // Nome
         gbc.gridx = 0;
         gbc.gridy = 2;
         JLabel nameLabel = new JLabel("Nome / Apelido:");
@@ -110,7 +105,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         nameField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(nameField, gbc);
 
-        // Peso
         gbc.gridx = 0;
         gbc.gridy = 3;
         JLabel weightLabel = new JLabel("Peso (kg):");
@@ -122,7 +116,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         weightField.setFont(UIStyles.BODY_FONT);
         cardPanel.add(weightField, gbc);
 
-        // Data
         gbc.gridx = 0;
         gbc.gridy = 4;
         JLabel dateLabel = new JLabel("Data de Cadastro:");
@@ -136,14 +129,12 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         dateField.setBackground(UIStyles.SECONDARY);
         cardPanel.add(dateField, gbc);
 
-        // Wrapper for true centering
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setBackground(UIStyles.BACKGROUND);
         wrapperPanel.add(cardPanel);
 
         add(wrapperPanel, BorderLayout.CENTER);
 
-        // Botoes Pannel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         buttonPanel.setBackground(UIStyles.BACKGROUND);
 
@@ -152,7 +143,7 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         writeTagButton.setBackground(UIStyles.WARNING);
         writeTagButton.setForeground(UIStyles.PRIMARY_DARK);
         writeTagButton.addActionListener(DebounceUtil.debounce(e -> writeTagAction()));
-        // Apenas habilita gravação física se for manual
+
         writeTagButton.setVisible(isManual);
         buttonPanel.add(writeTagButton);
 
@@ -228,8 +219,6 @@ public class CattleFormPanel extends JPanel implements CattleController.CattleVi
         controller.setViewListener(parentMainPanel);
         navManager.showPanel("Main", parentMainPanel);
     }
-
-    // ── CattleViewListener ────────────────────────────────────────────────────
 
     @Override
     public void onRfidReadSuccess(Cattle cattle) {}

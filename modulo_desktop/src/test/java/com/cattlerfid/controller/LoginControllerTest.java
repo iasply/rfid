@@ -53,10 +53,9 @@ class LoginControllerTest {
 
     @Test
     void testHandleMessageSuccessfulReadValidUser() {
-        // Simula Tag chegando pela Serial
+
         String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":V00000VET0001:FW:92";
 
-        // Simula db mock
         User mockedVet = new User("joao_vet", "Joao");
         when(authServiceMock.authenticateByTag("V00000VET0001")).thenReturn(Optional.of(mockedVet));
 
@@ -81,7 +80,7 @@ class LoginControllerTest {
 
     @Test
     void testInvalidTagPrefixLoginRejection() {
-        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":UNKNOWN12345678:FW:92"; // Nao comeca com V
+        String simulatedArduinoResponse = "RES:" + RfidConstants.ID_LOGIN + ":" + RfidConstants.RES_OK + ":UNKNOWN12345678:FW:92";
 
         controller.handleIncomingSerialMessage(simulatedArduinoResponse);
 

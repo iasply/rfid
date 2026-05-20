@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DateUtilsTest {
 
-    // ── toDisplayDate ──────────────────────────────────────────────────────────
-
     @Test
     void toDisplayDate_convertsIsoToDisplay() {
         assertEquals("15/01/2024", DateUtils.toDisplayDate("2024-01-15"));
@@ -35,11 +33,9 @@ class DateUtilsTest {
 
     @Test
     void toDisplayDate_passesThroughAlreadyDisplayFormat() {
-        // DD/MM/YYYY não tem '-', então passa direto
+
         assertEquals("15/01/2024", DateUtils.toDisplayDate("15/01/2024"));
     }
-
-    // ── toIsoDate ──────────────────────────────────────────────────────────────
 
     @Test
     void toIsoDate_convertsDisplayToIso() {
@@ -65,8 +61,6 @@ class DateUtilsTest {
     void toIsoDate_passesThroughNonDisplayInput() {
         assertEquals("not-a-date", DateUtils.toIsoDate("not-a-date"));
     }
-
-    // ── round-trip ─────────────────────────────────────────────────────────────
 
     @Test
     void roundTrip_isoToDisplayToIso() {

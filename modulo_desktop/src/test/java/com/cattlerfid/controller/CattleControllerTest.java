@@ -57,7 +57,7 @@ class CattleControllerTest {
     @Test
     void testRequestWriteTagConnected() {
         controller.requestWriteTag("C1234567890");
-        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE); // Valida fisicamente primeiro
+        verify(serialServiceMock).requestRead(RfidConstants.ID_CATTLE);
     }
 
     @Test
@@ -77,9 +77,6 @@ class CattleControllerTest {
         verify(serialServiceMock).requestWrite(RfidConstants.ID_CATTLE, "C123456");
     }
 
-    /**
-     * Regression test for the reported missing test.
-     */
     @Test
     void testHandleMessageWriteReadNoTagError() {
         controller.requestWriteTag("C123456");
@@ -172,9 +169,6 @@ class CattleControllerTest {
         verify(viewListenerMock).onApiSaveSuccess();
     }
 
-    /**
-     * Regression test for the 422 error fix. saveVaccineData should NOT call saveCattle/updateCattle because the server handles it.
-     */
     @Test
     void testSaveVaccineData_shouldOnlyCallSaveVaccine() {
         com.cattlerfid.model.Vaccine vaccine = new com.cattlerfid.model.Vaccine();

@@ -2,9 +2,6 @@ package com.cattlerfid.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Represents a Cattle animal. Matches CattleResponse DTO fields.
- */
 public class Cattle {
 
     private int id;
@@ -16,7 +13,7 @@ public class Cattle {
     private double weight;
 
     @SerializedName("registration_date")
-    private String registrationDate; // Using String YYYY-MM-DD
+    private String registrationDate;
 
     @SerializedName("vaccines_count")
     private int vaccinesCount;

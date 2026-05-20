@@ -32,16 +32,10 @@ public class RfidGenerator {
         return rfid.matches("^[a-zA-Z0-9]+$");
     }
 
-    /**
-     * Verifica se a tag é de um Animal (Cattle).
-     */
     public static boolean isCattleTag(String rfid) {
         return isValid(rfid) && Character.toUpperCase(rfid.charAt(0)) == 'C';
     }
 
-    /**
-     * Verifica se a tag é de um Veterinário (User).
-     */
     public static boolean isVetTag(String rfid) {
         return isValid(rfid) && Character.toUpperCase(rfid.charAt(0)) == 'V';
     }

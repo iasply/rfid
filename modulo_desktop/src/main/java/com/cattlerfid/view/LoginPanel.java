@@ -35,14 +35,12 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     private void setupUI() {
         setLayout(new BorderLayout(10, 10));
 
-        // Background
         setBackground(UIStyles.BACKGROUND);
 
-        // Header - Dark Emerald
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(UIStyles.PRIMARY_DARK); // Darker top
+        headerPanel.setBackground(UIStyles.PRIMARY_DARK);
         JLabel titleLabel = UIStyles.createTitleLabel("Acesso via Crachá RFID");
-        titleLabel.setForeground(Color.WHITE); // Contrast for Dark Emerald
+        titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
 
         JButton backButton = UIStyles.createBackButton("< Voltar");
@@ -50,7 +48,6 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         backButton.addActionListener(DebounceUtil.debounce(e -> {
             controller.detachSerial();
 
-            // Desliga a porta para liberá-la antes de voltar pro scanner raw de hardware
             controller.getSerialService().disconnect();
 
             AuthenticationService authService = new AuthenticationService(apiConfig);
@@ -69,7 +66,6 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         headerPanel.add(logButton, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Center Panel (Status e Leitura)
         JPanel centerPanel = new JPanel(new GridLayout(2, 1, 5, 20));
         centerPanel.setBorder(UIStyles.createCardBorder());
         centerPanel.setBackground(Color.WHITE);
@@ -89,7 +85,6 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
 
         centerPanel.add(buttonPanel);
 
-        // Wrapper for centering
         JPanel wrapperPanel = new JPanel(new GridBagLayout());
         wrapperPanel.setBackground(UIStyles.BACKGROUND);
         wrapperPanel.add(centerPanel);
@@ -97,21 +92,17 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
         add(wrapperPanel, BorderLayout.CENTER);
     }
 
-    // Callbacks do Controller
     @Override
     public void onLoginSuccess(User user) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, "Bem-vindo(a), " + user.getName() + "!", "Acesso Liberado", JOptionPane.INFORMATION_MESSAGE);
 
-            // Sucesso! Esconde esta tela e abre a MainPanel
             controller.detachSerial();
 
-            // Seta o state global
             if (navManager instanceof ApplicationFrame) {
                 ((ApplicationFrame) navManager).setLoggedUser(user);
             }
 
-            // Instancia o repositorio e controller global do sistema
             CattleApiService apiService = new CattleApiService(apiConfig, user);
             CattleController cattleController = new CattleController(apiService, controller.getSerialService());
 
@@ -135,7 +126,7 @@ public class LoginPanel extends JPanel implements LoginController.LoginViewListe
     public void onSerialConnected() {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Arduino Conectado! Por favor, leia seu crachá.");
-            statusLabel.setForeground(UIStyles.PRIMARY); // Premium Emerald
+            statusLabel.setForeground(UIStyles.PRIMARY);
             readCardButton.setEnabled(true);
         });
     }

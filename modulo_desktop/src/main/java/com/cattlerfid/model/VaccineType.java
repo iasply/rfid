@@ -59,9 +59,6 @@ public class VaccineType {
         this.seasonMonths = seasonMonths;
     }
 
-    /**
-     * Shown in the JComboBox dropdown.
-     */
     @Override
     public String toString() {
         if (intervalDays != null) {

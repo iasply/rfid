@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Communicates with the Laravel API for Cattle, Vaccine, and VaccineType operations.
- */
 public class CattleApiService {
 
     private final ApiClient client;
@@ -90,7 +87,7 @@ public class CattleApiService {
                 JsonObject obj = client.getGson().fromJson(response.body(), JsonObject.class);
                 Type listType = new TypeToken<ArrayList<Cattle>>() {}.getType();
                 List<Cattle> data = client.getGson().fromJson(obj.getAsJsonArray("data"), listType);
-                // Laravel ResourceCollection wraps pagination info inside "meta"
+
                 JsonObject meta = obj.getAsJsonObject("meta");
                 int currentPage = meta.get("current_page").getAsInt();
                 int lastPage = meta.get("last_page").getAsInt();
