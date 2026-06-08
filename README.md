@@ -49,7 +49,6 @@ Utiliza o framework **Laravel 12** para fornecer uma API segura e um painel de c
 O desenvolvimento seguiu princípios de engenharia de software acadêmica, incluindo:
 - **Modularização:** Separação clara de responsabilidades entre hardware e software.
 - **TDD (Test Driven Development):** Implementação de testes unitários e de integração em ambas as plataformas de software (JUnit e PHPUnit).
-- **Documentação Técnica:** Foco na clareza do fluxo de dados e na reprodutibilidade do experimento.
 
 ---
 
