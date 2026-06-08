@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Auth\TagLoginRequest;
 use App\DTOs\Response\AuthResponse;
 use App\DTOs\Response\VeterinarianResponse;
 use App\DTOs\Response\WorkstationResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\TagLoginRequest;
 use App\Models\User;
 use App\Models\Workstation;
 use Illuminate\Http\JsonResponse;

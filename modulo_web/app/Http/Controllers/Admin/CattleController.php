@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Cattle\StoreCattleRequest;
-use App\Http\Requests\Cattle\UpdateCattleRequest;
 use App\DTOs\Response\VaccineResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cattle\StoreCattleRequest;
+use App\Http\Requests\Cattle\UpdateCattleRequest;
 use App\Models\Cattle;
 use App\Services\CattleService;
 use Carbon\Carbon;
@@ -78,7 +78,7 @@ class CattleController extends Controller
             'values' => $typeCounts->values()->toArray(),
         ];
 
-        $q   = request('q');
+        $q = request('q');
         $col = request('col');
 
         $vaccines = $cattle->vaccines()
@@ -86,8 +86,8 @@ class CattleController extends Controller
             ->when($q, function ($query) use ($q, $col) {
                 match ($col) {
                     'vaccine_type' => $query->whereHas('vaccineType', fn($s) => $s->where('name', 'like', "%{$q}%")),
-                    'vet'          => $query->whereHas('user', fn($s) => $s->where('name', 'like', "%{$q}%")),
-                    default        => $query->where(fn($s) => $s
+                    'vet' => $query->whereHas('user', fn($s) => $s->where('name', 'like', "%{$q}%")),
+                    default => $query->where(fn($s) => $s
                         ->whereHas('vaccineType', fn($t) => $t->where('name', 'like', "%{$q}%"))
                         ->orWhereHas('user', fn($t) => $t->where('name', 'like', "%{$q}%"))
                     ),

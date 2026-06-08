@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\Vaccine\StoreVaccineRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Vaccine\StoreVaccineRequest;
 use App\Http\Resources\VaccineResource;
 use App\Models\Vaccine;
 use App\Services\VaccineService;
@@ -18,7 +18,7 @@ class VaccineApiController extends Controller
 
     public function store(StoreVaccineRequest $request): JsonResponse
     {
-        $user  = $request->user();
+        $user = $request->user();
         $token = $user->currentAccessToken();
 
         $vaccine = $this->vaccineService->recordVaccination(

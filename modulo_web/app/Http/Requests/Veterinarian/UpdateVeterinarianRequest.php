@@ -24,8 +24,8 @@ class UpdateVeterinarianRequest extends FormRequest
         $veterinarianId = $this->route('veterinarian')?->id;
 
         return [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $veterinarianId,
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $veterinarianId,
             'vet_rfid' => ['nullable', 'string', 'unique:users,vet_rfid,' . $veterinarianId, new ValidVetRfidTag],
             'password' => 'nullable|min:6',
         ];

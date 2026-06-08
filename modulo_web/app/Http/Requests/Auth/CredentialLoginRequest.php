@@ -14,8 +14,8 @@ class CredentialLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'identity'    => 'required|string',
-            'password'    => 'required|string',
+            'identity' => 'required|string',
+            'password' => 'required|string',
             'device_name' => 'required|string',
         ];
     }

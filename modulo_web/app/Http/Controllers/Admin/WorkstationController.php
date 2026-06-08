@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Workstation\StoreWorkstationRequest;
-use App\Http\Requests\Workstation\UpdateWorkstationRequest;
 use App\DTOs\Response\WorkstationResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Workstation\StoreWorkstationRequest;
+use App\Http\Requests\Workstation\UpdateWorkstationRequest;
 use App\Models\Workstation;
 
 class WorkstationController extends Controller

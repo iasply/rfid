@@ -13,15 +13,15 @@ class DashboardMetricsService
     public function getStats(): array
     {
         return [
-            'vets'     => User::where('is_veterinarian', true)->count(),
-            'cattle'   => Cattle::count(),
+            'vets' => User::where('is_veterinarian', true)->count(),
+            'cattle' => Cattle::count(),
             'vaccines' => Vaccine::count(),
         ];
     }
 
     public function getInsights(): array
     {
-        $totalCattle      = Cattle::count();
+        $totalCattle = Cattle::count();
         $vaccinatedCattle = DB::table('cattle')
             ->whereExists(function ($q) {
                 $q->select(DB::raw(1))->from('vaccines')->whereColumn('vaccines.rfid_tag', 'cattle.rfid_tag');
@@ -55,57 +55,24 @@ class DashboardMetricsService
             ->value('avg_days');
 
         return [
-            'coverage_pct'       => $totalCattle > 0 ? round(($vaccinatedCattle / $totalCattle) * 100, 1) : 0,
-            'avg_weight'         => round((float) Cattle::avg('weight'), 2),
-            'top_vaccine'        => $topVaccine,
-            'top_vet'            => $topVetRow
-                ? ['name' => $topVetRow->name, 'count' => (int) $topVetRow->total]
+            'coverage_pct' => $totalCattle > 0 ? round(($vaccinatedCattle / $totalCattle) * 100, 1) : 0,
+            'avg_weight' => round((float)Cattle::avg('weight'), 2),
+            'top_vaccine' => $topVaccine,
+            'top_vet' => $topVetRow
+                ? ['name' => $topVetRow->name, 'count' => (int)$topVetRow->total]
                 : ['name' => '—', 'count' => 0],
-            'never_vaccinated'   => $neverVaccinated,
-            'avg_days_since_vax' => $avgDaysSinceVax !== null ? (int) $avgDaysSinceVax : null,
+            'never_vaccinated' => $neverVaccinated,
+            'avg_days_since_vax' => $avgDaysSinceVax !== null ? (int)$avgDaysSinceVax : null,
         ];
     }
 
     public function getChartPeriods(): array
     {
         return [
-            '3m'  => $this->buildMonthly(3),
-            '6m'  => $this->buildMonthly(6),
+            '3m' => $this->buildMonthly(3),
+            '6m' => $this->buildMonthly(6),
             '12m' => $this->buildMonthly(12),
         ];
-    }
-
-    public function getCharts(): array
-    {
-        return [
-            'vaccineTypes'             => $this->buildVaccineTypesChart(),
-            'cattlePerVet'             => $this->buildCattlePerVetChart(),
-            'vaccinesPerWorkstation'   => $this->buildVaccinesPerWorkstationChart(),
-            'weightEvolution'          => $this->buildWeightEvolutionChart(),
-            'weightByVaccineType'      => $this->buildWeightByVaccineTypeChart(),
-            'seasonalVaccinations'     => $this->buildSeasonalChart(),
-            'vaccineTypeByWorkstation' => $this->buildVaccineTypeByWorkstationChart(),
-            'weightByWorkstation'      => $this->buildWeightByWorkstationChart(),
-        ];
-    }
-
-    public function getRecentVaccinations(): Collection
-    {
-        return DB::table('vaccines')
-            ->join('cattle', 'vaccines.rfid_tag', '=', 'cattle.rfid_tag')
-            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
-            ->leftJoin('users', 'vaccines.user_id', '=', 'users.id')
-            ->select(
-                'cattle.name as animal',
-                'vaccine_types.name as vaccine_type',
-                'vaccines.current_weight',
-                'vaccines.vaccination_date',
-                DB::raw("COALESCE(users.name, '—') as vet")
-            )
-            ->orderByDesc('vaccines.vaccination_date')
-            ->orderByDesc('vaccines.id')
-            ->limit(10)
-            ->get();
     }
 
     private function buildMonthly(int $months): array
@@ -123,12 +90,26 @@ class DashboardMetricsService
 
         $labels = $values = [];
         for ($i = $months - 1; $i >= 0; $i--) {
-            $key      = now()->subMonths($i)->format('Y-m');
+            $key = now()->subMonths($i)->format('Y-m');
             $labels[] = now()->subMonths($i)->translatedFormat('M/y');
-            $values[] = $raw->has($key) ? (int) $raw[$key]->total : 0;
+            $values[] = $raw->has($key) ? (int)$raw[$key]->total : 0;
         }
 
         return ['labels' => $labels, 'values' => $values];
+    }
+
+    public function getCharts(): array
+    {
+        return [
+            'vaccineTypes' => $this->buildVaccineTypesChart(),
+            'cattlePerVet' => $this->buildCattlePerVetChart(),
+            'vaccinesPerWorkstation' => $this->buildVaccinesPerWorkstationChart(),
+            'weightEvolution' => $this->buildWeightEvolutionChart(),
+            'weightByVaccineType' => $this->buildWeightByVaccineTypeChart(),
+            'seasonalVaccinations' => $this->buildSeasonalChart(),
+            'vaccineTypeByWorkstation' => $this->buildVaccineTypeByWorkstationChart(),
+            'weightByWorkstation' => $this->buildWeightByWorkstationChart(),
+        ];
     }
 
     private function buildVaccineTypesChart(): array
@@ -142,7 +123,7 @@ class DashboardMetricsService
 
         return [
             'labels' => $data->pluck('vaccine_type')->toArray(),
-            'values' => $data->pluck('total')->map(fn($v) => (int) $v)->toArray(),
+            'values' => $data->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
     }
 
@@ -158,7 +139,7 @@ class DashboardMetricsService
 
         return [
             'labels' => $data->pluck('name')->toArray(),
-            'values' => $data->pluck('total')->map(fn($v) => (int) $v)->toArray(),
+            'values' => $data->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
     }
 
@@ -176,7 +157,7 @@ class DashboardMetricsService
 
         return [
             'labels' => $data->pluck('station')->toArray(),
-            'values' => $data->pluck('total')->map(fn($v) => (int) $v)->toArray(),
+            'values' => $data->pluck('total')->map(fn($v) => (int)$v)->toArray(),
         ];
     }
 
@@ -196,9 +177,9 @@ class DashboardMetricsService
 
         $labels = $values = [];
         for ($i = 11; $i >= 0; $i--) {
-            $key      = now()->subMonths($i)->format('Y-m');
+            $key = now()->subMonths($i)->format('Y-m');
             $labels[] = now()->subMonths($i)->translatedFormat('M/y');
-            $values[] = $raw->has($key) ? (float) $raw[$key]->avg_weight : null;
+            $values[] = $raw->has($key) ? (float)$raw[$key]->avg_weight : null;
         }
 
         return ['labels' => $labels, 'values' => $values];
@@ -216,7 +197,7 @@ class DashboardMetricsService
 
         return [
             'labels' => $data->pluck('vaccine_type')->toArray(),
-            'values' => $data->pluck('avg_weight')->map(fn($v) => (float) $v)->toArray(),
+            'values' => $data->pluck('avg_weight')->map(fn($v) => (float)$v)->toArray(),
         ];
     }
 
@@ -233,8 +214,8 @@ class DashboardMetricsService
 
         $values = [];
         for ($m = 1; $m <= 12; $m++) {
-            $key      = str_pad($m, 2, '0', STR_PAD_LEFT);
-            $values[] = $raw->has($key) ? (int) $raw[$key]->total : 0;
+            $key = str_pad($m, 2, '0', STR_PAD_LEFT);
+            $values[] = $raw->has($key) ? (int)$raw[$key]->total : 0;
         }
 
         return ['labels' => $monthNames, 'values' => $values];
@@ -254,15 +235,15 @@ class DashboardMetricsService
             ->orderBy('station')
             ->get();
 
-        $stationLabels  = $rows->pluck('station')->unique()->values()->toArray();
+        $stationLabels = $rows->pluck('station')->unique()->values()->toArray();
         $vaccineTypeSet = $rows->pluck('vaccine_type')->unique()->values()->toArray();
-        $datasets       = [];
+        $datasets = [];
 
         foreach ($vaccineTypeSet as $type) {
             $values = [];
             foreach ($stationLabels as $station) {
-                $row      = $rows->first(fn($r) => $r->station === $station && $r->vaccine_type === $type);
-                $values[] = $row ? (int) $row->total : 0;
+                $row = $rows->first(fn($r) => $r->station === $station && $r->vaccine_type === $type);
+                $values[] = $row ? (int)$row->total : 0;
             }
             $datasets[] = ['label' => $type, 'values' => $values];
         }
@@ -285,7 +266,26 @@ class DashboardMetricsService
 
         return [
             'labels' => $data->pluck('station')->toArray(),
-            'values' => $data->pluck('avg_weight')->map(fn($v) => (float) $v)->toArray(),
+            'values' => $data->pluck('avg_weight')->map(fn($v) => (float)$v)->toArray(),
         ];
+    }
+
+    public function getRecentVaccinations(): Collection
+    {
+        return DB::table('vaccines')
+            ->join('cattle', 'vaccines.rfid_tag', '=', 'cattle.rfid_tag')
+            ->join('vaccine_types', 'vaccines.vaccine_type_id', '=', 'vaccine_types.id')
+            ->leftJoin('users', 'vaccines.user_id', '=', 'users.id')
+            ->select(
+                'cattle.name as animal',
+                'vaccine_types.name as vaccine_type',
+                'vaccines.current_weight',
+                'vaccines.vaccination_date',
+                DB::raw("COALESCE(users.name, '—') as vet")
+            )
+            ->orderByDesc('vaccines.vaccination_date')
+            ->orderByDesc('vaccines.id')
+            ->limit(10)
+            ->get();
     }
 }

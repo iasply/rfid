@@ -16,7 +16,7 @@ class TagLoginRequest extends FormRequest
     {
         return [
             'workstation' => 'required|string',
-            'tag'         => ['required', 'string', new ValidVetRfidTag],
+            'tag' => ['required', 'string', new ValidVetRfidTag],
         ];
     }
 }

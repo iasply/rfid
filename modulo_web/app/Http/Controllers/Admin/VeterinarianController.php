@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Veterinarian\StoreVeterinarianRequest;
-use App\Http\Requests\Veterinarian\UpdateVeterinarianRequest;
 use App\DTOs\Response\VaccineResponse;
 use App\DTOs\Response\VeterinarianResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Veterinarian\StoreVeterinarianRequest;
+use App\Http\Requests\Veterinarian\UpdateVeterinarianRequest;
 use App\Models\User;
 use App\Models\Vaccine;
 use Illuminate\Support\Facades\Hash;
@@ -93,6 +93,15 @@ class VeterinarianController extends Controller
         return view('admin.veterinarians.edit', ['veterinarian' => $dto]);
     }
 
+    private function authorizeVetEdit(User $veterinarian): void
+    {
+        $user = auth()->user();
+
+        if ($user->is_veterinarian && $user->id !== $veterinarian->id) {
+            abort(403, 'Você não tem permissão para editar outro veterinário.');
+        }
+    }
+
     public function update(UpdateVeterinarianRequest $request, User $veterinarian)
     {
         $this->authorizeVetEdit($veterinarian);
@@ -117,14 +126,5 @@ class VeterinarianController extends Controller
 
         return redirect()->route('admin.veterinarians.index')
             ->with('success', 'Veterinário removido.');
-    }
-
-    private function authorizeVetEdit(User $veterinarian): void
-    {
-        $user = auth()->user();
-
-        if ($user->is_veterinarian && $user->id !== $veterinarian->id) {
-            abort(403, 'Você não tem permissão para editar outro veterinário.');
-        }
     }
 }

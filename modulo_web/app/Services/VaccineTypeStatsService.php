@@ -14,12 +14,12 @@ class VaccineTypeStatsService
     {
         $since = now()->subMonths(11)->startOfMonth()->toDateString();
 
-        $totalCattle       = Cattle::count();
-        $vaccinatedCount   = Vaccine::where('vaccine_type_id', $vaccineType->id)
+        $totalCattle = Cattle::count();
+        $vaccinatedCount = Vaccine::where('vaccine_type_id', $vaccineType->id)
             ->distinct('rfid_tag')->count('rfid_tag');
         $totalApplications = Vaccine::where('vaccine_type_id', $vaccineType->id)->count();
-        $lastApplication   = Vaccine::where('vaccine_type_id', $vaccineType->id)->max('vaccination_date');
-        $avgWeight         = Vaccine::where('vaccine_type_id', $vaccineType->id)
+        $lastApplication = Vaccine::where('vaccine_type_id', $vaccineType->id)->max('vaccination_date');
+        $avgWeight = Vaccine::where('vaccine_type_id', $vaccineType->id)
             ->where('current_weight', '>', 0)->avg('current_weight');
 
         $monthlyRaw = Vaccine::where('vaccine_type_id', $vaccineType->id)
@@ -37,27 +37,27 @@ class VaccineTypeStatsService
 
         $labels = $monthly = $weightValues = [];
         for ($i = 11; $i >= 0; $i--) {
-            $d            = now()->subMonths($i);
-            $key          = $d->format('Y-m');
-            $labels[]     = self::ABBR[(int) $d->format('n')] . '/' . $d->format('y');
-            $monthly[]    = $monthlyRaw[$key] ?? 0;
-            $weightValues[] = isset($weightRaw[$key]) ? (float) $weightRaw[$key] : null;
+            $d = now()->subMonths($i);
+            $key = $d->format('Y-m');
+            $labels[] = self::ABBR[(int)$d->format('n')] . '/' . $d->format('y');
+            $monthly[] = $monthlyRaw[$key] ?? 0;
+            $weightValues[] = isset($weightRaw[$key]) ? (float)$weightRaw[$key] : null;
         }
 
         $neverCount = max(0, $totalCattle - $vaccinatedCount);
-        $coverage   = $totalCattle > 0 ? round($vaccinatedCount / $totalCattle * 100) : 0;
+        $coverage = $totalCattle > 0 ? round($vaccinatedCount / $totalCattle * 100) : 0;
 
         return [
             'totalApplications' => $totalApplications,
-            'vaccinatedCount'   => $vaccinatedCount,
-            'totalCattle'       => $totalCattle,
-            'coverage'          => $coverage,
-            'lastApplication'   => $lastApplication,
-            'avgWeight'         => $avgWeight,
-            'chartData'         => [
-                'monthly'  => ['labels' => $labels, 'values' => $monthly],
+            'vaccinatedCount' => $vaccinatedCount,
+            'totalCattle' => $totalCattle,
+            'coverage' => $coverage,
+            'lastApplication' => $lastApplication,
+            'avgWeight' => $avgWeight,
+            'chartData' => [
+                'monthly' => ['labels' => $labels, 'values' => $monthly],
                 'coverage' => ['labels' => ['Vacinados', 'Nunca vacinados'], 'values' => [$vaccinatedCount, $neverCount]],
-                'weight'   => ['labels' => $labels, 'values' => $weightValues],
+                'weight' => ['labels' => $labels, 'values' => $weightValues],
             ],
         ];
     }

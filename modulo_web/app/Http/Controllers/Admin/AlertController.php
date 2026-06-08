@@ -38,12 +38,12 @@ class AlertController extends Controller
 
         if (!$typeFilter) {
             return view('admin.alerts.index', [
-                'alertsByType'  => [],
-                'totalOverdue'  => 0,
-                'totalDueSoon'  => 0,
-                'totalNever'    => 0,
-                'vaccineTypes'  => $vaccineTypeNames,
-                'typeFilter'    => null,
+                'alertsByType' => [],
+                'totalOverdue' => 0,
+                'totalDueSoon' => 0,
+                'totalNever' => 0,
+                'vaccineTypes' => $vaccineTypeNames,
+                'typeFilter' => null,
             ]);
         }
 

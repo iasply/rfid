@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Cattle\StoreCattleRequest;
 use App\Http\Requests\Cattle\UpdateCattleRequest;
-use App\Http\Controllers\Controller;
 use App\Http\Resources\CattleResource;
 use App\Models\Cattle;
 use App\Services\CattleService;

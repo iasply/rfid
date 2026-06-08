@@ -13,14 +13,14 @@ use Illuminate\View\View;
 class VaccineTypeController extends Controller
 {
     private const MONTH_NAMES = [
-        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março',    4 => 'Abril',
-        5 => 'Maio',    6 => 'Junho',     7 => 'Julho',    8 => 'Agosto',
+        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Março', 4 => 'Abril',
+        5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
         9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro',
     ];
 
     public function index(): View
     {
-        $q   = request('q');
+        $q = request('q');
         $col = request('col');
 
         $query = VaccineType::orderBy('name');
@@ -33,7 +33,7 @@ class VaccineTypeController extends Controller
             } else {
                 $query->where(function ($sq) use ($q) {
                     $sq->where('name', 'like', "%{$q}%")
-                       ->orWhere('description', 'like', "%{$q}%");
+                        ->orWhere('description', 'like', "%{$q}%");
                 });
             }
         }
@@ -43,17 +43,17 @@ class VaccineTypeController extends Controller
         return view('admin.vaccine-types.index', compact('vaccineTypes'));
     }
 
-    public function create(): View
-    {
-        return view('admin.vaccine-types.create', ['monthNames' => self::MONTH_NAMES]);
-    }
-
     public function store(StoreVaccineTypeRequest $request): RedirectResponse
     {
         VaccineType::create($request->validated());
 
         return redirect()->route('admin.vaccine-types.index')
             ->with('success', 'Tipo de vacina cadastrado com sucesso!');
+    }
+
+    public function create(): View
+    {
+        return view('admin.vaccine-types.create', ['monthNames' => self::MONTH_NAMES]);
     }
 
     public function show(VaccineType $vaccineType, VaccineTypeStatsService $stats): View
@@ -68,7 +68,7 @@ class VaccineTypeController extends Controller
     {
         return view('admin.vaccine-types.edit', [
             'vaccineType' => $vaccineType,
-            'monthNames'  => self::MONTH_NAMES,
+            'monthNames' => self::MONTH_NAMES,
         ]);
     }
 

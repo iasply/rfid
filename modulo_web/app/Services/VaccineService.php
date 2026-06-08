@@ -12,7 +12,7 @@ class VaccineService
     {
         return DB::transaction(function () use ($data, $userId, $workstationId) {
             $vaccine = Vaccine::create(array_merge($data, [
-                'user_id'        => $userId,
+                'user_id' => $userId,
                 'workstation_id' => $workstationId,
             ]));
 

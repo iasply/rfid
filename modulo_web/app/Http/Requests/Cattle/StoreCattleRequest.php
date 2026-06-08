@@ -15,8 +15,8 @@ class StoreCattleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|max:255',
-            'weight'   => 'required|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'weight' => 'required|numeric|min:0',
             'rfid_tag' => ['nullable', 'string', 'unique:cattle,rfid_tag', new ValidCattleRfidTag],
         ];
     }

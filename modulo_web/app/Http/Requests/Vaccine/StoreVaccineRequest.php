@@ -15,9 +15,9 @@ class StoreVaccineRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rfid_tag'         => ['required', 'exists:cattle,rfid_tag', new ValidCattleRfidTag],
-            'vaccine_type_id'  => 'required|exists:vaccine_types,id',
-            'current_weight'   => 'required|numeric|min:0',
+            'rfid_tag' => ['required', 'exists:cattle,rfid_tag', new ValidCattleRfidTag],
+            'vaccine_type_id' => 'required|exists:vaccine_types,id',
+            'current_weight' => 'required|numeric|min:0',
             'vaccination_date' => 'required|date',
         ];
     }

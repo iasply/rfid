@@ -17,18 +17,18 @@ class DashboardController extends Controller
         $charts = $this->metrics->getCharts();
 
         return view('admin.dashboard', [
-            'stats'                         => $this->metrics->getStats(),
-            'insights'                      => $this->metrics->getInsights(),
-            'chartPeriods'                  => $this->metrics->getChartPeriods(),
-            'chartVaccineTypes'             => $charts['vaccineTypes'],
-            'chartCattlePerVet'             => $charts['cattlePerVet'],
-            'chartVaccinesPerWorkstation'   => $charts['vaccinesPerWorkstation'],
-            'chartWeightEvolution'          => $charts['weightEvolution'],
-            'chartWeightByVaccineType'      => $charts['weightByVaccineType'],
-            'chartSeasonalVaccinations'     => $charts['seasonalVaccinations'],
+            'stats' => $this->metrics->getStats(),
+            'insights' => $this->metrics->getInsights(),
+            'chartPeriods' => $this->metrics->getChartPeriods(),
+            'chartVaccineTypes' => $charts['vaccineTypes'],
+            'chartCattlePerVet' => $charts['cattlePerVet'],
+            'chartVaccinesPerWorkstation' => $charts['vaccinesPerWorkstation'],
+            'chartWeightEvolution' => $charts['weightEvolution'],
+            'chartWeightByVaccineType' => $charts['weightByVaccineType'],
+            'chartSeasonalVaccinations' => $charts['seasonalVaccinations'],
             'chartVaccineTypeByWorkstation' => $charts['vaccineTypeByWorkstation'],
-            'chartWeightByWorkstation'      => $charts['weightByWorkstation'],
-            'recentVaccinations'            => $this->metrics->getRecentVaccinations(),
+            'chartWeightByWorkstation' => $charts['weightByWorkstation'],
+            'recentVaccinations' => $this->metrics->getRecentVaccinations(),
         ]);
     }
 }

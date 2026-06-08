@@ -15,8 +15,8 @@ class StoreVeterinarianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'vet_rfid' => ['nullable', 'string', 'unique:users,vet_rfid', new ValidVetRfidTag],
             'password' => 'required|min:6',
         ];

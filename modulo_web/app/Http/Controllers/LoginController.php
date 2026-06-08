@@ -46,8 +46,8 @@ class LoginController extends Controller
             RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
             Log::info('session: regenerate no login', [
-                'user_id'    => Auth::id(),
-                'ip'         => $request->ip(),
+                'user_id' => Auth::id(),
+                'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
                 'session_id' => $request->session()->getId(),
             ]);
@@ -68,8 +68,8 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         Log::info('session: logout — invalidate + regenerateToken', [
-            'user_id'    => $userId,
-            'ip'         => $request->ip(),
+            'user_id' => $userId,
+            'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'session_id' => $request->session()->getId(),
         ]);
