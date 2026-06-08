@@ -111,5 +111,3 @@ mvn exec:exec
 - Conceitos de hardware e bibliotecas RFID: [RoboCore - Leitura e Escrita com RFID Mifare MFRC522](https://www.robocore.net/tutoriais/leitura-escrita-com-rfid-mifare-mfrc522)
 - Frameworks: [Laravel Documentation](https://laravel.com/docs), [OpenJDK](https://openjdk.org/)
 
----
-*Manutenção Recomendada: Certifique-se de atualizar o `MFRC522` sempre que houver falhas críticas de hardware em novas tags NTAG213, ajustando temporariamente a rotina auth dentro de `autenticarBloco()`.*
