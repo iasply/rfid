@@ -5,9 +5,9 @@
         <thead>
         <tr>
             @foreach($headers as $header)
-            <th class="{{ strtolower($header) == 'ações' ? 'text-right' : '' }}">
-                {{ $header }}
-            </th>
+                <th class="{{ strtolower($header) == 'ações' ? 'text-right' : '' }}">
+                    {{ $header }}
+                </th>
             @endforeach
         </tr>
         </thead>

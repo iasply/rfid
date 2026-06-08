@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class LargeTestDatasetSeeder extends Seeder
 {
-    /**
-     * Monthly probability weights per vaccine type (index 0 = January, 11 = December).
-     *
-     * Based on the Brazilian MAPA/Embrapa bovine vaccination calendar.
-     */
+
     private array $vaccineSeasons = [
         'Febre Aftosa' => [1, 1, 1, 2, 10, 2, 1, 1, 1, 2, 10, 2],
         'Brucelose' => [3, 3, 4, 5, 8, 4, 2, 2, 2, 2, 5, 3],

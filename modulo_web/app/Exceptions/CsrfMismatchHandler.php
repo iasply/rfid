@@ -8,13 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
-/**
- * Trata 419 (CSRF token mismatch) sem expor a tela de erro padrão do Laravel.
- *
- * Importante: o Laravel converte TokenMismatchException → HttpException(419) antes
- * dos render callbacks. Por isso recebemos HttpException e identificamos a causa
- * via $e->getPrevious().
- */
+
 class CsrfMismatchHandler
 {
     public function __invoke(HttpException $e, Request $request)

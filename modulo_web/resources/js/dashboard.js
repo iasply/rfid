@@ -2,7 +2,6 @@ import {Chart, registerables} from 'chart.js';
 
 Chart.register(...registerables);
 
-// ── Palette (mirrors CSS custom properties in app.css) ────────────────────────
 const C = {
     primary: '#10b981',
     primaryDark: '#059669',
@@ -18,7 +17,6 @@ const MULTI_PALETTE = [
     '#8b5cf6', '#f97316', '#06b6d4', '#ec4899',
 ];
 
-// ── Shared config ─────────────────────────────────────────────────────────────
 const GRID_COLOR = 'rgba(100,116,139,0.08)';
 const INT_TICKS = {stepSize: 1, precision: 0};
 const TOOLTIP = {
@@ -37,7 +35,6 @@ const AXIS_STYLE = {
 const alpha = (hex, a) =>
     hex + Math.round(a * 255).toString(16).padStart(2, '0');
 
-// ── Chart builders ────────────────────────────────────────────────────────────
 
 function buildLineChart(canvas, data, {color = C.primary, label = '', unit = ''} = {}) {
     const ctx = canvas.getContext('2d');
@@ -370,7 +367,6 @@ function buildStackedBarChart(canvas, data) {
     });
 }
 
-// ── Period filter ─────────────────────────────────────────────────────────────
 
 function initPeriodFilter(periods, chart) {
     const buttons = document.querySelectorAll('.period-btn');
@@ -392,7 +388,6 @@ function initPeriodFilter(periods, chart) {
     });
 }
 
-// ── Recent vaccinations search ────────────────────────────────────────────────
 
 function initRecentSearch() {
     const input = document.getElementById('recent-search');
@@ -410,7 +405,6 @@ function initRecentSearch() {
     });
 }
 
-// ── Entry point ───────────────────────────────────────────────────────────────
 
 function initDashboardCharts() {
     const raw = window.__dashboardData;
@@ -459,7 +453,6 @@ function initDashboardCharts() {
     initRecentSearch();
 }
 
-// ── Animal detail charts ──────────────────────────────────────────────────────
 
 function initAnimalCharts() {
     const raw = window.__animalData;
@@ -477,7 +470,6 @@ function initAnimalCharts() {
         buildDoughnutChart(el('chart-animal-vaccines'), raw.vaccineTypes);
 }
 
-// ── Vaccine type detail charts ────────────────────────────────────────────────
 
 function initVaccineTypeCharts() {
     const raw = window.__vaccineTypeData;
@@ -498,9 +490,7 @@ function initVaccineTypeCharts() {
         buildWeightChart(el('chart-vt-weight'), raw.weight);
 }
 
-// ── Entry point ───────────────────────────────────────────────────────────────
 
-// Deferred modules run after HTML parse — DOM is ready, call directly
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         initDashboardCharts();

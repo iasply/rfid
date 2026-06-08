@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-    /* Premium Emerald & Slate Palette */
     --primary: #10b981;
     /* Emerald 500 */
     --primary-dark: #059669;
@@ -60,7 +59,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base Components Styles (Moved from Layout) */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -123,9 +121,7 @@ body {
     transition: box-shadow 0.2s, transform 0.2s;
 }
 
-/* ── Dashboard ───────────────────────────────────────────────────────────── */
 
-/* Hero Banner */
 .hero-banner {
     background: linear-gradient(135deg, #022c22 0%, #064e3b 55%, #065f46 100%);
     border-radius: var(--radius-lg);
@@ -231,7 +227,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Section Label */
 .section-label {
     display: flex;
     align-items: center;
@@ -252,7 +247,6 @@ body {
     opacity: 0.85;
 }
 
-/* KPI grid — 3 equal columns, collapse at 600px */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -271,7 +265,6 @@ body {
     box-shadow: 0 8px 28px rgb(0 0 0 / 0.1);
 }
 
-/* Watermark icon per card type */
 .kpi-icon-bg {
     position: absolute;
     top: 0.875rem;
@@ -281,24 +274,62 @@ body {
     line-height: 0;
 }
 
-.kpi-primary .kpi-icon-bg  { color: var(--primary); }
-.kpi-success .kpi-icon-bg  { color: var(--success); }
-.kpi-warning .kpi-icon-bg  { color: var(--accent); }
-.kpi-light .kpi-icon-bg    { color: var(--primary-light); }
-.kpi-accent .kpi-icon-bg   { color: var(--accent); }
-.kpi-secondary .kpi-icon-bg{ color: var(--secondary); }
-.kpi-danger .kpi-icon-bg   { color: var(--danger); }
+.kpi-primary .kpi-icon-bg {
+    color: var(--primary);
+}
 
-/* Gradient background tints — sem borda lateral */
-.kpi-primary   { background: linear-gradient(140deg, rgba(16,185,129,0.07) 0%, var(--bg-surface) 55%); }
-.kpi-success   { background: linear-gradient(140deg, rgba(16,185,129,0.07) 0%, var(--bg-surface) 55%); }
-.kpi-warning   { background: linear-gradient(140deg, rgba(251,191,36,0.09) 0%, var(--bg-surface) 55%); }
-.kpi-light     { background: linear-gradient(140deg, rgba(52,211,153,0.07) 0%, var(--bg-surface) 55%); }
-.kpi-accent    { background: linear-gradient(140deg, rgba(251,191,36,0.09) 0%, var(--bg-surface) 55%); }
-.kpi-secondary { background: linear-gradient(140deg, rgba(100,116,139,0.06) 0%, var(--bg-surface) 55%); }
-.kpi-danger    { background: linear-gradient(140deg, rgba(239,68,68,0.07) 0%, var(--bg-surface) 55%); }
+.kpi-success .kpi-icon-bg {
+    color: var(--success);
+}
 
-/* 6-column insight row */
+.kpi-warning .kpi-icon-bg {
+    color: var(--accent);
+}
+
+.kpi-light .kpi-icon-bg {
+    color: var(--primary-light);
+}
+
+.kpi-accent .kpi-icon-bg {
+    color: var(--accent);
+}
+
+.kpi-secondary .kpi-icon-bg {
+    color: var(--secondary);
+}
+
+.kpi-danger .kpi-icon-bg {
+    color: var(--danger);
+}
+
+.kpi-primary {
+    background: linear-gradient(140deg, rgba(16, 185, 129, 0.07) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-success {
+    background: linear-gradient(140deg, rgba(16, 185, 129, 0.07) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-warning {
+    background: linear-gradient(140deg, rgba(251, 191, 36, 0.09) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-light {
+    background: linear-gradient(140deg, rgba(52, 211, 153, 0.07) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-accent {
+    background: linear-gradient(140deg, rgba(251, 191, 36, 0.09) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-secondary {
+    background: linear-gradient(140deg, rgba(100, 116, 139, 0.06) 0%, var(--bg-surface) 55%);
+}
+
+.kpi-danger {
+    background: linear-gradient(140deg, rgba(239, 68, 68, 0.07) 0%, var(--bg-surface) 55%);
+}
+
 .kpi-grid--6 {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
@@ -374,7 +405,6 @@ body {
     min-height: 260px;
 }
 
-/* ── Chart card header (title + period filter side by side) ─────────────── */
 .chart-card-header {
     display: flex;
     align-items: center;
@@ -387,7 +417,6 @@ body {
     margin: 0;
 }
 
-/* ── Period filter buttons ───────────────────────────────────────────────── */
 .period-filter {
     display: flex;
     gap: 0.25rem;
@@ -420,7 +449,6 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-/* ── Recent activity table ───────────────────────────────────────────────── */
 .recent-search-input {
     padding: 0.4rem 0.875rem;
     font-size: 0.85rem;
@@ -487,7 +515,6 @@ body {
     white-space: nowrap;
 }
 
-/* ── Index toolbar (search + result count) ───────────────────────────────── */
 .index-toolbar {
     display: flex;
     align-items: center;
@@ -558,7 +585,6 @@ body {
     white-space: nowrap;
 }
 
-/* ── Pagination (Bootstrap-compatible) ───────────────────────────────────── */
 .pagination-footer {
     display: flex;
     align-items: center;
@@ -615,7 +641,6 @@ body {
     pointer-events: none;
 }
 
-/* ── Alert badges ────────────────────────────────────────────────────────── */
 .alert-badge {
     display: inline-block;
     padding: 0.2rem 0.65rem;
@@ -640,7 +665,6 @@ body {
     color: var(--secondary);
 }
 
-/* ── Flash messages ──────────────────────────────────────────────────────── */
 .success-banner {
     display: flex;
     align-items: center;
@@ -661,7 +685,6 @@ body {
     color: var(--primary);
 }
 
-/* ── Sidebar utilities ───────────────────────────────────────────────────── */
 .nav-badge {
     margin-left: auto;
     background: var(--danger);
@@ -709,7 +732,6 @@ body {
     opacity: 1;
 }
 
-/* ── Page header ─────────────────────────────────────────────────────────── */
 .page-header {
     margin-bottom: 2.5rem;
     padding-bottom: 1.25rem;
@@ -767,7 +789,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* ── Quick actions card ──────────────────────────────────────────────────── */
 .quick-actions-card {
     background: var(--bg-surface);
     border-radius: var(--radius-lg);
@@ -804,7 +825,6 @@ body {
     flex-shrink: 0;
 }
 
-/* ── Show page layout ────────────────────────────────────────────────────── */
 .show-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -812,8 +832,6 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Grid items têm min-width: auto por padrão, o que deixa o conteúdo (tabelas)
-   estourar o grid. min-width: 0 permite que o overflow-x: auto da tabela funcione. */
 .show-layout > * {
     min-width: 0;
 }
@@ -824,13 +842,11 @@ body {
     }
 }
 
-/* Prevent long codes/emails from overflowing cards */
 code {
     word-break: break-all;
     overflow-wrap: break-word;
 }
 
-/* ── Mobile Layout ───────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
     .main-content {
         padding: 1rem !important;
@@ -838,7 +854,6 @@ code {
         padding-bottom: 5rem !important;
     }
 
-    /* Dashboard Hero */
     .hero-banner {
         flex-direction: column;
         padding: 1.5rem;
@@ -938,7 +953,6 @@ code {
         flex: 1;
     }
 
-    /* Pagination — scrollable row on mobile */
     .pagination-footer {
         flex-direction: column;
         align-items: flex-start;
@@ -959,7 +973,6 @@ code {
         flex-shrink: 0;
     }
 
-    /* Tables — prevent wide content from stretching the page */
     .table-container,
     .table-wrap {
         min-width: 0;

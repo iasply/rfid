@@ -11,9 +11,6 @@ class ApiSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Data provider for protected routes and their methods.
-     */
     public static function protectedRoutesProvider(): array
     {
         return [

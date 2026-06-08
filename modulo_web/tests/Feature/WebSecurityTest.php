@@ -12,9 +12,6 @@ class WebSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Data provider for protected admin routes.
-     */
     public static function protectedAdminRoutesProvider(): array
     {
         return [
@@ -65,7 +62,7 @@ class WebSecurityTest extends TestCase
 
         $this->actingAs($vet)
             ->put(route('admin.veterinarians.update', $other->id), [
-                'name'  => 'Hacker',
+                'name' => 'Hacker',
                 'email' => $other->email,
             ])
             ->assertStatus(403);
@@ -88,7 +85,7 @@ class WebSecurityTest extends TestCase
 
         $this->actingAs($vet)
             ->put(route('admin.veterinarians.update', $vet->id), [
-                'name'  => 'Nome Atualizado',
+                'name' => 'Nome Atualizado',
                 'email' => $vet->email,
             ])
             ->assertRedirect(route('admin.veterinarians.index'));
@@ -98,7 +95,7 @@ class WebSecurityTest extends TestCase
     public function admin_can_edit_any_vet()
     {
         $admin = User::factory()->create(['is_veterinarian' => false]);
-        $vet   = User::factory()->create(['is_veterinarian' => true]);
+        $vet = User::factory()->create(['is_veterinarian' => true]);
 
         $this->actingAs($admin)
             ->get(route('admin.veterinarians.edit', $vet->id))
@@ -109,11 +106,11 @@ class WebSecurityTest extends TestCase
     public function admin_can_update_any_vet()
     {
         $admin = User::factory()->create(['is_veterinarian' => false]);
-        $vet   = User::factory()->create(['is_veterinarian' => true]);
+        $vet = User::factory()->create(['is_veterinarian' => true]);
 
         $this->actingAs($admin)
             ->put(route('admin.veterinarians.update', $vet->id), [
-                'name'  => 'Nome pelo Admin',
+                'name' => 'Nome pelo Admin',
                 'email' => $vet->email,
             ])
             ->assertRedirect(route('admin.veterinarians.index'));

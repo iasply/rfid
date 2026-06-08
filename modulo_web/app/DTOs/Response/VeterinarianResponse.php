@@ -4,10 +4,6 @@ namespace App\DTOs\Response;
 
 use App\Models\User;
 
-/**
- * Exposes only safe fields for a veterinarian.
- * Never leaks: password, tag_hash, remember_token, email_verified_at.
- */
 readonly class VeterinarianResponse
 {
     public function __construct(

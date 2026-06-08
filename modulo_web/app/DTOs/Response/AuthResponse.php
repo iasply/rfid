@@ -2,10 +2,6 @@
 
 namespace App\DTOs\Response;
 
-/**
- * Auth response DTO — wraps token + safe user/workstation data.
- * Never leaks raw model attributes (password, tag_hash, etc.).
- */
 readonly class AuthResponse
 {
     public function __construct(

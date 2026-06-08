@@ -20,15 +20,6 @@ class CsrfTokenMismatchTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Route::post('/test-csrf-mismatch', function () {
-            throw new TokenMismatchException('CSRF token mismatch.');
-        })->middleware('web');
-    }
-
     #[Test]
     public function token_mismatch_redirects_to_login_not_419()
     {
@@ -103,8 +94,6 @@ class CsrfTokenMismatchTest extends TestCase
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
     }
 
-    // ─── Cenários reproduzidos do log de produção (mobile Android Chrome) ────
-
     /**
      * Reproduz o ciclo de 3 logins observado em prod:
      *   1. POST /login OK     → sessão regenerada, novo token
@@ -125,6 +114,8 @@ class CsrfTokenMismatchTest extends TestCase
             $this->assertAuthenticatedAs($user);
         }
     }
+
+    // ─── Cenários reproduzidos do log de produção (mobile Android Chrome) ────
 
     #[Test]
     public function session_token_is_regenerated_for_authenticated_user_on_csrf_mismatch()
@@ -182,5 +173,14 @@ class CsrfTokenMismatchTest extends TestCase
         // o JS deve marcar form como submetido E desabilitar o botão
         $response->assertSee("form.dataset.submitted = '1'", false);
         $response->assertSee('btn.disabled = true', false);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Route::post('/test-csrf-mismatch', function () {
+            throw new TokenMismatchException('CSRF token mismatch.');
+        })->middleware('web');
     }
 }
